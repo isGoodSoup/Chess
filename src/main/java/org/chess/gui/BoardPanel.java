@@ -33,14 +33,18 @@ public class BoardPanel extends JPanel implements Runnable {
     private Piece castlingPiece;
 	private Piece promotingPawn;
 	private Piece checkingPiece;
-	private int hoverCol = -1;
-	private int hoverRow = -1;
-	private int dragOffsetX;
+    private int dragOffsetX;
 	private int dragOffsetY;
     private Tint promotionColor;
 
 	private final BufferedImage yes;
 	private final BufferedImage no;
+	private final BufferedImage whitePawn, blackPawn;
+	private final BufferedImage whiteRook, blackRook;
+	private final BufferedImage whiteKnight, blackKnight;
+	private final BufferedImage whiteBishop, blackBishop;
+	private final BufferedImage whiteQueen, blackQueen;
+	private final BufferedImage whiteKing, blackKing;
 
 	private boolean canMove;
 	private boolean validSquare;
@@ -64,6 +68,18 @@ public class BoardPanel extends JPanel implements Runnable {
 		try {
 			yes = getImage("/ticks/tick_yes");
 			no = getImage("/ticks/tick_no");
+			whitePawn = getImage("/pieces/pawn-h");
+			blackPawn = getImage("/pieces/pawn-bh");
+			whiteRook = getImage("/pieces/rook-h");
+			blackRook = getImage("/pieces/rook-bh");
+			whiteKnight = getImage("/pieces/knight-h");
+			blackKnight = getImage("/pieces/knight-bh");
+			whiteBishop = getImage("/pieces/bishop-h");
+			blackBishop = getImage("/pieces/bishop-bh");
+			whiteQueen = getImage("/pieces/queen-h");
+			blackQueen = getImage("/pieces/queen-bh");
+			whiteKing = getImage("/pieces/king-h");
+			blackKing = getImage("/pieces/king-bh");
 		} catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -193,6 +209,35 @@ public class BoardPanel extends JPanel implements Runnable {
 		pieces.add(new King(Tint.BLACK, 4, 0));
 	}
 
+	private Piece getHoveredPiece() {
+		int hoverCol = mouse.getX() / Board.getSquare();
+		int hoverRow = mouse.getY() / Board.getSquare();
+
+		for (Piece p : pieces) {
+			if (p.getCol() == hoverCol && p.getRow() ==
+					hoverRow && p != currentPiece) {
+				return p;
+			}
+		}
+		return null;
+	}
+
+	private BufferedImage getHoverSprite(Piece p) {
+		if (p instanceof Pawn) return (p.getColor() == Tint.WHITE) ?
+				whitePawn : blackPawn;
+		if (p instanceof Rook) return (p.getColor() == Tint.WHITE) ?
+				whiteRook : blackRook;
+		if (p instanceof Knight) return (p.getColor() == Tint.WHITE) ?
+				whiteKnight : blackKnight;
+		if (p instanceof Bishop) return (p.getColor() == Tint.WHITE) ?
+				whiteBishop : blackBishop;
+		if (p instanceof Queen) return (p.getColor() == Tint.WHITE) ?
+				whiteQueen : blackQueen;
+		if (p instanceof King) return (p.getColor() == Tint.WHITE) ?
+				whiteKing : blackKing;
+		return null;
+	}
+
 	@Override
 	public void run() {
 		double drawInterval = (double) 1000000000 / FPS;
@@ -214,8 +259,8 @@ public class BoardPanel extends JPanel implements Runnable {
 	}
 
 	private void update() {
-		hoverCol = mouse.getX() / Board.getSquare();
-		hoverRow = mouse.getY() / Board.getSquare();
+        int hoverCol = mouse.getX() / Board.getSquare();
+        int hoverRow = mouse.getY() / Board.getSquare();
 
 		if (isPromoted) {
 			promotion();
@@ -387,40 +432,55 @@ public class BoardPanel extends JPanel implements Runnable {
 		return false;
 	}
 
-	private void promotion() {
-		if(isPromoted && mouse.isClicked()) {
-			int startX = WIDTH - 4 * Board.getSquare();
-			int startY = HEIGHT - Board.getSquare();
-			int size = Board.getSquare();
+    private void promotion() {
+        if(!isPromoted || !mouse.isClicked()) {
+            return;
+        }
 
-			Type[] options = { Type.QUEEN, Type.ROOK, Type.BISHOP, Type.KNIGHT };
+        int size = Board.getSquare();
+        int totalWidth = size * 4;
+        int startX = (WIDTH - totalWidth) / 2;
+        int startY = (HEIGHT - size) / 2;
 
-			for(int i = 0; i < options.length; i++) {
-				int x0 = startX + i * size;
-				int x1 = x0 + size;
-				int y1 = startY + size;
+        Type[] options = {
+                Type.QUEEN,
+                Type.ROOK,
+                Type.BISHOP,
+                Type.KNIGHT
+        };
 
-				if(mouse.getX() >= x0 && mouse.getX() <= x1 && mouse.getY() >= startY && mouse.getY() <= y1) {
-					pieces.remove(promotingPawn);
-					Piece promotedPiece = switch (options[i]) {
-					case QUEEN -> new Queen(promotingPawn.getColor(), promotingPawn.getCol(), promotingPawn.getRow());
-					case ROOK -> new Rook(promotingPawn.getColor(), promotingPawn.getCol(), promotingPawn.getRow());
-					case BISHOP -> new Bishop(promotingPawn.getColor(), promotingPawn.getCol(), promotingPawn.getRow());
-					case KNIGHT -> new Knight(promotingPawn.getColor(), promotingPawn.getCol(), promotingPawn.getRow());
-					default -> null;
-					};
-					pieces.add(promotedPiece);
-					promotingPawn = null;
-					isPromoted = false;
-					currentTurn = (currentTurn == Tint.WHITE) ? Tint.BLACK : Tint.WHITE;
-					currentPiece = null;
-					break;
-				}
-			}
-		}
-	}
+        for(int i = 0; i < options.length; i++) {
+            int x0 = startX + i * size;
+            int x1 = x0 + size;
+            int y1 = startY + size;
 
-	private boolean isKingInCheck(Tint kingColor) {
+            if(mouse.getX() >= x0 && mouse.getX() <= x1 &&
+                    mouse.getY() >= startY && mouse.getY() <= y1) {
+                pieces.remove(promotingPawn);
+                Piece promotedPiece = switch(options[i]) {
+                    case QUEEN -> new Queen(promotingPawn.getColor(),
+                            promotingPawn.getCol(), promotingPawn.getRow());
+                    case ROOK -> new Rook(promotingPawn.getColor(),
+                            promotingPawn.getCol(), promotingPawn.getRow());
+                    case BISHOP -> new Bishop(promotingPawn.getColor(),
+                            promotingPawn.getCol(), promotingPawn.getRow());
+                    case KNIGHT -> new Knight(promotingPawn.getColor(),
+                            promotingPawn.getCol(), promotingPawn.getRow());
+                    default -> throw new IllegalStateException("Unexpected promotion type");
+                };
+
+                pieces.add(promotedPiece);
+
+                promotingPawn = null;
+                isPromoted = false;
+                currentTurn = (currentTurn == Tint.WHITE) ? Tint.BLACK : Tint.WHITE;
+                mouse.setClicked(false);
+                break;
+            }
+        }
+    }
+
+    private boolean isKingInCheck(Tint kingColor) {
 		Piece king = getKing(kingColor);
 
 		for(Piece p : pieces) {
@@ -484,39 +544,55 @@ public class BoardPanel extends JPanel implements Runnable {
 	}
 
 	private void drawPromotionOptions(Graphics2D g2) {
-		if(!isPromoted)
+		if(!isPromoted) {
 			return;
+		}
 
-		int startX = WIDTH - 4 * Board.getSquare();
-		int startY = HEIGHT - Board.getSquare();
 		int size = Board.getSquare();
+		int totalWidth = size * 4;
+		int startX = (WIDTH - totalWidth) / 2;
+		int startY = (HEIGHT - size) / 2;
 
-		g2.setColor(new Color(0, 0, 0, 200));
-		g2.fillRoundRect(startX, startY, size * 4, size, 10, 10);
+		g2.setColor(new Color(0, 0, 0, 180));
+		g2.fillRect(0, 0, WIDTH, HEIGHT);
 
 		Type[] options = { Type.QUEEN, Type.ROOK, Type.BISHOP, Type.KNIGHT };
 
+		int hoverIndex = -1;
+		for (int i = 0; i < options.length; i++) {
+			int x0 = startX + i * size;
+			int x1 = x0 + size;
+			int y1 = startY + size;
+
+			if (mouse.getX() >= x0 && mouse.getX() <= x1 &&
+					mouse.getY() >= startY && mouse.getY() <= y1) {
+				hoverIndex = i;
+				break;
+			}
+		}
+
 		for(int i = 0; i < options.length; i++) {
 			Piece temp;
-			switch (options[i]) {
-			case QUEEN:
-				temp = new Queen(promotionColor, startX / size + i, startY / size);
-				break;
-			case ROOK:
-				temp = new Rook(promotionColor, startX / size + i, startY / size);
-				break;
-			case BISHOP:
-				temp = new Bishop(promotionColor, startX / size + i, startY / size);
-				break;
-			case KNIGHT:
-				temp = new Knight(promotionColor, startX / size + i, startY / size);
-				break;
-			default:
-				continue;
+            switch (options[i]) {
+                case QUEEN -> temp = new Queen(promotionColor, 0, 0);
+                case ROOK -> temp = new Rook(promotionColor, 0, 0);
+                case BISHOP -> temp = new Bishop(promotionColor, 0, 0);
+                case KNIGHT -> temp = new Knight(promotionColor, 0, 0);
+                default -> { continue; }
+            }
+
+            int x = startX + i * size;
+
+            temp.setX(x);
+            temp.setY(startY);
+
+			if (i == hoverIndex) {
+				temp.setScale(temp.getScale() + 0.5f);
+			} else {
+				temp.setScale(temp.getDEFAULT_SCALE());
 			}
-			temp.setX(startX + i * size);
-			temp.setY(startY);
-			temp.draw(g2);
+
+            temp.draw(g2);
 		}
 	}
 
@@ -540,6 +616,8 @@ public class BoardPanel extends JPanel implements Runnable {
 		Graphics2D g2 = (Graphics2D) g;
 		board.draw(g2);
 
+		Piece hovered = getHoveredPiece();
+
 		g2.setRenderingHint(
 				RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
@@ -555,9 +633,16 @@ public class BoardPanel extends JPanel implements Runnable {
 				RenderingHints.VALUE_ANTIALIAS_ON
 		);
 
+
 		for (Piece p : pieces) {
 			if (p != currentPiece) {
-				p.draw(g2);
+				if (p == hovered) {
+					BufferedImage hoverImage = getHoverSprite(p);
+					int size = (int)(Board.getSquare() * p.getScale());
+					g2.drawImage(hoverImage, p.getX(), p.getY(), size, size, null);
+				} else {
+					p.draw(g2);
+				}
 			}
 		}
 

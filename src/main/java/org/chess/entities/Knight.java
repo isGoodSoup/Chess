@@ -12,7 +12,7 @@ public class Knight extends Piece {
 		if(color == Tint.WHITE) {
 			image = getImage("/pieces/knight");
 		} else {
-			image = getImage("/pieces/knight_b");
+			image = getImage("/pieces/knight-b");
 		}
 	}
 

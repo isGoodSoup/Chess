@@ -12,7 +12,7 @@ public class Queen extends Piece {
 		if(color == Tint.WHITE) {
 			image = getImage("/pieces/queen");
 		} else {
-			image = getImage("/pieces/queen_b");
+			image = getImage("/pieces/queen-b");
 		}
 	}
 

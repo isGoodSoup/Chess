@@ -12,7 +12,7 @@ public class King extends Piece {
 		if(color == Tint.WHITE) {
 			image = getImage("/pieces/king");
 		} else {
-			image = getImage("/pieces/king_b");
+			image = getImage("/pieces/king-b");
 		}
 	}
 

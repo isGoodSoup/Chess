@@ -13,7 +13,7 @@ public class ChessFrame extends JFrame {
     public ChessFrame() throws HeadlessException {
 		super(TITLE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setResizable(true);
+		setResizable(false);
         BoardPanel panel = new BoardPanel();
 		add(panel);
 		pack();

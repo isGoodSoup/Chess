@@ -12,7 +12,7 @@ public class Bishop extends Piece {
 		if (color == Tint.WHITE) {
 			image = getImage("/pieces/bishop");
 		} else {
-			image = getImage("/pieces/bishop_b");
+			image = getImage("/pieces/bishop-b");
 		}
 	}
 

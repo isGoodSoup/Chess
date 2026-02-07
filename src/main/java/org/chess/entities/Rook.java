@@ -12,7 +12,7 @@ public class Rook extends Piece {
 		if(color == Tint.WHITE) {
 			image = getImage("/pieces/rook");
 		} else {
-			image = getImage("/pieces/rook_b");
+			image = getImage("/pieces/rook-b");
 		}
 	}
 

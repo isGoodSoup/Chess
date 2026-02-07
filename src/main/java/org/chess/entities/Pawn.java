@@ -12,7 +12,7 @@ public class Pawn extends Piece {
 		if(color == Tint.WHITE) {
 			image = getImage("/pieces/pawn");
 		} else {
-			image = getImage("/pieces/pawn_b");
+			image = getImage("/pieces/pawn-b");
 		}
 	}
 
