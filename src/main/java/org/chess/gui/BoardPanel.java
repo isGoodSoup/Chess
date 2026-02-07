@@ -39,13 +39,14 @@ public class BoardPanel extends JPanel implements Runnable {
 	private int dragOffsetY;
     private Tint promotionColor;
 
-	private BufferedImage yes;
-	private BufferedImage no;
+	private final BufferedImage yes;
+	private final BufferedImage no;
 
 	private boolean canMove;
 	private boolean validSquare;
 	private boolean isPromoted;
 	private boolean isDragging;
+	private boolean isLegalPreview;
 	private boolean isGameOver;
 
 	public BoardPanel() {
@@ -242,6 +243,13 @@ public class BoardPanel extends JPanel implements Runnable {
 		if (isDragging && mouse.isPressed() && currentPiece != null) {
 			currentPiece.setX(mouse.getX() - dragOffsetX);
 			currentPiece.setY(mouse.getY() - dragOffsetY);
+
+			int targetCol = mouse.getX() / Board.getSquare();
+			int targetRow = mouse.getY() / Board.getSquare();
+
+			isLegalPreview =
+					currentPiece.canMove(targetCol, targetRow, this) &&
+							!wouldLeaveKingInCheck(currentPiece, targetCol, targetRow);
 		}
 
 		if (isDragging && mouse.isClicked() && currentPiece != null) {
@@ -455,13 +463,11 @@ public class BoardPanel extends JPanel implements Runnable {
 
 		piece.setCol(targetCol);
 		piece.setRow(targetRow);
-		piece.updatePos();
 
 		boolean inCheck = isKingInCheck(piece.getColor());
 
 		piece.setCol(oldCol);
 		piece.setRow(oldRow);
-		piece.updatePos();
 
 		if(captured != null) {
 			pieces.add(captured);
@@ -519,12 +525,11 @@ public class BoardPanel extends JPanel implements Runnable {
                 getClass().getResourceAsStream(path + ".png")));
 	}
 
-	public void drawTick(Graphics2D g2, int mouseX, int mouseY, boolean isLegal) {
-		int size = 64;
-		int centerX = isDragging ? mouseX : currentPiece.getX() + Board.getSquare() / 2;
-		int centerY = isDragging ? mouseY : currentPiece.getY() + Board.getSquare() / 2;
-		int x = centerX - size / 2;
-		int y = centerY - size / 2;
+	public void drawTick(Graphics2D g2, boolean isLegal) {
+		double scale = currentPiece.getScale();
+		int size = (int) (Board.getSquare() * scale);
+		int x = currentPiece.getX() - size / 2;
+		int y = currentPiece.getY() - size / 2;
 		BufferedImage image = isLegal ? yes : no;
 		g2.drawImage(image, x, y, size, size, null);
 	}
@@ -560,10 +565,8 @@ public class BoardPanel extends JPanel implements Runnable {
 			currentPiece.draw(g2);
 		}
 
-		if (currentPiece != null) {
-			boolean canMoveHere = currentPiece.canMove(hoverCol, hoverRow, this) &&
-					!wouldLeaveKingInCheck(currentPiece, hoverCol, hoverRow);
-			drawTick(g2, mouse.getX(), mouse.getY(), canMoveHere);
+		if (currentPiece != null && isDragging) {
+			drawTick(g2, isLegalPreview);
 		}
 		drawPromotionOptions(g2);
 	}
