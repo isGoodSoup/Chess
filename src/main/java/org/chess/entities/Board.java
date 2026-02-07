@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 public class Board {
 	private final int COL = 8;
 	private final int ROW = 8;
-	private static final int SQUARE = 64;
+	private static final int SQUARE = 128;
 	private static final int HALF_SQUARE = SQUARE / 2;
 
 	public int getCOL() {

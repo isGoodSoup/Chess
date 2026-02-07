@@ -28,9 +28,9 @@ public class King extends Piece {
 				}
 			}
 
-			if(!hasMoved()) {
+			if(hasMoved()) {
 				if(targetCol == getPreCol() + 2 && targetRow == getPreRow()
-						&& !isPieceOnTheWay(targetCol, targetRow)) {
+						&& isPieceOnTheWay(targetCol, targetRow)) {
 					for(Piece p : board.getPieces()) {
 						BoardPanel boardPanel = new BoardPanel();
 						boardPanel.setCastlingPiece(p);
@@ -39,7 +39,7 @@ public class King extends Piece {
 				}
 
 				if(targetCol == getPreCol() - 2 && targetRow == getPreRow()
-						&& !isPieceOnTheWay(targetCol, targetRow)) {
+						&& isPieceOnTheWay(targetCol, targetRow)) {
 					Piece[] ps = new Piece[2];
 					for(Piece p : board.getPieces()) {
 						if(p.getCol() == getPreCol() - 3 && p.getRow() == targetRow) { 
@@ -50,7 +50,7 @@ public class King extends Piece {
 							ps[1] = p;
 						}
 						
-						if(ps[0] == null && ps[1] != null && !ps[1].hasMoved()) {
+						if(ps[0] == null && ps[1] != null && ps[1].hasMoved()) {
 							BoardPanel boardPanel2 = new BoardPanel();
 							boardPanel2.setCastlingPiece(ps[1]);
 							return true;

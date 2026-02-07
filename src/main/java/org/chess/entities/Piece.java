@@ -1,9 +1,9 @@
 package org.chess.entities;
 
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.imageio.ImageIO;
 
@@ -16,6 +16,8 @@ public abstract class Piece {
 	protected BufferedImage image;
 	private int x, y;
 	private int col, row, preCol, preRow;
+    private static final double DEFAULT_SCALE = 1.0;
+	private double scale = DEFAULT_SCALE;
 	private Tint color;
 	private Piece otherPiece;
 	private boolean hasMoved;
@@ -31,7 +33,7 @@ public abstract class Piece {
 		this.preCol = col;
 		this.preRow = row;
 	}
-	
+
 	public Type getId() {
 		return id;
 	}
@@ -63,6 +65,14 @@ public abstract class Piece {
 	public void setPreRow(int preRow) {
 		this.preRow = preRow;
 	}
+
+    public double getDEFAULT_SCALE() {
+        return DEFAULT_SCALE;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
 
 	public Tint getColor() {
 		return color;
@@ -129,13 +139,13 @@ public abstract class Piece {
 	}
 
 	public boolean hasMoved() {
-		return hasMoved;
+		return !hasMoved;
 	}
 
 	public void setHasMoved(boolean hasMoved) {
 		this.hasMoved = hasMoved;
 	}
-	
+
 	public boolean isTwoStepsAhead() {
 		return isTwoStepsAhead;
 	}
@@ -143,7 +153,7 @@ public abstract class Piece {
 	public void setTwoStepsAhead(boolean twoStepsAhead) {
 		this.isTwoStepsAhead = twoStepsAhead;
 	}
-	
+
 	public void resetEnPassant() {
 		isTwoStepsAhead = false;
 	}
@@ -168,31 +178,15 @@ public abstract class Piece {
 		y = getY(row);
 	}
 
-	public int getIndex() {
-		BoardPanel board = new BoardPanel();
-		for(int index = 0; index < board.getPieces().size(); index++) {
-			if(board.getPieces().get(index) == this) {
-				return index;
-			}
-		}
-		return 0;
-	}
-
 	public abstract boolean canMove(int targetCol, int targetRow, BoardPanel board);
 
 	public boolean isWithinBoard(int targetCol, int targetRow) {
-		if(targetCol >= 0 && targetCol <= 7 && targetRow >= 0 && targetRow <= 7) {
-			return true;
-		}
-		return false;
-	}
+        return targetCol >= 0 && targetCol <= 7 && targetRow >= 0 && targetRow <= 7;
+    }
 
 	public boolean isSameSquare(int targetCol, int targetRow) {
-		if(targetCol == preCol && targetRow == preRow) {
-			return true;
-		}
-		return false;
-	}
+        return targetCol == preCol && targetRow == preRow;
+    }
 
 	public Piece isColliding(int col, int row, BoardPanel board) {
 	    for (Piece p : board.getPieces()) {
@@ -202,7 +196,7 @@ public abstract class Piece {
 	    }
 	    return null;
 	}
-	
+
 	public boolean isValidSquare(int targetCol, int targetRow, BoardPanel board) {
 	    for (Piece p : board.getPieces()) {
 	        if (p.getCol() == targetCol && p.getRow() == targetRow) {
@@ -221,7 +215,7 @@ public abstract class Piece {
 				for(Piece piece : board.getPieces()) {
 					if(piece.getCol() == c && piece.getRow() == targetRow) {
 						otherPiece = piece;
-						return true;
+						return false;
 					}
 				}
 			}
@@ -232,7 +226,7 @@ public abstract class Piece {
 				for(Piece piece : board.getPieces()) {
 					if(piece.getCol() == targetCol && piece.getRow() == r) {
 						otherPiece = piece;
-						return true;
+						return false;
 					}
 				}
 			}
@@ -246,32 +240,22 @@ public abstract class Piece {
 				for(Piece piece : board.getPieces()) {
 					if(piece.getCol() == c && piece.getRow() == r) {
 						otherPiece = piece;
-						return true;
+						return false;
 					}
 				}
 				c += colStep;
 				r += rowStep;
 			}
 		}
-		return false;
+		return true;
 	}
-	
-	public BufferedImage scaleImage(BufferedImage src, int width, int height) {
-	    BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-	    Graphics2D g2 = scaled.createGraphics();
-	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, 
-	    		RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-	    g2.drawImage(src, 0, 0, width, height, null);
-	    g2.dispose();
-	    return scaled;
-	}
-	
+
 	public BufferedImage getImage(String path) {
 	    BufferedImage img = null;
 	    try {
-	        img = ImageIO.read(getClass().getResourceAsStream(path + ".png"));
-	        img = scaleImage(img, Board.getSquare(), Board.getSquare());
-	    } catch (IOException e) {
+			img = ImageIO.read(Objects.requireNonNull(
+					getClass().getResourceAsStream(path + ".png")));
+		} catch (IOException e) {
 	        e.printStackTrace();
 	    }
 	    return img;
@@ -279,6 +263,18 @@ public abstract class Piece {
 
 
 	public void draw(Graphics2D g2) {
-		g2.drawImage(image, x, y, null);
+		int square = Board.getSquare();
+
+		int drawSize = (int) (square * scale);
+		int offset = (square - drawSize) / 2;
+
+		g2.drawImage(
+				image,
+				x + offset,
+				y + offset,
+				drawSize,
+				drawSize,
+				null
+		);
 	}
 }

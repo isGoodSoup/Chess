@@ -1,26 +1,24 @@
 package org.chess.gui;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JPanel;
-
-import org.chess.entities.Bishop;
-import org.chess.entities.Board;
-import org.chess.entities.King;
-import org.chess.entities.Knight;
-import org.chess.entities.Pawn;
-import org.chess.entities.Piece;
-import org.chess.entities.Queen;
-import org.chess.entities.Rook;
+import org.chess.entities.*;
 import org.chess.enums.Tint;
 import org.chess.enums.Type;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 public class BoardPanel extends JPanel implements Runnable {
-	private static final long serialVersionUID = -5189356863277669172L;
-	private static final int WIDTH = 512;
-	private static final int HEIGHT = 512;
+	@Serial
+    private static final long serialVersionUID = -5189356863277669172L;
+	private static int WIDTH;
+	private static int HEIGHT;
 	private final int FPS = 60;
 	private Thread thread;
 
@@ -28,12 +26,11 @@ public class BoardPanel extends JPanel implements Runnable {
 	private final Mouse mouse;
 	private Tint currentTurn = Tint.WHITE;
 
-	private List<Piece> pieces = new ArrayList<>();
+	private final List<Piece> pieces = new ArrayList<>();
 	private List<Piece> promoted = new ArrayList<>();
 
 	private Piece currentPiece;
-	private Piece capturedPiece;
-	private Piece castlingPiece;
+    private Piece castlingPiece;
 	private Piece promotingPawn;
 	private Piece checkingPiece;
 	private int hoverCol = -1;
@@ -41,6 +38,9 @@ public class BoardPanel extends JPanel implements Runnable {
 	private int dragOffsetX;
 	private int dragOffsetY;
     private Tint promotionColor;
+
+	private BufferedImage yes;
+	private BufferedImage no;
 
 	private boolean canMove;
 	private boolean validSquare;
@@ -52,11 +52,20 @@ public class BoardPanel extends JPanel implements Runnable {
 		super();
 		this.board = new Board();
 		this.mouse = new Mouse();
+		WIDTH = Board.getSquare() * 8;
+		HEIGHT = Board.getSquare() * 8;
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		setBackground(Color.BLACK);
 		addMouseMotionListener(mouse);
 		addMouseListener(mouse);
 		setPieces();
+
+		try {
+			yes = getImage("/ticks/tick_yes");
+			no = getImage("/ticks/tick_no");
+		} catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 	}
 
 	public Thread getThread() {
@@ -185,7 +194,7 @@ public class BoardPanel extends JPanel implements Runnable {
 
 	@Override
 	public void run() {
-		double drawInterval = 1000000000 / FPS;
+		double drawInterval = (double) 1000000000 / FPS;
 		double delta = 0;
 		long lastTime = System.nanoTime();
 		long currentTime;
@@ -219,6 +228,7 @@ public class BoardPanel extends JPanel implements Runnable {
 						p.getCol() == hoverCol &&
 						p.getRow() == hoverRow) {
 					currentPiece = p;
+					currentPiece.setScale(currentPiece.getDEFAULT_SCALE() + 0.5f);
 					isDragging = true;
 					dragOffsetX = mouse.getX() - p.getX();
 					dragOffsetY = mouse.getY() - p.getY();
@@ -245,7 +255,7 @@ public class BoardPanel extends JPanel implements Runnable {
 							!wouldLeaveKingInCheck(currentPiece, targetCol, targetRow);
 
 			if (legal) {
-				capturedPiece = null;
+                Piece capturedPiece = null;
 				for (Piece p : pieces) {
 					if (p != currentPiece &&
 							p.getCol() == targetCol &&
@@ -262,7 +272,7 @@ public class BoardPanel extends JPanel implements Runnable {
 				if (currentPiece instanceof King) {
 					int colDiff = targetCol - currentPiece.getCol();
 
-					if (Math.abs(colDiff) == 2 && !currentPiece.hasMoved()) {
+					if (Math.abs(colDiff) == 2 && currentPiece.hasMoved()) {
 						int step = (colDiff > 0) ? 1 : -1;
 						int rookStartCol = (colDiff > 0) ? 7 : 0;
 						int rookTargetCol = (colDiff > 0) ? 5 : 3;
@@ -290,7 +300,7 @@ public class BoardPanel extends JPanel implements Runnable {
 								if (p instanceof Rook &&
 										p.getCol() == rookStartCol &&
 										p.getRow() == currentPiece.getRow() &&
-										!p.hasMoved()) {
+										p.hasMoved()) {
 
 									p.setCol(rookTargetCol);
 									p.updatePos();
@@ -321,7 +331,6 @@ public class BoardPanel extends JPanel implements Runnable {
 										p.getCol() == targetCol &&
 										p.getRow() == oldRow &&
 										p.isTwoStepsAhead()) {
-									capturedPiece = p;
 									pieces.remove(p);
 									break;
 								}
@@ -349,6 +358,7 @@ public class BoardPanel extends JPanel implements Runnable {
 			} else {
 				currentPiece.updatePos();
 			}
+			currentPiece.setScale(currentPiece.getDEFAULT_SCALE());
 			currentPiece = null;
 		}
 	}
@@ -380,10 +390,9 @@ public class BoardPanel extends JPanel implements Runnable {
 			for(int i = 0; i < options.length; i++) {
 				int x0 = startX + i * size;
 				int x1 = x0 + size;
-				int y0 = startY;
 				int y1 = startY + size;
 
-				if(mouse.getX() >= x0 && mouse.getX() <= x1 && mouse.getY() >= y0 && mouse.getY() <= y1) {
+				if(mouse.getX() >= x0 && mouse.getX() <= x1 && mouse.getY() >= startY && mouse.getY() <= y1) {
 					pieces.remove(promotingPawn);
 					Piece promotedPiece = switch (options[i]) {
 					case QUEEN -> new Queen(promotingPawn.getColor(), promotingPawn.getCol(), promotingPawn.getRow());
@@ -400,7 +409,6 @@ public class BoardPanel extends JPanel implements Runnable {
 					break;
 				}
 			}
-			return;
 		}
 	}
 
@@ -506,11 +514,41 @@ public class BoardPanel extends JPanel implements Runnable {
 		}
 	}
 
+	public BufferedImage getImage(String path) throws IOException {
+        return ImageIO.read(Objects.requireNonNull(
+                getClass().getResourceAsStream(path + ".png")));
+	}
+
+	public void drawTick(Graphics2D g2, int mouseX, int mouseY, boolean isLegal) {
+		int size = 64;
+		int centerX = isDragging ? mouseX : currentPiece.getX() + Board.getSquare() / 2;
+		int centerY = isDragging ? mouseY : currentPiece.getY() + Board.getSquare() / 2;
+		int x = centerX - size / 2;
+		int y = centerY - size / 2;
+		BufferedImage image = isLegal ? yes : no;
+		g2.drawImage(image, x, y, size, size, null);
+	}
+
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		board.draw(g2);
+
+		g2.setRenderingHint(
+				RenderingHints.KEY_INTERPOLATION,
+				RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+		);
+
+		g2.setRenderingHint(
+				RenderingHints.KEY_RENDERING,
+				RenderingHints.VALUE_RENDER_QUALITY
+		);
+
+		g2.setRenderingHint(
+				RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON
+		);
 
 		for (Piece p : pieces) {
 			if (p != currentPiece) {
@@ -525,20 +563,7 @@ public class BoardPanel extends JPanel implements Runnable {
 		if (currentPiece != null) {
 			boolean canMoveHere = currentPiece.canMove(hoverCol, hoverRow, this) &&
 					!wouldLeaveKingInCheck(currentPiece, hoverCol, hoverRow);
-
-			g2.setStroke(new BasicStroke(3));
-
-			if (!canMoveHere) {
-				g2.setColor(new Color(255, 0, 0, 150));
-				g2.drawRect(hoverCol * Board.getSquare(),
-						hoverRow * Board.getSquare(),
-						Board.getSquare(), Board.getSquare());
-			} else {
-				g2.setColor(new Color(0, 255, 0, 150));
-				g2.drawRect(hoverCol * Board.getSquare(),
-						hoverRow * Board.getSquare(),
-						Board.getSquare(), Board.getSquare());
-			}
+			drawTick(g2, mouse.getX(), mouse.getY(), canMoveHere);
 		}
 		drawPromotionOptions(g2);
 	}

@@ -36,7 +36,7 @@ public class Pawn extends Piece {
 
 			if(targetCol == getPreCol() && targetRow == getPreRow() + moveValue * 2 
 					&& getOtherPiece() == null
-					&& !hasMoved() && !isPieceOnTheWay(targetCol, targetRow)) {
+					&& hasMoved() && isPieceOnTheWay(targetCol, targetRow)) {
 				return true;
 			}
 

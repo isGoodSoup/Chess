@@ -18,4 +18,8 @@ public class ChessApp {
 	public ChessFrame getFrame() {
 		return frame;
 	}
+
+	public ChessApp getApp() {
+		return app;
+	}
 }
