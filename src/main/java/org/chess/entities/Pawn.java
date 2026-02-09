@@ -13,8 +13,10 @@ public class Pawn extends Piece {
 		this.id = Type.PAWN;
 		if(color == Tint.WHITE) {
 			image = PieceService.getImage("/pieces/pawn");
+			hovered = PieceService.getImage("/pieces/pawn-h");
 		} else {
 			image = PieceService.getImage("/pieces/pawn-b");
+			hovered = PieceService.getImage("/pieces/pawn-bh");
 		}
 	}
 

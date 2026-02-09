@@ -9,6 +9,7 @@ import org.chess.service.PieceService;
 public abstract class Piece {
 	protected Type id;
 	protected BufferedImage image;
+	protected BufferedImage hovered;
 	private int x, y;
 	private int col, row, preCol, preRow;
     private int dragOffsetX, dragOffsetY;
@@ -41,6 +42,10 @@ public abstract class Piece {
 
 	public BufferedImage getImage() {
 		return image;
+	}
+
+	public BufferedImage getHovered() {
+		return hovered;
 	}
 
 	public void setImage(BufferedImage image) {

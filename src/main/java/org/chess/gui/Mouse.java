@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 public class Mouse extends MouseAdapter {
 	private int x, y;
 	private boolean isHeld;
-	private boolean isClicked;
+	private boolean prevHeld;
 
 	public Mouse() {}
 
@@ -34,6 +34,18 @@ public class Mouse extends MouseAdapter {
 		this.isHeld = isPressed;
 	}
 
+	public void update() {
+		prevHeld = isHeld;
+	}
+
+	public boolean wasPressed() {
+		return isHeld && !prevHeld;
+	}
+
+	public boolean wasReleased() {
+		return !isHeld && prevHeld;
+	}
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 		isHeld = true;
@@ -44,7 +56,6 @@ public class Mouse extends MouseAdapter {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		isHeld = false;
-		isClicked = true;
 	}
 
 	@Override
@@ -57,17 +68,5 @@ public class Mouse extends MouseAdapter {
 	public void mouseMoved(MouseEvent e) {
 		x = e.getX();
 		y = e.getY();
-	}
-	
-	public void setClicked(boolean isClicked) {
-		this.isClicked = isClicked;
-	}
-
-	public boolean isClicked() {
-	    if (isClicked) {
-	    	isClicked = false;
-	        return true;
-	    }
-	    return false;
 	}
 }

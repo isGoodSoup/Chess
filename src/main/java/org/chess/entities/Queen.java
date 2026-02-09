@@ -14,8 +14,10 @@ public class Queen extends Piece {
 		this.id = Type.QUEEN;
 		if(color == Tint.WHITE) {
 			image = PieceService.getImage("/pieces/queen");
+			hovered = PieceService.getImage("/pieces/queen-h");
 		} else {
 			image = PieceService.getImage("/pieces/queen-b");
+			hovered = PieceService.getImage("/pieces/queen-bh");
 		}
 	}
 

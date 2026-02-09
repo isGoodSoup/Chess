@@ -6,7 +6,9 @@ import org.chess.records.Move;
 import org.chess.records.MoveScore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class ModelService {
     private final PieceService pieceService;

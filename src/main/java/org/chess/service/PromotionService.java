@@ -73,7 +73,7 @@ public class PromotionService {
             int x0 = startX + i * size;
             int x1 = x0 + size;
 
-            if(mouse.isClicked() &&
+            if(mouse.wasPressed() &&
                     mouse.getX() >= x0 && mouse.getX() <= x1 &&
                     mouse.getY() >= startY && mouse.getY() <= startY + size) {
                 selectedIndex = i;
@@ -105,6 +105,5 @@ public class PromotionService {
         promotingPawn = null;
         BooleanService.isPromotionPending = false;
         pieceService.switchTurns();
-        mouse.setClicked(false);
     }
 }

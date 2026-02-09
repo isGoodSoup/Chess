@@ -159,16 +159,21 @@ public class GUIService {
 
         for (Piece p : PieceService.getPieces()) {
             if (p != currentPiece) {
+                BufferedImage img;
                 if (p == hovered) {
-                    p.setScale(p.getDEFAULT_SCALE() + p.getMORE_SCALE()/2);
+                    img = pieceService.getHoveredPiece().getHovered();
                 } else {
+                    img = p.getImage();
                     p.setScale(p.getDEFAULT_SCALE());
                 }
-                drawPiece(g2, p);
+                drawPiece(g2, p, img);
             }
         }
 
         if(currentPiece != null) {
+            if (!BooleanService.isDragging) {
+                currentPiece.setScale(currentPiece.getDEFAULT_SCALE());
+            }
             drawPiece(g2, currentPiece);
         }
 
@@ -253,12 +258,16 @@ public class GUIService {
     }
 
     public void drawPiece(Graphics2D g2, Piece piece) {
+        drawPiece(g2, piece, null);
+    }
+
+    public void drawPiece(Graphics2D g2, Piece piece, BufferedImage override) {
         int square = Board.getSquare();
         int drawSize = (int) (square * piece.getScale());
         int offset = (square - drawSize) / 2;
 
         g2.drawImage(
-                piece.getImage(),
+                override != null ? override : piece.getImage(),
                 piece.getX() + offset,
                 piece.getY() + offset,
                 drawSize,
@@ -268,7 +277,7 @@ public class GUIService {
     }
 
     public void handleMenuInput() {
-        if(!mouse.isClicked()) {
+        if(!mouse.wasPressed()) {
             return;
         }
         int startY = getHEIGHT()/2 + MENU_START_Y;
@@ -284,7 +293,6 @@ public class GUIService {
                     case 0 -> gameService.startNewGame();
                     case 1 -> System.exit(0);
                 }
-                mouse.setClicked(false);
                 break;
             }
         }

@@ -1,7 +1,7 @@
 package org.chess.gui;
 
-import org.chess.entities.*;
 import org.chess.enums.GameState;
+import org.chess.enums.PlayState;
 import org.chess.service.*;
 
 import javax.swing.*;
@@ -19,6 +19,7 @@ public class BoardPanel extends JPanel implements Runnable {
         super();
         service = new ServiceFactory();
         GameService.setState(GameState.MENU);
+        BooleanService.isChaosActive = false;
         final int WIDTH = GUIService.getWIDTH();
         final int HEIGHT = GUIService.getHEIGHT();
         GUIService.drawRandomBackground(BooleanService.getBoolean());
@@ -48,6 +49,7 @@ public class BoardPanel extends JPanel implements Runnable {
             if(delta >= 1) {
                 update();
                 AnimationService.animateMove();
+                service.getMouseService().update();
                 repaint();
                 delta--;
             }
@@ -68,10 +70,6 @@ public class BoardPanel extends JPanel implements Runnable {
     }
 
     private void update() {
-        if(BooleanService.isChaosActive) {
-
-        }
-
         switch(GameService.getState()) {
             case MENU -> {
                 service.getGuiService().handleMenuInput();
@@ -84,10 +82,16 @@ public class BoardPanel extends JPanel implements Runnable {
             default -> service.getBoardService().getGame();
         }
 
-        switch(GameService.getMode()) {
-            case PLAYER -> BooleanService.isAIPlaying = false;
-            case AI -> BooleanService.isAIPlaying = true;
-            case CHAOS -> BooleanService.isChaosActive = true;
+        PlayState mode = GameService.getMode();
+        if(mode != null) {
+            switch(mode) {
+                case PLAYER -> BooleanService.isAIPlaying = false;
+                case AI -> BooleanService.isAIPlaying = true;
+                case CHAOS -> {
+                    BooleanService.isChaosActive = true;
+                    BooleanService.isAIPlaying = true;
+                }
+            }
         }
     }
 }

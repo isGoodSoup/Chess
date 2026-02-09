@@ -15,8 +15,10 @@ public class King extends Piece {
 		this.pieceService = pieceService;
 		if(color == Tint.WHITE) {
 			image = PieceService.getImage("/pieces/king");
+			hovered = PieceService.getImage("/pieces/king-h");
 		} else {
 			image = PieceService.getImage("/pieces/king-b");
+			hovered = PieceService.getImage("/pieces/king-bh");
 		}
 	}
 

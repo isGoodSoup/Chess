@@ -7,6 +7,8 @@ import org.chess.gui.Mouse;
 import org.chess.gui.Sound;
 import org.chess.records.Move;
 
+import javax.swing.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,7 +64,7 @@ public class BoardService {
     public void startBoard() {
         PieceService.getPieces().clear();
         setPieces();
-        pieceService.switchTurns();
+        GameService.setCurrentTurn(Tint.WHITE);
         BooleanService.isGameOver = false;
         PieceService.nullThisPiece();
         GameService.setState(GameState.BOARD);
@@ -93,6 +95,10 @@ public class BoardService {
         pieces.add(new Queen(Tint.BLACK, 3, 0));
         pieces.add(new King(pieceService, Tint.WHITE, 4, 7));
         pieces.add(new King(pieceService, Tint.BLACK, 4, 0));
+
+        if(BooleanService.isChaosActive) {
+            Collections.shuffle(pieces);
+        }
     }
 
     private void clearBoardState() {
@@ -105,6 +111,10 @@ public class BoardService {
     }
 
     public void getGame() {
+        if (BooleanService.isDragging && PieceService.getPiece() == null) {
+            BooleanService.isDragging = false;
+        }
+
         Piece currentPiece = PieceService.getPiece();
         int hoverCol = mouse.getX() / Board.getSquare();
         int hoverRow = mouse.getY() / Board.getSquare();
@@ -123,13 +133,12 @@ public class BoardService {
 
         if(BooleanService.isPromotionPending) {
             promotionService.promotion();
-            mouse.setClicked(false);
         }
         currentPiece = pickUpPiece(currentPiece, hoverCol, hoverRow);
     }
 
     private Piece pickUpPiece(Piece currentPiece, int hoverCol, int hoverRow) {
-        if(mouse.isHeld() && !BooleanService.isDragging && currentPiece == null) {
+        if (mouse.wasPressed() && !BooleanService.isDragging && currentPiece == null) {
             for(Piece p : PieceService.getPieces()) {
                 if(p.getColor() == GameService.getCurrentTurn() &&
                         p.getCol() == hoverCol &&
@@ -152,7 +161,7 @@ public class BoardService {
     }
 
     private Piece dragPiece(Piece currentPiece) {
-        if(BooleanService.isDragging && mouse.isHeld() && currentPiece != null) {
+        if (BooleanService.isDragging && mouse.isHeld()) {
             currentPiece.setX(mouse.getX() - PieceService.getPiece().getDragOffsetX());
             currentPiece.setY(mouse.getY() - PieceService.getPiece().getDragOffsetY());
             int targetCol = mouse.getX() / Board.getSquare();
@@ -168,7 +177,8 @@ public class BoardService {
     }
 
     private Piece dropPiece(Piece currentPiece) {
-        if(BooleanService.isDragging && mouse.isClicked() && currentPiece != null) {
+        if (BooleanService.isDragging && mouse.wasReleased()
+                && currentPiece != null) {
             BooleanService.isDragging = false;
             int targetCol = mouse.getX() / Board.getSquare();
             int targetRow = mouse.getY() / Board.getSquare();
@@ -189,7 +199,7 @@ public class BoardService {
                 fx.playFX(0);
 
                 if (currentPiece instanceof Pawn) {
-                    executeEmPassant(currentPiece, captured, targetCol, targetRow);
+                    executeEnPassant(currentPiece, captured, targetCol, targetRow);
                 }
 
                 for (Piece p : PieceService.getPieces()) {
@@ -203,17 +213,14 @@ public class BoardService {
                     promotionService.setPromotionColor(currentPiece.getColor());
                 } else {
                     pieceService.switchTurns();
-
-                    if (currentPiece != null) {
-                        currentPiece.setScale(currentPiece.getDEFAULT_SCALE());
-                        currentPiece = null;
-                    }
-
                     if (BooleanService.isAIPlaying && !BooleanService.isPromotionPending) {
-                        Move move = modelService.getAiTurn();
-                        if (move != null) {
-                            modelService.executeMove(move);
-                        }
+                        new Thread(() -> {
+                            Move move = modelService.getAiTurn();
+                            if (move != null) {
+                                SwingUtilities.invokeLater(() ->
+                                        modelService.executeMove(move));
+                            }
+                        }).start();
                     }
 
                     if (pieceService.isKingInCheck(
@@ -227,10 +234,10 @@ public class BoardService {
             } else {
                 PieceService.updatePos(currentPiece);
             }
-            if(currentPiece != null) {
-                currentPiece.setScale(currentPiece.getDEFAULT_SCALE());
-                currentPiece = null;
-            }
+            currentPiece.setScale(currentPiece.getDEFAULT_SCALE());
+        }
+        if (!BooleanService.isDragging) {
+            PieceService.nullThisPiece();
         }
         return currentPiece;
     }
@@ -278,8 +285,8 @@ public class BoardService {
         }
     }
 
-    private void executeEmPassant(Piece currentPiece, Piece captured,
-                                 int targetCol, int targetRow) {
+    private void executeEnPassant(Piece currentPiece, Piece captured,
+                                  int targetCol, int targetRow) {
         int oldRow = currentPiece.getPreRow();
         int movedSquares = Math.abs(targetRow - oldRow);
 

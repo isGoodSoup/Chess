@@ -31,7 +31,7 @@ public class GameService {
     }
 
     public static void setMode() {
-        if(!mouse.isClicked()) {
+        if(!mouse.wasPressed()) {
             return;
         }
 
@@ -50,8 +50,8 @@ public class GameService {
                 switch(i) {
                     case 0 -> mode = PlayState.PLAYER;
                     case 1 -> mode = PlayState.AI;
+                    case 2 -> mode = PlayState.CHAOS;
                 }
-                mouse.setClicked(false);
                 boardService.startBoard();
                 return;
             }
