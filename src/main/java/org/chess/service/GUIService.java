@@ -22,7 +22,7 @@ public class GUIService {
     private static final int MENU_FONT = 32;
     private static final int EXTRA_WIDTH = 150;
     private static final int GRAPHICS_OFFSET = EXTRA_WIDTH/2;
-    private static final int MOVES_CAP = 15;
+    private static final int MOVES_CAP = 14;
     private int lastHoveredIndex = -1;
     private static Color background;
     private static Color foreground;
