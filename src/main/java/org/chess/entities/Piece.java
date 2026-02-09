@@ -186,10 +186,16 @@ public abstract class Piece {
 	}
 
 	public void movePiece(Piece p, int newCol, int newRow) {
+		String oldPos = Board.getSquareName(p.getPreCol(), p.getPreRow());
+		String newPos = Board.getSquareName(newCol, newRow);
+
 		BoardPanel.getBoardState()[p.getCol()][p.getRow()] = null;
 		p.setCol(newCol);
 		p.setRow(newRow);
 		p.updatePos();
+
+		System.out.println(p.getColor().toString() + " "
+				+ p.getId().toString() + ": " + oldPos + " -> " + newPos);
 		BoardPanel.getBoardState()[newCol][newRow] = p;
 	}
 
