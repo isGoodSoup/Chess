@@ -127,7 +127,8 @@ public class MoveManager {
                 piece.getRow(),
                 targetCol,
                 targetRow,
-                piece.getColor()
+                piece.getColor(),
+                captured
         ));
 
         PieceService.movePiece(piece, targetCol, targetRow);
@@ -294,6 +295,7 @@ public class MoveManager {
         if(state == GameState.BOARD) {
             moveY = Math.max(0, moveY - 1);
             updateKeyboardHover();
+            getFx().play(4);
         }
     }
 
@@ -309,6 +311,7 @@ public class MoveManager {
         if(GameService.getState() == GameState.BOARD) {
             moveX = Math.max(0, moveX - 1);
             updateKeyboardHover();
+            getFx().play(4);
         }
     }
 
@@ -317,6 +320,7 @@ public class MoveManager {
         if(state == GameState.BOARD) {
             moveY = Math.min(7, moveY + 1);
             updateKeyboardHover();
+            getFx().play(4);
         }
     }
 
@@ -332,13 +336,14 @@ public class MoveManager {
         if(GameService.getState() == GameState.BOARD) {
             moveX = Math.min(7, moveX + 1);
             updateKeyboardHover();
+            getFx().play(4);
         }
     }
 
     public void activate(GameState state) {
-        service.getGuiService().getFx().play(0);
         switch (state) {
             case MENU -> {
+                service.getGuiService().getFx().play(3);
                 switch (selectedIndex) {
                     case 0 -> service.getGameService().startNewGame();
                     case 1 -> service.getGameService().optionsMenu();
@@ -346,6 +351,7 @@ public class MoveManager {
                 }
             }
             case MODE -> {
+                service.getGuiService().getFx().play(3);
                 switch (selectedIndex) {
                     case 0 -> service.getBoardService().startBoard();
                     case 1 -> {
@@ -355,12 +361,30 @@ public class MoveManager {
                 }
             }
             case RULES -> {
+                service.getGuiService().getFx().play(3);
                 if (selectedIndex == 0) { return; }
                 String option = MenuRender.optionsTweaks[selectedIndex];
-                service.getGuiService().getFx().play(0);
+                service.getGuiService().getFx().playFX(0);
                 service.getGuiService().getMenuRender().toggleOption(option);
             }
             case BOARD -> keyboardMove();
         }
+    }
+
+    public void undoLastMove(Piece piece) {
+        if(!BooleanService.canUndoMoves) { return; }
+        Move lastMove = moves.removeLast();
+        Piece movedPiece = lastMove.piece();
+        movedPiece.setCol(lastMove.fromCol());
+        movedPiece.setRow(lastMove.fromRow());
+        PieceService.updatePos(movedPiece);
+        movedPiece.setHasMoved(false);
+
+        Piece captured = lastMove.captured();
+        if (captured != null) {
+            service.getPieceService().getPieces().add(captured);
+            PieceService.updatePos(captured);
+        }
+        service.getPieceService().switchTurns();
     }
 }

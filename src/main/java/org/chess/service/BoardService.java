@@ -80,6 +80,12 @@ public class BoardService {
         GameService.setCurrentTurn(Tint.WHITE);
         PieceService.nullThisPiece();
         GameService.setState(GameState.BOARD);
+        if(BooleanService.isTimerActive) {
+            Timer timer = new Timer(1000, e -> {
+                System.out.println("Tick");
+            });
+            timer.start();
+        }
     }
 
     public void setPieces() {

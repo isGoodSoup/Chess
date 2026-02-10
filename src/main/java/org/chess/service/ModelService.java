@@ -59,7 +59,7 @@ public class ModelService {
                 for(int row = 0; row < 8; row++) {
                     if(!isLegalMove(p, col, row)) { continue; }
                     Move move = new Move(p, p.getCol(), p.getRow(), col, row,
-                            p.getColor());
+                            p.getColor(), null);
                     moves.add(new MoveScore(move, evaluateMove(move)));
                 }
             }

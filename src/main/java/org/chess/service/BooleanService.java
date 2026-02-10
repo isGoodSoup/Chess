@@ -19,9 +19,11 @@ public class BooleanService {
     public static boolean canPromote;
     public static boolean isTestingToggle;
     public static boolean isChaosActive;
-    public static boolean isEasyModeActive;
+    public static boolean isTrainingModeActive;
     public static boolean isCastlingActive;
     public static boolean isEnPassantActive;
+    public static boolean isTimerActive;
+    public static boolean isStopwatchActive;
 
     private static final Random random = new Random();
 

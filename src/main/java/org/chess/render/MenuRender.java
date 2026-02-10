@@ -15,7 +15,8 @@ public class MenuRender {
             "EXIT" };
     public static final String[] optionsMode = { "PLAYER", "AI" };
     public static final String[] optionsTweaks = { "RULES", "Undo Moves",
-            "Promotion", "Easy Mode", "Chaos Mode", "Testing", "Castling",
+            "Promotion", "Training Mode", "Chaos Mode",
+            "Timer", "Testing", "Castling",
             "En Passant"};
     private static final String ENABLE = "Enable ";
     private final BufferedImage TOGGLE_ON;
@@ -58,8 +59,10 @@ public class MenuRender {
         return switch(option) {
             case "Undo Moves" -> BooleanService.canUndoMoves;
             case "Promotion" -> BooleanService.canPromote;
-            case "Easy Mode" -> BooleanService.isEasyModeActive;
+            case "Training Mode" -> BooleanService.isTrainingModeActive;
             case "Chaos Mode" -> BooleanService.isChaosActive;
+            case "Timer" -> BooleanService.isTimerActive;
+            case "Stopwatch" -> BooleanService.isStopwatchActive;
             case "Testing" -> BooleanService.isTestingToggle;
             case "Castling" -> BooleanService.isCastlingActive;
             case "En Passant" -> BooleanService.isEnPassantActive;
@@ -71,8 +74,10 @@ public class MenuRender {
         switch(option) {
             case "Undo Moves" -> BooleanService.canUndoMoves ^= true;
             case "Promotion" -> BooleanService.canPromote ^= true;
-            case "Easy Mode" -> BooleanService.isEasyModeActive ^= true;
+            case "Training Mode" -> BooleanService.isTrainingModeActive ^= true;
             case "Chaos Mode" -> BooleanService.isChaosActive ^= true;
+            case "Timer" -> BooleanService.isTimerActive ^= true;
+            case "Stopwatch" -> BooleanService.isStopwatchActive ^= true;
             case "Testing" -> BooleanService.isTestingToggle ^= true;
             case "Castling" -> BooleanService.isCastlingActive ^= true;
             case "En Passant" -> BooleanService.isEnPassantActive ^= true;

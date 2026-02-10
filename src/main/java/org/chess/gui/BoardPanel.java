@@ -116,6 +116,7 @@ public class BoardPanel extends JPanel implements Runnable {
         if((state == GameState.RULES || state == GameState.MODE)
                 && keyboard.wasBPressed()) {
             GameService.setState(GameState.MENU);
+            service.getGuiService().getFx().playFX(3);
         }
 
         switch(state) {
@@ -140,6 +141,7 @@ public class BoardPanel extends JPanel implements Runnable {
                 if(keyboard.wasDownPressed()) { move.moveDown(); move.updateKeyboardHover(); }
                 if(keyboard.wasRightPressed()) { move.moveRight(); move.updateKeyboardHover(); }
                 if(keyboard.wasSelectPressed()) { move.activate(GameState.BOARD); }
+                if(keyboard.wasZPressed()) { move.undoLastMove(move.getSelectedPiece()); }
             }
         }
     }
