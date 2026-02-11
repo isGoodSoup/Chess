@@ -16,7 +16,7 @@ public class MenuRender {
     public static final String[] optionsMode = { "PLAYER", "AI" };
     public static final String[] optionsTweaks = { "RULES", "Undo Moves",
             "Promotion", "Training Mode", "Chaos Mode",
-            "Timer", "Testing", "Castling",
+            "Timer", "Stopwatch", "Testing", "Castling",
             "En Passant"};
     private static final String ENABLE = "Enable ";
     private final BufferedImage TOGGLE_ON;
@@ -76,8 +76,14 @@ public class MenuRender {
             case "Promotion" -> BooleanService.canPromote ^= true;
             case "Training Mode" -> BooleanService.isTrainingModeActive ^= true;
             case "Chaos Mode" -> BooleanService.isChaosActive ^= true;
-            case "Timer" -> BooleanService.isTimerActive ^= true;
-            case "Stopwatch" -> BooleanService.isStopwatchActive ^= true;
+            case "Timer" -> {
+                BooleanService.isTimerActive ^= true;
+                BooleanService.isStopwatchActive = false;
+            }
+            case "Stopwatch" -> {
+                BooleanService.isStopwatchActive ^= true;
+                BooleanService.isTimerActive = false;
+            }
             case "Testing" -> BooleanService.isTestingToggle ^= true;
             case "Castling" -> BooleanService.isCastlingActive ^= true;
             case "En Passant" -> BooleanService.isEnPassantActive ^= true;
@@ -143,7 +149,7 @@ public class MenuRender {
         int totalWidth = boardWidth + 2 * GUIService.getEXTRA_WIDTH();
         int centerX = totalWidth/2;
         int headerTextWidth = g2.getFontMetrics().stringWidth(options[0]);
-        int y = 100;
+        int y = 60;
         g2.drawString(options[0], centerX - headerTextWidth/2, y);
 
         int lineHeight = g2.getFontMetrics().getHeight() + 6;
@@ -185,8 +191,8 @@ public class MenuRender {
         }
     }
 
-    public void handleOptionsInput(boolean isClicked) {
-        if(!isClicked) { return; }
+    public void handleOptionsInput() {
+        if(!mouse.wasPressed()) { return; }
         int y = 100 + GUIService.getFontBold(32).getSize() + 16;
         int lineHeight = GUIService.getFontBold(32).getSize() + 8;
 
@@ -224,8 +230,8 @@ public class MenuRender {
         }
     }
 
-    public void handleMenuInput(boolean isClicked) {
-        if (!isClicked) return;
+    public void handleMenuInput() {
+        if(!mouse.wasPressed()) { return; }
 
         int startY = GUIService.getHEIGHT()/2 + GUIService.getMENU_START_Y();
         int spacing = GUIService.getMENU_SPACING();

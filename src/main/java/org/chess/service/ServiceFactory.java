@@ -5,6 +5,8 @@ import org.chess.input.Mouse;
 import org.chess.input.MoveManager;
 import org.chess.render.MenuRender;
 
+import java.util.Timer;
+
 public class ServiceFactory {
     private final PieceService piece;
     private final BoardService board;
@@ -16,6 +18,7 @@ public class ServiceFactory {
     private final MoveManager manager;
     private final ModelService model;
     private final AnimationService animation;
+    private final TimerService timer;
 
     public ServiceFactory() {
         this.mouse = new Mouse();
@@ -26,11 +29,14 @@ public class ServiceFactory {
         this.model = new ModelService(piece, animation, promotion);
         this.manager = new MoveManager();
         this.piece.setMoveManager(manager);
-        this.board = new BoardService(piece, mouse, promotion, model, manager);
+        this.board = new BoardService(piece, mouse, promotion,
+                model, manager);
+        this.board.setServiceFactory(this);
         this.model.setBoardService(board);
         this.gs = new GameService(board, mouse);
-        this.gui = new GUIService(piece, board, gs, promotion, model, manager
-                , mouse);
+        this.timer = new TimerService();
+        this.gui = new GUIService(piece, board, gs, promotion,
+                model, manager, timer, mouse);
         this.manager.init(this);
     }
 
@@ -73,4 +79,6 @@ public class ServiceFactory {
     public AnimationService getAnimationService() {
         return animation;
     }
+
+    public TimerService getTimerService() { return timer; }
 }

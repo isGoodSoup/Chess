@@ -79,13 +79,18 @@ public class BoardPanel extends JPanel implements Runnable {
                 service.getGuiService().getMovesRender().drawMoves(g2);
             }
         }
+
+        if(service.getTimerService().isActive()) {
+            service.getGuiService().drawTimer(g2);
+        }
     }
 
     private void update() {
         checkKeyboard();
+        service.getTimerService().update();
         switch(GameService.getState()) {
             case MENU -> {
-                service.getGuiService().getMenuRender().handleMenuInput(true);
+                service.getGuiService().getMenuRender().handleMenuInput();
                 return;
             }
             case MODE -> {
@@ -93,7 +98,7 @@ public class BoardPanel extends JPanel implements Runnable {
                 return;
             }
             case RULES -> {
-                service.getGuiService().getMenuRender().handleOptionsInput(true);
+                service.getGuiService().getMenuRender().handleOptionsInput();
                 return;
             }
             default -> service.getBoardService().getGame();

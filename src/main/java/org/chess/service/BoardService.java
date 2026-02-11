@@ -8,7 +8,10 @@ import org.chess.input.MoveManager;
 import org.chess.gui.Sound;
 import org.chess.records.Move;
 
-import java.util.*;
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class BoardService {
     private static Piece[][] boardState;
@@ -21,6 +24,8 @@ public class BoardService {
     private final PromotionService promotionService;
     private final ModelService modelService;
     private static MoveManager manager;
+
+    private ServiceFactory serviceFactory;
 
     public BoardService(PieceService pieceService, Mouse mouse,
                         PromotionService promotionService,
@@ -36,6 +41,14 @@ public class BoardService {
         boardState = new Piece[board.getROW()][board.getCOL()];
         this.moves = new ArrayList<>();
         precomputeSquares();
+    }
+
+    public ServiceFactory getServiceFactory() {
+        return serviceFactory;
+    }
+
+    public void setServiceFactory(ServiceFactory serviceFactory) {
+        this.serviceFactory = serviceFactory;
     }
 
     public Board getBoard() {
@@ -80,11 +93,15 @@ public class BoardService {
         GameService.setCurrentTurn(Tint.WHITE);
         PieceService.nullThisPiece();
         GameService.setState(GameState.BOARD);
+
+        if(BooleanService.isStopwatchActive) {
+            BooleanService.isTimerActive = false;
+            getServiceFactory().getTimerService().start();
+        }
+
         if(BooleanService.isTimerActive) {
-            Timer timer = new Timer(1000, e -> {
-                System.out.println("Tick");
-            });
-            timer.start();
+            BooleanService.isStopwatchActive = false;
+            getServiceFactory().getTimerService().start();
         }
     }
 

@@ -38,6 +38,7 @@ public class GUIService {
     private final BoardService boardService;
     private final GameService gameService;
     private final ModelService modelService;
+    private final TimerService timerService;
     private final Mouse mouse;
     private static PromotionService promotionService;
 
@@ -45,12 +46,13 @@ public class GUIService {
                       GameService gameService,
                       PromotionService promotionService,
                       ModelService modelService,
-                      MoveManager moveManager,
+                      MoveManager moveManager, TimerService timerService,
                       Mouse mouse) {
         this.pieceService = pieceService;
         this.boardService = boardService;
         this.gameService = gameService;
         this.modelService = modelService;
+        this.timerService = timerService;
         this.mouse = mouse;
         this.fx = new Sound();
         this.boardRender = new BoardRender(this, pieceService, boardService, promotionService);
@@ -191,5 +193,12 @@ public class GUIService {
                 40
         );
         return hitbox;
+    }
+
+    public void drawTimer(Graphics2D g2) {
+        g2.setFont(GUIService.getFont(24));
+        g2.setColor(foreground);
+        g2.drawString(timerService.getTimeString(),
+                getEXTRA_WIDTH()/3.75f, 475);
     }
 }
