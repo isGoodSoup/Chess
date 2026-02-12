@@ -4,6 +4,7 @@ import org.chess.entities.Board;
 import org.chess.render.MenuRender;
 import org.chess.render.RenderContext;
 import org.chess.service.BoardService;
+import org.chess.service.BooleanService;
 import org.chess.service.GUIService;
 import org.chess.service.GameService;
 
@@ -69,29 +70,44 @@ public class MenuInput {
     public void handleOptionsInput() {
         if(!mouse.wasPressed()) { return; }
 
-        int lineHeight = menuRender.getFontMetrics().getHeight() + 4;
-        int y = MenuRender.getOPTION_Y() + lineHeight;
+        int itemsPerPage = 8;
+        int startIndex = (menuRender.getCurrentPage() - 1) * itemsPerPage + 1;
+        int endIndex = Math.min(startIndex + itemsPerPage, MenuRender.optionsTweaks.length);
 
-        int boardWidth = render.scale(Board.getSquare() * 8);
-        int totalWidth = boardWidth + render.scale(RenderContext.BASE_WIDTH) * 2;
-        int centerX = totalWidth / 2;
+        FontMetrics fm = menuRender.getFontMetrics();
+        int lineHeight = fm.getHeight() + render.scale(10);
 
-        int toggleWidth = menuRender.getSprite(0).getWidth() / 2;
-        int toggleHeight = menuRender.getSprite(0).getHeight() / 2;
-        int toggleX = centerX + render.scale(200);
+        int headerY = render.getOffsetY() + render.scale(MenuRender.getOPTION_Y());
+        int startY = headerY + render.scale(90);
 
-        for(int i = 1; i < MenuRender.optionsTweaks.length; i++) {
+        int gap = render.scale(100);
+        int maxRowWidth = 0;
+
+        for(int i = startIndex; i < endIndex; i++) {
+            String enabledOption = MenuRender.ENABLE + MenuRender.optionsTweaks[i];
+            int textWidth = fm.stringWidth(enabledOption.toUpperCase());
+            int toggleWidth = render.scale(menuRender.getSprite(0).getWidth() / 2);
+            int rowWidth = textWidth + gap + toggleWidth;
+            if(rowWidth > maxRowWidth) maxRowWidth = rowWidth;
+        }
+
+        for(int i = startIndex; i < endIndex; i++) {
             String option = MenuRender.optionsTweaks[i];
             String enabledOption = MenuRender.ENABLE + option;
-            int textX = render.scale(MenuRender.getOPTION_X());
-            int textY = render.scale(y);
-            int textWidth = menuRender.getFontMetrics().stringWidth(enabledOption);
+
+            int textWidth = fm.stringWidth(enabledOption);
+            int toggleWidth = render.scale(menuRender.getSprite(0).getWidth()/2);
+            int toggleHeight = render.scale(menuRender.getSprite(0).getHeight()/2);
+
+            int blockX = MenuRender.getCenterX(menuRender.getTotalWidth(), maxRowWidth);
+            int toggleX = blockX + maxRowWidth - toggleWidth;
+            int toggleY = startY - toggleHeight;
 
             Rectangle toggleHitbox = new Rectangle(
-                    render.unscaleX(toggleX),
-                    render.unscaleY(textY - toggleHeight + 16),
-                    render.unscaleX(toggleWidth),
-                    render.unscaleY(toggleHeight)
+                    toggleX,
+                    toggleY,
+                    toggleWidth,
+                    toggleHeight
             );
 
             if(toggleHitbox.contains(mouse.getX(), mouse.getY())) {
@@ -99,32 +115,51 @@ public class MenuInput {
                 menuRender.toggleOption(option);
                 break;
             }
-            y += lineHeight;
+            startY += lineHeight;
         }
     }
 
-    public void handleMenuInput() {
+    public void handleMenuInput(String[] options) {
         if(!mouse.wasPressed()) { return; }
 
-        int startY = render.scale(RenderContext.BASE_HEIGHT)/2 + GUIService.getMENU_START_Y();
-        int spacing = GUIService.getMENU_SPACING();
+        int startY = render.scale(RenderContext.BASE_HEIGHT)/2 + render.scale(GUIService.getMENU_START_Y());
+        int spacing = render.scale(GUIService.getMENU_SPACING());
 
-        for(int i = 0; i < MenuRender.optionsMenu.length; i++) {
-            int y = startY + i * spacing;
+        for(int i = 0; i < options.length; i++) {
+            String optionText = options[i];
+            FontMetrics fm = menuRender.getFontMetrics();
+            int textWidth = fm.stringWidth(optionText);
 
-            boolean isHovered = GUIService.getHITBOX(
-                    render.unscaleX(render.getOffsetX()),
-                    render.unscaleY(y),
-                    render.unscaleX(200),
-                    render.unscaleY(40)
-            ).contains(mouse.getX(), mouse.getY());
+            int x = MenuRender.getCenterX(menuRender.getTotalWidth(), textWidth);
+            int y = render.getOffsetY() + startY + i * spacing;
 
-            if(isHovered) {
+            Rectangle hitbox = new Rectangle(
+                    x,
+                    y - fm.getAscent(),
+                    textWidth,
+                    fm.getHeight()
+            );
+
+            if(hitbox.contains(mouse.getX(), mouse.getY())) {
                 guiService.getFx().play(0);
-                switch (i) {
-                    case 0 -> gameService.startNewGame();
-                    case 1 -> gameService.optionsMenu();
-                    case 2 -> System.exit(0);
+                switch(GameService.getState()) {
+                    case MENU -> {
+                        switch(i) {
+                            case 0 -> gameService.startNewGame();
+                            case 1 -> gameService.achievementsMenu();
+                            case 2 -> gameService.optionsMenu();
+                            case 3 -> System.exit(0);
+                        }
+                    }
+                    case MODE -> {
+                        switch(i) {
+                            case 0 -> boardService.startBoard();
+                            case 1 -> {
+                                BooleanService.isAIPlaying = true;
+                                boardService.startBoard();
+                            }
+                        }
+                    }
                 }
                 break;
             }

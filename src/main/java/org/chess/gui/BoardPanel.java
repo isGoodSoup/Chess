@@ -5,6 +5,7 @@ import org.chess.enums.GameState;
 import org.chess.enums.PlayState;
 import org.chess.input.Keyboard;
 import org.chess.input.MoveManager;
+import org.chess.render.Colorblindness;
 import org.chess.render.MenuRender;
 import org.chess.render.RenderContext;
 import org.chess.service.*;
@@ -39,12 +40,11 @@ public class BoardPanel extends JPanel implements Runnable {
         final int WIDTH = RenderContext.BASE_WIDTH;
         final int HEIGHT = RenderContext.BASE_HEIGHT;
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        setBackground(GUIService.getNewBackground());
-        addMouseMotionListener(service.getMouseService());
+        setBackground(Colorblindness.filter(Colors.BACKGROUND));
         addMouseListener(service.getMouseService());
+        addMouseMotionListener(service.getMouseService());
         addKeyListener(service.getKeyboard());
         setFocusable(true);
-        requestFocusInWindow();
 	}
 
     public void launch() {
@@ -66,12 +66,16 @@ public class BoardPanel extends JPanel implements Runnable {
 
             if(delta >= 1) {
                 update();
+                updateMouse();
                 service.getAnimationService().update();
-                service.getMouseService().update();
                 repaint();
                 delta--;
             }
         }
+    }
+
+    public void updateMouse() {
+        service.getMouseService().update();
     }
 
     @Override
@@ -87,16 +91,17 @@ public class BoardPanel extends JPanel implements Runnable {
 
     public void drawGame(Graphics2D g2) {
         switch(GameService.getState()) {
-            case MENU -> service.getGuiService().getMenuRender().drawGraphics(g2,
+            case MENU -> service.getRender().getMenuRender().drawGraphics(g2,
                     MenuRender.optionsMenu);
-            case MODE -> service.getGuiService().getMenuRender().drawGraphics(g2,
+            case MODE -> service.getRender().getMenuRender().drawGraphics(g2,
                     MenuRender.optionsMode);
-            case RULES -> service.getGuiService().getMenuRender()
+            case RULES -> service.getRender().getMenuRender()
                     .drawOptionsMenu(g2, MenuRender.optionsTweaks);
             case BOARD -> {
-                service.getGuiService().getBoardRender().drawBoard(g2);
-                service.getGuiService().getMovesRender().drawMoves(g2);
+                service.getRender().getBoardRender().drawBoard(g2);
+                service.getRender().getMovesRender().drawMoves(g2);
             }
+            case ACHIEVEMENTS -> service.getRender().getMenuRender().drawAchievementsMenu(g2);
         }
 
         if(service.getTimerService().isActive()) {
@@ -112,17 +117,21 @@ public class BoardPanel extends JPanel implements Runnable {
 
         switch(GameService.getState()) {
             case MENU -> {
-                service.getGuiService().getMenuRender().getMenuInput().handleMenuInput();
+                service.getRender().getMenuRender()
+                        .getMenuInput().handleMenuInput(MenuRender.optionsMenu);
                 return;
             }
             case MODE -> {
-                GameService.setMode();
+                service.getRender().getMenuRender()
+                        .getMenuInput().handleMenuInput(MenuRender.optionsMode);
                 return;
             }
             case RULES -> {
-                service.getGuiService().getMenuRender().getMenuInput().handleOptionsInput();
+                service.getRender().getMenuRender()
+                        .getMenuInput().handleOptionsInput();
                 return;
             }
+            case ACHIEVEMENTS -> {}
             default -> service.getBoardService().getGame();
         }
 
@@ -239,7 +248,7 @@ public class BoardPanel extends JPanel implements Runnable {
         }
 
         if(keyboard.isComboPressed(KeyEvent.VK_CONTROL, KeyEvent.VK_H)) {
-            service.getGuiService().getMovesRender().hideMoves();
+            service.getRender().getMovesRender().hideMoves();
         }
 
         if(keyboard.wasF11Pressed()) {

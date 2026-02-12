@@ -7,6 +7,40 @@ public class RenderContext {
     private int offsetX = 0;
     private int offsetY = 0;
 
+    private BoardRender boardRender;
+    private MenuRender menuRender;
+    private MovesRender movesRender;
+
+    public RenderContext() {
+        this.boardRender = new BoardRender(this);
+        this.menuRender = new MenuRender(this);
+        this.movesRender = new MovesRender(this);
+    }
+
+    public BoardRender getBoardRender() {
+        return boardRender;
+    }
+
+    public void setBoardRender(BoardRender boardRender) {
+        this.boardRender = boardRender;
+    }
+
+    public MenuRender getMenuRender() {
+        return menuRender;
+    }
+
+    public void setMenuRender(MenuRender menuRender) {
+        this.menuRender = menuRender;
+    }
+
+    public MovesRender getMovesRender() {
+        return movesRender;
+    }
+
+    public void setMovesRender(MovesRender movesRender) {
+        this.movesRender = movesRender;
+    }
+
     public void updateTransform(int windowWidth, int windowHeight) {
         double scaleX = windowWidth/(double) BASE_WIDTH;
         double scaleY = windowHeight/(double) BASE_HEIGHT;

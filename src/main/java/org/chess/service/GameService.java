@@ -45,35 +45,6 @@ public class GameService {
         GameService.state = state;
     }
 
-    public static void setMode() {
-        if(!mouse.wasPressed()) {
-            return;
-        }
-
-        if(state != GameState.MODE) {
-            return;
-        }
-
-        int startY =
-                render.scale(RenderContext.BASE_HEIGHT)/2 + GUIService.getMENU_START_Y();
-        int spacing = GUIService.getMENU_SPACING();
-
-        for(int i = 0; i < MenuRender.optionsMode.length; i++) {
-            int y = startY + i * spacing;
-            boolean isHovered =
-                    GUIService.getHITBOX(render.getOffsetX(), y, 200, 40).contains(mouse.getX(),
-                    mouse.getY());
-            if(isHovered) {
-                switch(i) {
-                    case 0 -> mode = PlayState.PLAYER;
-                    case 1 -> mode = PlayState.AI;
-                }
-                boardService.startBoard();
-                return;
-            }
-        }
-    }
-
     public static Tint getCurrentTurn() {
         return currentTurn;
     }
@@ -92,5 +63,9 @@ public class GameService {
 
     public void optionsMenu() {
         setState(GameState.RULES);
+    }
+
+    public void achievementsMenu() {
+        setState((GameState.ACHIEVEMENTS));
     }
 }

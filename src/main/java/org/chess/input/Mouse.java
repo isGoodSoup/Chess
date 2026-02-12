@@ -1,7 +1,6 @@
 package org.chess.input;
 
 import org.chess.render.RenderContext;
-import org.chess.service.GUIService;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -89,12 +88,5 @@ public class Mouse extends MouseAdapter {
 		int rawY = e.getY();
 		x = (int)((rawX - render.getOffsetX()) / scale);
 		y = (int)((rawY - render.getOffsetY()) / scale);
-	}
-
-	private void updateMousePosition(MouseEvent e) {
-		int rawX = e.getX();
-		int rawY = e.getY();
-		x = render.unscaleX(rawX);
-		y = render.unscaleY(rawY);
 	}
 }

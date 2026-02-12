@@ -11,14 +11,35 @@ import java.awt.*;
 import java.util.List;
 
 public class MovesRender {
-    private final BoardService boardService;
-    private final GUIService guiService;
-    private final RenderContext render;
+    private BoardService boardService;
+    private GUIService guiService;
+    private RenderContext render;
 
-    public MovesRender(RenderContext render, BoardService boardService,
-                       GUIService guiService) {
+    public MovesRender(RenderContext render) {
+        this.render = render;
+    }
+
+    public BoardService getBoardService() {
+        return boardService;
+    }
+
+    public void setBoardService(BoardService boardService) {
         this.boardService = boardService;
+    }
+
+    public GUIService getGuiService() {
+        return guiService;
+    }
+
+    public void setGuiService(GUIService guiService) {
         this.guiService = guiService;
+    }
+
+    public RenderContext getRender() {
+        return render;
+    }
+
+    public void setRender(RenderContext render) {
         this.render = render;
     }
 
@@ -32,11 +53,11 @@ public class MovesRender {
         int lineHeight = render.scale(fm.getHeight() + 8);
 
         int stroke = 4;
-        int boardX = guiService.getBoardRender().getBoardOriginX();
-        int boardY = guiService.getBoardRender().getBoardOriginY();
+        int boardX = render.getBoardRender().getBoardOriginX();
+        int boardY = render.getBoardRender().getBoardOriginY();
         int boardSize = Board.getSquare() * boardService.getBoard().getCOL();
-        int arcWidth = 25;
-        int arcHeight = 25;
+        int arcWidth = 32;
+        int arcHeight = 32;
         boolean hasBackground = true;
 
         int padding = render.scale(GUIService.getPADDING() - 30);

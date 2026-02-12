@@ -21,17 +21,14 @@ public class GUIService {
     private static final int MOVES_CAP = 28;
     private static final int PADDING = 90;
 
+    private final RenderContext render;
     private final Sound fx;
-    private final BoardRender boardRender;
-    private final MenuRender menuRender;
-    private final MovesRender moveRender;
 
     private static BufferedImage logo;
     private static BufferedImage logo_v2;
     private final BufferedImage YES;
     private final BufferedImage NO;
 
-    private final RenderContext render;
     private final PieceService pieceService;
     private final BoardService boardService;
     private final GameService gameService;
@@ -55,13 +52,6 @@ public class GUIService {
         this.timerService = timerService;
         this.mouse = mouse;
         this.fx = new Sound();
-        this.boardRender = new BoardRender(render, this, pieceService,
-                boardService, promotionService);
-        this.menuRender  = new MenuRender(render, this, gameService,
-            boardService,
-                moveManager, mouse);
-        this.moveRender  = new MovesRender(render, boardService, this);
-
         this.boardService.setPieces();
         GUIService.promotionService = promotionService;
         logo = null;
@@ -116,16 +106,6 @@ public class GUIService {
         return NO;
     }
 
-    public static Color getNewBackground() {
-        return BooleanService.canBeColorblind
-                ? Colorblindness.filter(Colors.EVEN) : Colors.EVEN;
-    }
-
-    public static Color getNewForeground() {
-        return BooleanService.canBeColorblind
-                ? Colorblindness.filter(Colors.ODD) : Colors.ODD;
-    }
-
     public static BufferedImage getLogo() {
         return logo;
     }
@@ -140,18 +120,6 @@ public class GUIService {
 
     public static int getPADDING() {
         return PADDING;
-    }
-
-    public BoardRender getBoardRender() {
-        return boardRender;
-    }
-
-    public MenuRender getMenuRender() {
-        return menuRender;
-    }
-
-    public MovesRender getMovesRender() {
-        return moveRender;
     }
 
     public Sound getFx() {
@@ -170,11 +138,11 @@ public class GUIService {
     public void drawTimer(Graphics2D g2) {
         g2.setFont(getFont(MENU_FONT));
         Color filtered = BooleanService.canBeColorblind || BooleanService.isDarkMode
-                ? Colorblindness.filter(Colors.ODD) : Colors.ODD;
+                ? Colorblindness.filter(Colors.FOREGROUND) : Colors.FOREGROUND;
         g2.setColor(filtered);
 
-        int boardX = boardRender.getBoardOriginX();
-        int boardY = boardRender.getBoardOriginY();
+        int boardX = render.getBoardRender().getBoardOriginX();
+        int boardY = render.getBoardRender().getBoardOriginY();
         int boardWidth = Board.getSquare() * boardService.getBoard().getCOL();
 
         FontMetrics fm = g2.getFontMetrics();
@@ -194,7 +162,7 @@ public class GUIService {
         int boxHeight = textHeight + 2 * innerPadding;
 
         drawBox(g2, 4, boxX, boxY, boxWidth,
-                boxHeight, 15, 15, true);
+                boxHeight, 32, 32, true);
         g2.drawString(time, textX, textY);
     }
 
@@ -205,8 +173,8 @@ public class GUIService {
         image = Colorblindness.filter(image);
 
         int size = render.scale(Board.getSquare());
-        int boardX = boardRender.getBoardOriginX();
-        int boardY = boardRender.getBoardOriginY();
+        int boardX = render.getBoardRender().getBoardOriginX();
+        int boardY = render.getBoardRender().getBoardOriginY();
         int boardWidth = Board.getSquare() * boardService.getBoard().getCOL();
 
         int padding = render.scale(PADDING + 30);

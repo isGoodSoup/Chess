@@ -38,7 +38,19 @@ public class ServiceFactory {
         this.timer = new TimerService();
         this.gui = new GUIService(render, piece, board, gs, promotion,
                 model, manager, timer, mouse);
+        this.render.getBoardRender().setBoardService(board);
+        this.render.getBoardRender().setPieceService(piece);
+        this.render.getBoardRender().setGuiService(gui);
+        this.render.getBoardRender().setPromotionService(promotion);
+        this.render.getMenuRender().setBoardService(board);
+        this.render.getMenuRender().setGuiService(gui);
+        this.render.getMenuRender().setGameService(gs);
+        this.render.getMenuRender().setMoveManager(manager);
+        this.render.getMenuRender().setMouse(mouse);
+        this.render.getMovesRender().setBoardService(board);
+        this.render.getMovesRender().setGuiService(gui);
         this.manager.init(this);
+        this.render.getMenuRender().init();
     }
 
     public RenderContext getRender() {

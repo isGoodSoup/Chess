@@ -6,7 +6,6 @@ import org.chess.enums.Tint;
 import org.chess.gui.Sound;
 import org.chess.records.Move;
 import org.chess.render.MenuRender;
-import org.chess.render.RenderContext;
 import org.chess.service.*;
 
 import javax.swing.*;
@@ -77,7 +76,6 @@ public class MoveManager {
         if(mouse.wasPressed()
                 && !BooleanService.isDragging
                 && currentPiece == null) {
-
             for(Piece p : service.getPieceService().getPieces()) {
                 if(p.getColor() == GameService.getCurrentTurn()
                         && p.getCol() == hoverCol
@@ -101,19 +99,26 @@ public class MoveManager {
     private void dragPiece(Piece currentPiece) {
         if(!BooleanService.isDragging || currentPiece == null) { return; }
 
-        int originX = service.getGuiService().getBoardRender().getBoardOriginX();
-        int originY = service.getGuiService().getBoardRender().getBoardOriginY();
+        int originX = service.getRender().getBoardRender().getBoardOriginX();
+        int originY = service.getRender().getBoardRender().getBoardOriginY();
 
-        int boardMouseX = mouse.getX() - RenderContext.BASE_WIDTH/2;
-        currentPiece.setX(boardMouseX - currentPiece.getDragOffsetX());
-        currentPiece.setY(mouse.getY() - currentPiece.getDragOffsetY());
-        int targetCol = boardMouseX/Board.getSquare();
-        int targetRow = mouse.getY()/Board.getSquare();
+        int mouseX = mouse.getX();
+        int mouseY = mouse.getY();
 
-        BooleanService.isLegal =
-                currentPiece.canMove(targetCol, targetRow, service.getPieceService().getPieces())
-                        && !service.getPieceService().wouldLeaveKingInCheck(
-                        currentPiece, targetCol, targetRow);
+        if(currentPiece.getDragOffsetX() == 0 && currentPiece.getDragOffsetY() == 0) {
+            currentPiece.setDragOffsetX(mouseX - originX - currentPiece.getX() * Board.getSquare());
+            currentPiece.setDragOffsetY(mouseY - originY - currentPiece.getY() * Board.getSquare());
+        }
+        currentPiece.setX((mouseX - originX - currentPiece.getDragOffsetX())/Board.getSquare());
+        currentPiece.setY((mouseY - originY - currentPiece.getDragOffsetY())/Board.getSquare());
+
+        int targetCol = (mouseX - originX) / Board.getSquare();
+        int targetRow = (mouseY - originY) / Board.getSquare();
+
+        BooleanService.isLegal = currentPiece.canMove(targetCol, targetRow,
+                service.getPieceService().getPieces())
+                && !service.getPieceService().wouldLeaveKingInCheck(
+                currentPiece, targetCol, targetRow);
 
         dropPiece(currentPiece);
     }
@@ -190,16 +195,18 @@ public class MoveManager {
     }
 
     private Piece dropPiece(Piece currentPiece) {
-        if(!BooleanService.isDragging || currentPiece == null) return currentPiece;
-
-        int originX = service.getGuiService().getBoardRender().getBoardOriginX();
-        int originY = service.getGuiService().getBoardRender().getBoardOriginY();
-
-        int boardMouseX = mouse.getX() - originX;
-        int boardMouseY = mouse.getY() - originY;
+        if(!BooleanService.isDragging || currentPiece == null) {
+            return currentPiece;
+        }
 
         if(mouse.wasReleased()) {
             BooleanService.isDragging = false;
+
+            int originX = service.getRender().getBoardRender().getBoardOriginX();
+            int originY = service.getRender().getBoardRender().getBoardOriginY();
+
+            int boardMouseX = mouse.getX() - originX;
+            int boardMouseY = mouse.getY() - originY;
 
             if(boardMouseX < 0 || boardMouseX >= Board.getSquare() * 8
                     || boardMouseY < 0 || boardMouseY >= Board.getSquare() * 8) {
@@ -207,15 +214,14 @@ public class MoveManager {
                 return currentPiece;
             }
 
-            int targetCol = boardMouseX / Board.getSquare();
-            int targetRow = boardMouseY / Board.getSquare();
+            int targetCol = boardMouseX/Board.getSquare();
+            int targetRow = boardMouseY/Board.getSquare();
 
             attemptMove(currentPiece, targetCol, targetRow);
 
             currentPiece.setScale(currentPiece.getDEFAULT_SCALE());
             PieceService.nullThisPiece();
         }
-
         return currentPiece;
     }
 
@@ -296,11 +302,12 @@ public class MoveManager {
             if(targetRow - oldRow == dir) {
                 for(Piece p : service.getPieceService().getPieces()) {
                     if(p instanceof Pawn &&
+                            p != null &&
                             p.getColor() != currentPiece.getColor() &&
                             p.getCol() == targetCol &&
                             p.getRow() == oldRow &&
                             p.isTwoStepsAhead()) {
-                        service.getPieceService().getPieces().remove(p);
+                        service.getPieceService().removePiece(p);
                         break;
                     }
                 }
@@ -352,7 +359,7 @@ public class MoveManager {
 
     public void moveLeft(String[] options) {
         selectedIndexX--;
-        service.getGuiService().getMenuRender().getMenuInput().previousPage();
+        service.getRender().getMenuRender().getMenuInput().previousPage();
         getFx().playFX(4);
         if(selectedIndexX >= options.length) {
             selectedIndexX = 0;
@@ -386,7 +393,7 @@ public class MoveManager {
 
     public void moveRight(String[] options) {
         selectedIndexX++;
-        service.getGuiService().getMenuRender().getMenuInput().nextPage();
+        service.getRender().getMenuRender().getMenuInput().nextPage();
         getFx().playFX(4);
         if(selectedIndexX >= options.length) {
             selectedIndexX = 0;
@@ -407,8 +414,9 @@ public class MoveManager {
                 getFx().playFX(3);
                 switch (selectedIndexY) {
                     case 0 -> service.getGameService().startNewGame();
-                    case 1 -> service.getGameService().optionsMenu();
-                    case 2 -> System.exit(0);
+                    case 1 -> service.getGameService().achievementsMenu();
+                    case 2 -> service.getGameService().optionsMenu();
+                    case 3 -> System.exit(0);
                 }
             }
             case MODE -> {
@@ -426,7 +434,7 @@ public class MoveManager {
                 if (selectedIndexY == 0) { return; }
                 String option = MenuRender.optionsTweaks[selectedIndexY];
                 getFx().playFX(0);
-                service.getGuiService().getMenuRender().toggleOption(option);
+                service.getRender().getMenuRender().toggleOption(option);
             }
             case BOARD -> keyboardMove();
         }

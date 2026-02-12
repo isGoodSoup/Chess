@@ -13,13 +13,27 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class MenuRender {
-    public static final String[] optionsMenu = { "PLAY AGAINST", "RULES", "EXIT" };
+    public static final String[] optionsMenu = { "NEW GAME",
+            "ACHIEVEMENTS", "RULES", "EXIT" };
     public static final String[] optionsMode = { "PLAYER", "AI" };
-    public static final String[] optionsTweaks = { "RULES",
-            "Dark Mode", "Promotion", "Training Mode", "Continue", "Castling",
-            "En Passant", "Timer", "Stopwatch", "Chaos " +
-            "Mode", "Testing", "Undo Moves", "Reset Table", "Colorblind Mode",
-            "Themes"};
+    public static final String[] optionsTweaks = {
+            "RULES",
+            "Dark Mode",
+            "Promotion",
+            "Achievements",
+            "Training Mode",
+            "Continue",
+            "Castling",
+            "En Passant",
+            "Timer",
+            "Stopwatch",
+            "Chaos Mode",
+            "Sandbox Mode",
+            "Undo Moves",
+            "Reset Table",
+            "Colorblind Mode",
+            "Themes"
+    };
     public static String ENABLE = "Enable ";
     private static final int OPTION_X = 100;
     private static final int OPTION_Y = 160;
@@ -40,27 +54,21 @@ public class MenuRender {
     private int currentPage = 1;
 
     private static RenderContext render;
-    private final GameService gameService;
-    private final BoardService boardService;
-    private final MoveManager moveManager;
-    private final GUIService guiService;
-    private final Mouse mouse;
+    private GameService gameService;
+    private BoardService boardService;
+    private MoveManager moveManager;
+    private GUIService guiService;
+    private Mouse mouse;
     private MenuInput menuInput;
 
-    public MenuRender(RenderContext render, GUIService guiService,
-                      GameService gameService,
-                      BoardService boardService, MoveManager moveManager,
-                      Mouse mouse) {
+    public MenuRender(RenderContext render) {
         MenuRender.render = render;
-        this.guiService = guiService;
-        this.gameService = gameService;
-        this.boardService = boardService;
-        this.moveManager = moveManager;
-        this.mouse = mouse;
+        cb = ColorblindType.PROTANOPIA;
+    }
+
+    public void init() {
         this.menuInput = new MenuInput(render, this, guiService, gameService,
                 boardService, moveManager, mouse);
-        cb = ColorblindType.PROTANOPIA;
-
         try {
             DARK_MODE_ON = guiService.getImage("/ui/dark-mode_on");
             DARK_MODE_OFF = guiService.getImage("/ui/dark-mode_off");
@@ -83,6 +91,46 @@ public class MenuRender {
         TOGGLE_OFF = Colorblindness.filter(TOGGLE_OFF);
         TOGGLE_ON_HIGHLIGHTED = Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED);
         TOGGLE_OFF_HIGHLIGHTED = Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED);
+    }
+
+    public GameService getGameService() {
+        return gameService;
+    }
+
+    public void setGameService(GameService gameService) {
+        this.gameService = gameService;
+    }
+
+    public BoardService getBoardService() {
+        return boardService;
+    }
+
+    public void setBoardService(BoardService boardService) {
+        this.boardService = boardService;
+    }
+
+    public MoveManager getMoveManager() {
+        return moveManager;
+    }
+
+    public void setMoveManager(MoveManager moveManager) {
+        this.moveManager = moveManager;
+    }
+
+    public GUIService getGuiService() {
+        return guiService;
+    }
+
+    public void setGuiService(GUIService guiService) {
+        this.guiService = guiService;
+    }
+
+    public Mouse getMouse() {
+        return mouse;
+    }
+
+    public void setMouse(Mouse mouse) {
+        this.mouse = mouse;
     }
 
     public MenuInput getMenuInput() {
@@ -110,7 +158,7 @@ public class MenuRender {
         this.currentPage = currentPage;
     }
 
-    private int getTotalWidth() {
+    public int getTotalWidth() {
         return totalWidth = render.scale(RenderContext.BASE_WIDTH);
     }
 
@@ -134,13 +182,14 @@ public class MenuRender {
         return switch(option) {
             case "Dark Mode" -> BooleanService.isDarkMode;
             case "Promotion" -> BooleanService.canPromote;
+            case "Achievements" -> BooleanService.canDoAchievements;
             case "Training Mode" -> BooleanService.canTrain;
             case "Continue" -> BooleanService.canContinue;
             case "Castling" -> BooleanService.canDoCastling;
             case "En Passant" -> BooleanService.canDoEnPassant;
             case "Timer" -> BooleanService.canTime;
             case "Stopwatch" -> BooleanService.canStopwatch;
-            case "Testing" -> BooleanService.canDoTest;
+            case "Sandbox Mode" -> BooleanService.canSandbox;
             case "Chaos Mode" -> BooleanService.canDoChaos;
             case "Undo Moves" -> BooleanService.canUndoMoves;
             case "Reset Table" -> BooleanService.canResetTable;
@@ -157,6 +206,7 @@ public class MenuRender {
                 Colors.toggleDarkTheme();
             }
             case "Promotion" -> BooleanService.canPromote ^= true;
+            case "Achievements" -> BooleanService.canDoAchievements ^= true;
             case "Training Mode" -> BooleanService.canTrain ^= true;
             case "Continue" -> BooleanService.canContinue ^= true;
             case "Castling" -> BooleanService.canDoCastling ^= true;
@@ -169,7 +219,7 @@ public class MenuRender {
                 BooleanService.canStopwatch ^= true;
                 BooleanService.canTime = false;
             }
-            case "Testing" -> BooleanService.canDoTest ^= true;
+            case "Sandbox Mode" -> BooleanService.canSandbox ^= true;
             case "Chaos Mode" -> BooleanService.canDoChaos ^= true;
             case "Undo Moves" -> BooleanService.canUndoMoves ^= true;
             case "Reset Table" -> BooleanService.canResetTable ^= true;
@@ -198,7 +248,7 @@ public class MenuRender {
     }
 
     public void drawGraphics(Graphics2D g2, String[] options) {
-        g2.setColor(Colorblindness.filter(Colors.EVEN));
+        g2.setColor(Colorblindness.filter(Colors.BACKGROUND));
         g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
         g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
@@ -209,23 +259,24 @@ public class MenuRender {
 
         for(int i = 0; i < options.length; i++) {
             String optionText = options[i];
-            FontMetrics fm = g2.getFontMetrics();
+            fm = g2.getFontMetrics();
             int textWidth = fm.stringWidth(optionText);
 
             int x = getCenterX(getTotalWidth(), textWidth);
             int y = render.getOffsetY() + startY + i * spacing;
 
             Rectangle hitbox = new Rectangle(
-                    render.unscaleX(render.getOffsetX()),
-                    render.unscaleY(y),
-                    render.unscaleX(fm.stringWidth(options[i])),
-                    render.unscaleY(render.scale(40))
+                    x,
+                    y - fm.getAscent(),
+                    textWidth,
+                    fm.getHeight()
             );
-            boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY());
-            boolean isSelected = (i == moveManager.getSelectedIndexY());
 
-            Color foreground = Colorblindness.filter(GUIService.getNewForeground());
-            Color textColor = isSelected ? Color.YELLOW : (isHovered ? Color.WHITE : foreground);
+            boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY())
+                    || (i == moveManager.getSelectedIndexY());
+
+            Color foreground = Colorblindness.filter(Colors.FOREGROUND);
+            Color textColor = isHovered ? Color.YELLOW : foreground;
 
             g2.setColor(textColor);
             g2.drawString(optionText, x, y);
@@ -238,9 +289,7 @@ public class MenuRender {
     }
 
     public void drawOptionsMenu(Graphics2D g2, String[] options) {
-        g2.setColor(BooleanService.canBeColorblind ?
-                Colorblindness.filter(Colors.EVEN)
-                : Colors.EVEN);
+        g2.setColor(Colorblindness.filter(Colors.BACKGROUND));
         g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
         menuInput.updatePage();
@@ -250,8 +299,8 @@ public class MenuRender {
         int headerY = render.getOffsetY() + render.scale(OPTION_Y);
         int headerWidth = fm.stringWidth(options[0]);
         g2.setColor(BooleanService.canBeColorblind ?
-                Colorblindness.filter(Colors.ODD)
-                : Colors.ODD);
+                Colorblindness.filter(Colors.FOREGROUND)
+                : Colors.FOREGROUND);
         g2.drawString(options[0],
                 getCenterX(getTotalWidth(), headerWidth),
                 headerY);
@@ -265,7 +314,7 @@ public class MenuRender {
 
         int gap = render.scale(100);
         int maxRowWidth = 0;
-        g2.setFont(GUIService.getFont(24));
+        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
 
         for(int i = startIndex; i < endIndex; i++) {
             String enabledOption = ENABLE + options[i];
@@ -284,38 +333,41 @@ public class MenuRender {
             int blockX = getCenterX(getTotalWidth(), maxRowWidth);
             int textX = blockX;
             int toggleX = blockX + maxRowWidth - toggleWidth;
-            int toggleY = startY - toggleHeight + render.scale(12);
+            int toggleY = startY - toggleHeight;
 
             Rectangle toggleHitbox = new Rectangle(
-                    render.unscaleX(toggleX),
-                    render.unscaleY(toggleY),
-                    render.unscaleX(toggleWidth),
-                    render.unscaleY(toggleHeight)
+                    toggleX,
+                    toggleY,
+                    toggleWidth,
+                    toggleHeight
             );
 
-            boolean isHovered = toggleHitbox.contains(mouse.getX(), mouse.getY());
-            boolean isSelected = (i == moveManager.getSelectedIndexY());
+            boolean isHovered = toggleHitbox.contains(mouse.getX(),
+                    mouse.getY()) || (i == moveManager.getSelectedIndexY());
             boolean isEnabled = getOptionState(options[i]);
 
-            g2.setColor(Colorblindness.filter(GUIService.getNewForeground()));
+            g2.setColor(Colorblindness.filter(Colors.FOREGROUND));
             g2.drawString(enabledOption.toUpperCase(), textX,
                     render.getOffsetY() + startY);
 
             BufferedImage toggleImage;
             if(options[i].equals("Dark Mode")) {
                 toggleImage = isEnabled
-                        ? (isSelected || isHovered ? DARK_MODE_ON_HIGHLIGHTED : DARK_MODE_ON)
-                        : (isSelected || isHovered ? DARK_MODE_OFF_HIGHLIGHTED : DARK_MODE_OFF);
+                        ? (isHovered ? DARK_MODE_ON_HIGHLIGHTED : DARK_MODE_ON)
+                        : (isHovered ? DARK_MODE_OFF_HIGHLIGHTED : DARK_MODE_OFF);
             } else {
                 toggleImage = isEnabled
-                        ? (isSelected || isHovered ? TOGGLE_ON_HIGHLIGHTED : TOGGLE_ON)
-                        : (isSelected || isHovered ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
+                        ? (isHovered ? TOGGLE_ON_HIGHLIGHTED : TOGGLE_ON)
+                        : (isHovered ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
             }
             drawToggle(g2, toggleImage, render.getOffsetX() + toggleX,
                     render.getOffsetY() + toggleY, toggleWidth, toggleHeight);
 
             startY += lineHeight;
         }
+    }
+
+    public void drawAchievementsMenu(Graphics2D g2) {
     }
 
     public BufferedImage getSprite(int i) {

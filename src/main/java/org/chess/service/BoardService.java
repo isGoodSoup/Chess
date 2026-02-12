@@ -7,7 +7,6 @@ import org.chess.input.Mouse;
 import org.chess.input.MoveManager;
 import org.chess.gui.Sound;
 import org.chess.records.Move;
-import org.chess.render.RenderContext;
 
 import java.util.*;
 
@@ -91,7 +90,7 @@ public class BoardService {
 
     public void startBoard() {
         pieceService.getPieces().clear();
-        if(BooleanService.canDoTest) { setPiecesTest(); }
+        if(BooleanService.canSandbox) { setPiecesTest(); }
         else if(BooleanService.canDoChaos) { setPiecesChaos(); }
         else { setPieces(); }
         GameService.setCurrentTurn(Tint.WHITE);
@@ -206,9 +205,8 @@ public class BoardService {
         }
 
         Piece currentPiece = PieceService.getPiece();
-        int boardMouseX = mouse.getX() - RenderContext.BASE_WIDTH/3;
-        int hoverCol = boardMouseX/Board.getSquare();
-        int hoverRow = mouse.getY()/Board.getSquare();
+        int hoverCol = serviceFactory.getRender().unscaleX(mouse.getX()) / Board.getSquare();
+        int hoverRow = serviceFactory.getRender().unscaleY(mouse.getY()) / Board.getSquare();
         checkPiece(currentPiece, hoverCol, hoverRow);
     }
 
@@ -219,7 +217,6 @@ public class BoardService {
                 GameService.getCurrentTurn() == Tint.BLACK) {
             return;
         }
-
         manager.pickUpPiece(currentPiece, hoverCol, hoverRow);
     }
 }

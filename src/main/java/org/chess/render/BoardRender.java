@@ -3,28 +3,57 @@ package org.chess.render;
 import org.chess.entities.Board;
 import org.chess.entities.Piece;
 import org.chess.gui.Colors;
+import org.chess.input.Mouse;
 import org.chess.service.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class BoardRender {
-    private final RenderContext render;
-    private final GUIService guiService;
-    private final PieceService pieceService;
-    private final BoardService boardService;
-    private final PromotionService promotionService;
+    private RenderContext render;
+    private GUIService guiService;
+    private PieceService pieceService;
+    private BoardService boardService;
+    private PromotionService promotionService;
 
-    public BoardRender(RenderContext render, GUIService guiService,
-                       PieceService pieceService,
-                       BoardService boardService,
-                       PromotionService promotionService) {
+    public BoardRender(RenderContext render) {
         this.render = render;
-        this.guiService = guiService;
-        this.pieceService = pieceService;
-        this.boardService = boardService;
-        this.promotionService = promotionService;
+    }
 
+    public void setRender(RenderContext render) {
+        this.render = render;
+    }
+
+    public GUIService getGuiService() {
+        return guiService;
+    }
+
+    public void setGuiService(GUIService guiService) {
+        this.guiService = guiService;
+    }
+
+    public PieceService getPieceService() {
+        return pieceService;
+    }
+
+    public void setPieceService(PieceService pieceService) {
+        this.pieceService = pieceService;
+    }
+
+    public BoardService getBoardService() {
+        return boardService;
+    }
+
+    public void setBoardService(BoardService boardService) {
+        this.boardService = boardService;
+    }
+
+    public PromotionService getPromotionService() {
+        return promotionService;
+    }
+
+    public void setPromotionService(PromotionService promotionService) {
+        this.promotionService = promotionService;
     }
 
     public int getBoardOriginX() {
@@ -62,7 +91,7 @@ public class BoardRender {
             int squareSize = render.scale(Board.getSquare());
             guiService.drawBox(g2, 4, getBoardOriginX() + hoverX * squareSize,
                     getBoardOriginY() + hoverY * squareSize, squareSize,
-                    squareSize, 16, 16, false);
+                    squareSize, 16, 16, true);
         }
 
         Piece selectedPiece = pieceService.getMoveManager() != null
@@ -84,7 +113,7 @@ public class BoardRender {
     }
 
     public void drawBaseBoard(Graphics2D g2) {
-        g2.setColor(Colorblindness.filter(Colors.getEVEN()));
+        g2.setColor(Colorblindness.filter(Colors.getBACKGROUND()));
         g2.fillRect(0, 0, RenderContext.BASE_WIDTH, RenderContext.BASE_HEIGHT);
         final int ROW = boardService.getBoard().getROW();
         final int COL = boardService.getBoard().getCOL();
@@ -105,8 +134,8 @@ public class BoardRender {
         for (int row = 0; row < ROW; row++) {
             for (int col = 0; col < COL; col++) {
                 boolean isEven = (row + col) % 2 == 0;
-                g2.setColor(isEven ? Colorblindness.filter(Colors.getEVEN())
-                        : Colorblindness.filter(Colors.getODD()));
+                g2.setColor(isEven ? Colorblindness.filter(Colors.getBACKGROUND())
+                        : Colorblindness.filter(Colors.getFOREGROUND()));
                 g2.fillRect(
                         getBoardOriginX() + col * SQUARE,
                         getBoardOriginY() + row * SQUARE,
@@ -115,8 +144,8 @@ public class BoardRender {
                 );
 
                 g2.setFont(GUIService.getFont(16));
-                g2.setColor(isEven ? Colorblindness.filter(Colors.getODD())
-                        : Colorblindness.filter(Colors.getEVEN()));
+                g2.setColor(isEven ? Colorblindness.filter(Colors.getFOREGROUND())
+                        : Colorblindness.filter(Colors.getBACKGROUND()));
                 g2.drawString(
                         BoardService.getSquareName(col, row),
                         getBoardOriginX() + col * SQUARE + PADDING,
@@ -132,15 +161,26 @@ public class BoardRender {
 
     public void drawPiece(Graphics2D g2, Piece piece, BufferedImage override) {
         int square = render.scale(Board.getSquare());
-        int drawSize = (int) (square * piece.getScale());
-        int offset = (square - drawSize)/2;
+        int size = (int) (square * piece.getScale());
+        Mouse mouse = guiService.getMouse();
+        int offset = (square - size)/2;
+
+        Rectangle hitbox =
+                new Rectangle(getBoardOriginX() + render.scale(piece.getX())
+                        + offset,getBoardOriginY() + render.scale(piece.getY()) +
+                        offset, size, size);
+
+        boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY());
+        if(isHovered) {
+            override = piece.getHovered();
+        }
 
         g2.drawImage(
                 override != null ? override : piece.getImage(),
                 getBoardOriginX() + render.scale(piece.getX()) + offset,
                 getBoardOriginY() + render.scale(piece.getY()) + offset,
-                drawSize,
-                drawSize,
+                size,
+                size,
                 null
         );
     }

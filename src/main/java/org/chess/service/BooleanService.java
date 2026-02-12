@@ -19,9 +19,10 @@ public class BooleanService {
     public static boolean isExitActive;
 
     public static boolean canUndoMoves;
+    public static boolean canDoAchievements;
     public static boolean canPromote;
     public static boolean canContinue;
-    public static boolean canDoTest;
+    public static boolean canSandbox;
     public static boolean canDoChaos;
     public static boolean canTrain;
     public static boolean canDoCastling;

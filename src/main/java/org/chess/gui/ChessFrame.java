@@ -28,10 +28,12 @@ public class ChessFrame extends JFrame {
 		setLocationRelativeTo(null);
 		toggleFullscreen();
 		setVisible(true);
+		panel.requestFocusInWindow();
 		panel.launch();
 	}
 
 	public void toggleFullscreen() {
+		boolean wasFocused = panel.isFocusOwner();
 		dispose();
 		if (BooleanService.isFullscreen) {
 			windowedBounds = getBounds();
@@ -48,5 +50,6 @@ public class ChessFrame extends JFrame {
 		}
 		BooleanService.isFullscreen = !BooleanService.isFullscreen;
 		setVisible(true);
+		if(wasFocused) { panel.requestFocus(); }
 	}
 }

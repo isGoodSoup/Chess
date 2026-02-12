@@ -199,36 +199,6 @@ public class PieceService {
         updatePos(piece);
     }
 
-    public Piece getHoveredPiece() {
-        if (currentPiece != null) return null;
-
-        int boardOriginX = moveManager != null ?
-                moveManager.getService().getGuiService().getBoardRender().getBoardOriginX() : 0;
-        int boardOriginY = moveManager != null ?
-                moveManager.getService().getGuiService().getBoardRender().getBoardOriginY() : 0;
-
-        int boardMouseX = mouse.getX() - boardOriginX;
-        int boardMouseY = mouse.getY() - boardOriginY;
-
-        if(boardMouseX < 0 || boardMouseY < 0) { return null; }
-
-        int hoverCol = boardMouseX / Board.getSquare();
-        int hoverRow = boardMouseY / Board.getSquare();
-
-        if(!isWithinBoard(hoverCol, hoverRow)) { return null; }
-
-        for(Piece p : pieces) {
-            if (p.getCol() == hoverCol && p.getRow() == hoverRow) {
-                if (BooleanService.isAIPlaying && p.getColor() != Tint.WHITE
-                        || BooleanService.isDragging) {
-                    return null;
-                }
-                return p;
-            }
-        }
-        return null;
-    }
-
     public void switchTurns() {
         GameService.setCurrentTurn(
                 GameService.getCurrentTurn() == Tint.WHITE ? Tint.BLACK : Tint.WHITE
