@@ -73,7 +73,7 @@ public class MenuInput {
         int y = MenuRender.getOPTION_Y() + lineHeight;
 
         int boardWidth = render.scale(Board.getSquare() * 8);
-        int totalWidth = boardWidth + render.scale(GUIService.getEXTRA_WIDTH()) * 2;
+        int totalWidth = boardWidth + render.scale(RenderContext.BASE_WIDTH) * 2;
         int centerX = totalWidth / 2;
 
         int toggleWidth = menuRender.getSprite(0).getWidth() / 2;
@@ -82,7 +82,7 @@ public class MenuInput {
 
         for(int i = 1; i < MenuRender.optionsTweaks.length; i++) {
             String option = MenuRender.optionsTweaks[i];
-            String enabledOption = MenuRender.getENABLE() + option;
+            String enabledOption = MenuRender.ENABLE + option;
             int textX = render.scale(MenuRender.getOPTION_X());
             int textY = render.scale(y);
             int textWidth = menuRender.getFontMetrics().stringWidth(enabledOption);
@@ -113,7 +113,7 @@ public class MenuInput {
             int y = startY + i * spacing;
 
             boolean isHovered = GUIService.getHITBOX(
-                    render.unscaleX(menuRender.getOFFSET_X()),
+                    render.unscaleX(render.getOffsetX()),
                     render.unscaleY(y),
                     render.unscaleX(200),
                     render.unscaleY(40)

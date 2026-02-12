@@ -200,18 +200,25 @@ public class PieceService {
     }
 
     public Piece getHoveredPiece() {
-        int boardMouseX = mouse.getX() - GUIService.getEXTRA_WIDTH();
-        int boardMouseY = mouse.getY();
+        if (currentPiece != null) return null;
 
-        if (boardMouseX < 0 || boardMouseY < 0) {
-            return null;
-        }
+        int boardOriginX = moveManager != null ?
+                moveManager.getService().getGuiService().getBoardRender().getBoardOriginX() : 0;
+        int boardOriginY = moveManager != null ?
+                moveManager.getService().getGuiService().getBoardRender().getBoardOriginY() : 0;
 
-        int hoverCol = boardMouseX  / Board.getSquare();
+        int boardMouseX = mouse.getX() - boardOriginX;
+        int boardMouseY = mouse.getY() - boardOriginY;
+
+        if(boardMouseX < 0 || boardMouseY < 0) { return null; }
+
+        int hoverCol = boardMouseX / Board.getSquare();
         int hoverRow = boardMouseY / Board.getSquare();
 
-        for (Piece p : pieces) {
-            if (p.getCol() == hoverCol && p.getRow() == hoverRow && p != currentPiece) {
+        if(!isWithinBoard(hoverCol, hoverRow)) { return null; }
+
+        for(Piece p : pieces) {
+            if (p.getCol() == hoverCol && p.getRow() == hoverRow) {
                 if (BooleanService.isAIPlaying && p.getColor() != Tint.WHITE
                         || BooleanService.isDragging) {
                     return null;

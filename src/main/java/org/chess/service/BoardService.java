@@ -7,6 +7,7 @@ import org.chess.input.Mouse;
 import org.chess.input.MoveManager;
 import org.chess.gui.Sound;
 import org.chess.records.Move;
+import org.chess.render.RenderContext;
 
 import java.util.*;
 
@@ -205,9 +206,9 @@ public class BoardService {
         }
 
         Piece currentPiece = PieceService.getPiece();
-        int boardMouseX = mouse.getX() - GUIService.getEXTRA_WIDTH();
-        int hoverCol = boardMouseX / Board.getSquare();
-        int hoverRow = mouse.getY() / Board.getSquare();
+        int boardMouseX = mouse.getX() - RenderContext.BASE_WIDTH/3;
+        int hoverCol = boardMouseX/Board.getSquare();
+        int hoverRow = mouse.getY()/Board.getSquare();
         checkPiece(currentPiece, hoverCol, hoverRow);
     }
 

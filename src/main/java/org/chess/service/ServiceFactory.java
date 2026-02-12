@@ -41,6 +41,10 @@ public class ServiceFactory {
         this.manager.init(this);
     }
 
+    public RenderContext getRender() {
+        return render;
+    }
+
     public PieceService getPieceService() {
         return piece;
     }

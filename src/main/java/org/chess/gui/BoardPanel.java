@@ -38,8 +38,7 @@ public class BoardPanel extends JPanel implements Runnable {
         BooleanService.defaultToggles();
         final int WIDTH = RenderContext.BASE_WIDTH;
         final int HEIGHT = RenderContext.BASE_HEIGHT;
-        setPreferredSize(new Dimension(WIDTH +
-                GUIService.getEXTRA_WIDTH(), HEIGHT));
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(GUIService.getNewBackground());
         addMouseMotionListener(service.getMouseService());
         addMouseListener(service.getMouseService());
@@ -235,8 +234,20 @@ public class BoardPanel extends JPanel implements Runnable {
             Colors.nextTheme();
         }
 
+        if(keyboard.isComboPressed(KeyEvent.VK_CONTROL, KeyEvent.VK_R)) {
+            refreshGraphics();
+        }
+
+        if(keyboard.isComboPressed(KeyEvent.VK_CONTROL, KeyEvent.VK_H)) {
+            service.getGuiService().getMovesRender().hideMoves();
+        }
+
         if(keyboard.wasF11Pressed()) {
             frame.toggleFullscreen();
         }
+    }
+
+    public void refreshGraphics() {
+        repaint();
     }
 }

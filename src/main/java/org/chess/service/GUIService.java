@@ -16,13 +16,10 @@ import java.util.Objects;
 public class GUIService {
     private static Font font;
     private static final int MENU_SPACING = 40;
-    private static final int MENU_START_Y = 80;
+    private static final int MENU_START_Y = 160;
     private static final int MENU_FONT = 32;
-    private static final int EXTRA_WIDTH = 150;
-    private static final int LEFT_PANEL_CENTER_X = EXTRA_WIDTH/2;
-    private static final int GRAPHICS_OFFSET = EXTRA_WIDTH/2;
-    private static final int MOVES_CAP = 14;
-    private final int TIMER_Y;
+    private static final int MOVES_CAP = 28;
+    private static final int PADDING = 90;
 
     private final Sound fx;
     private final BoardRender boardRender;
@@ -89,11 +86,6 @@ public class GUIService {
             System.err.println(e.getMessage());
             font = new Font("Helvetica", Font.BOLD, 30);
         }
-        TIMER_Y = 475;
-    }
-
-    public static int getEXTRA_WIDTH() {
-        return EXTRA_WIDTH;
     }
 
     public static Font getFont(int size) {
@@ -142,12 +134,12 @@ public class GUIService {
         return logo_v2;
     }
 
-    public static int getGRAPHICS_OFFSET() {
-        return GRAPHICS_OFFSET;
-    }
-
     public static int getMOVES_CAP() {
         return MOVES_CAP;
+    }
+
+    public static int getPADDING() {
+        return PADDING;
     }
 
     public BoardRender getBoardRender() {
@@ -176,31 +168,64 @@ public class GUIService {
     }
 
     public void drawTimer(Graphics2D g2) {
-        g2.setFont(GUIService.getFont(24));
+        g2.setFont(getFont(MENU_FONT));
         Color filtered = BooleanService.canBeColorblind || BooleanService.isDarkMode
                 ? Colorblindness.filter(Colors.ODD) : Colors.ODD;
         g2.setColor(filtered);
 
+        int boardX = boardRender.getBoardOriginX();
+        int boardY = boardRender.getBoardOriginY();
+        int boardWidth = Board.getSquare() * boardService.getBoard().getCOL();
+
         FontMetrics fm = g2.getFontMetrics();
         String time = timerService.getTimeString();
         int textWidth = fm.stringWidth(time);
-        int x = LEFT_PANEL_CENTER_X - textWidth/2;
-        g2.drawString(time, x, TIMER_Y);
+        int textHeight = fm.getAscent() + fm.getDescent();
+
+        int innerPadding = render.scale(30);
+        int padding = render.scale(PADDING);
+
+        int textX = boardX + (boardWidth - textWidth)/2;
+        int textY = boardY - padding - fm.getDescent();
+
+        int boxX = textX - innerPadding;
+        int boxY = textY - fm.getAscent() - innerPadding;
+        int boxWidth = textWidth + 2 * innerPadding;
+        int boxHeight = textHeight + 2 * innerPadding;
+
+        drawBox(g2, 4, boxX, boxY, boxWidth,
+                boxHeight, 15, 15, true);
+        g2.drawString(time, textX, textY);
     }
 
     public void drawTick(Graphics2D g2, boolean isLegal) {
-        if(pieceService.getHeldPiece() == null) {
-            return;
-        }
+        if(pieceService.getHeldPiece() == null) return;
 
         BufferedImage image = isLegal ? YES : NO;
         image = Colorblindness.filter(image);
 
-        FontMetrics fm = g2.getFontMetrics(GUIService.getFont(24));
-        int size = Board.getSquare();
-        int x = LEFT_PANEL_CENTER_X - size/2;
-        int y = TIMER_Y - fm.getAscent() - size - 5;
-        g2.drawImage(image, x, y, size, size, null);
+        int size = render.scale(Board.getSquare());
+        int boardX = boardRender.getBoardOriginX();
+        int boardY = boardRender.getBoardOriginY();
+        int boardWidth = Board.getSquare() * boardService.getBoard().getCOL();
+
+        int padding = render.scale(PADDING + 30);
+        int tickX = boardX + (boardWidth - size)/2;
+        int tickY = boardY - size - padding;
+
+        g2.drawImage(image, tickX, tickY, size, size, null);
+    }
+
+    public void drawBox(Graphics2D g2, int stroke, int x, int y, int width,
+                        int height, int arcWidth, int arcHeight,
+                        boolean hasBackground) {
+        if(hasBackground) {
+            g2.setColor(new Color(0, 0, 0, 180));
+            g2.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
+        }
+        g2.setColor(new Color(255, 255, 255));
+        g2.setStroke(new BasicStroke(stroke));
+        g2.drawRoundRect(x, y, width, height, arcWidth, arcHeight);
     }
 
     public static Rectangle getHITBOX(int x, int y, int width, int height) {

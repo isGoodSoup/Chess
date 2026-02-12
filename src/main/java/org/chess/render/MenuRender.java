@@ -20,32 +20,23 @@ public class MenuRender {
             "En Passant", "Timer", "Stopwatch", "Chaos " +
             "Mode", "Testing", "Undo Moves", "Reset Table", "Colorblind Mode",
             "Themes"};
-    private static final String ENABLE = "Enable ";
+    public static String ENABLE = "Enable ";
     private static final int OPTION_X = 100;
-    private static final int OPTION_Y = 80;
-    private final BufferedImage DARK_MODE_ON;
-    private final BufferedImage DARK_MODE_OFF;
-    private final BufferedImage DARK_MODE_ON_HIGHLIGHTED;
-    private final BufferedImage DARK_MODE_OFF_HIGHLIGHTED;
-    private final BufferedImage cbDARK_MODE_ON;
-    private final BufferedImage cbDARK_MODE_OFF;
-    private final BufferedImage cbDARK_MODE_ON_HIGHLIGHTED;
-    private final BufferedImage cbDARK_MODE_OFF_HIGHLIGHTED;
-    private final BufferedImage TOGGLE_ON;
-    private final BufferedImage TOGGLE_OFF;
-    private final BufferedImage TOGGLE_ON_HIGHLIGHTED;
-    private final BufferedImage TOGGLE_OFF_HIGHLIGHTED;
-    private final BufferedImage cbTOGGLE_ON;
-    private final BufferedImage cbTOGGLE_OFF;
-    private final BufferedImage cbTOGGLE_ON_HIGHLIGHTED;
-    private final BufferedImage cbTOGGLE_OFF_HIGHLIGHTED;
+    private static final int OPTION_Y = 160;
+    private static final float SCALE = 1.5f;
+    private BufferedImage DARK_MODE_ON;
+    private BufferedImage DARK_MODE_OFF;
+    private BufferedImage DARK_MODE_ON_HIGHLIGHTED;
+    private BufferedImage DARK_MODE_OFF_HIGHLIGHTED;
+    private BufferedImage TOGGLE_ON;
+    private BufferedImage TOGGLE_OFF;
+    private BufferedImage TOGGLE_ON_HIGHLIGHTED;
+    private BufferedImage TOGGLE_OFF_HIGHLIGHTED;
     private static ColorblindType cb;
-    private Rectangle yesButton;
-    private Rectangle noButton;
     private int lastHoveredIndex = -1;
     private int exitSelection = 0;
-    private final int OFFSET_X;
-    private FontMetrics fontMetrics;
+    private static int totalWidth;
+    private static FontMetrics fm;
     private int currentPage = 1;
 
     private static RenderContext render;
@@ -83,17 +74,15 @@ public class MenuRender {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        OFFSET_X = render.scale(RenderContext.BASE_WIDTH)/2 - 100
-                + GUIService.getGRAPHICS_OFFSET() - 30;
-        cbDARK_MODE_ON = Colorblindness.filter(DARK_MODE_ON);
-        cbDARK_MODE_OFF = Colorblindness.filter(DARK_MODE_OFF);
-        cbDARK_MODE_ON_HIGHLIGHTED = Colorblindness.filter(DARK_MODE_ON_HIGHLIGHTED);
-        cbDARK_MODE_OFF_HIGHLIGHTED =
+        DARK_MODE_ON = Colorblindness.filter(DARK_MODE_ON);
+        DARK_MODE_OFF = Colorblindness.filter(DARK_MODE_OFF);
+        DARK_MODE_ON_HIGHLIGHTED = Colorblindness.filter(DARK_MODE_ON_HIGHLIGHTED);
+        DARK_MODE_OFF_HIGHLIGHTED =
                 Colorblindness.filter(DARK_MODE_OFF_HIGHLIGHTED);
-        cbTOGGLE_ON = Colorblindness.filter(TOGGLE_ON);
-        cbTOGGLE_OFF = Colorblindness.filter(TOGGLE_OFF);
-        cbTOGGLE_ON_HIGHLIGHTED = Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED);
-        cbTOGGLE_OFF_HIGHLIGHTED = Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED);
+        TOGGLE_ON = Colorblindness.filter(TOGGLE_ON);
+        TOGGLE_OFF = Colorblindness.filter(TOGGLE_OFF);
+        TOGGLE_ON_HIGHLIGHTED = Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED);
+        TOGGLE_OFF_HIGHLIGHTED = Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED);
     }
 
     public MenuInput getMenuInput() {
@@ -108,8 +97,9 @@ public class MenuRender {
         MenuRender.cb = cb;
     }
 
-    public int getOFFSET_X() {
-        return OFFSET_X;
+    public static int getCenterX(int containerWidth, int elementWidth) {
+        return render.getOffsetX()
+                + (containerWidth - elementWidth)/2;
     }
 
     public int getCurrentPage() {
@@ -120,16 +110,12 @@ public class MenuRender {
         this.currentPage = currentPage;
     }
 
+    private int getTotalWidth() {
+        return totalWidth = render.scale(RenderContext.BASE_WIDTH);
+    }
+
     public FontMetrics getFontMetrics() {
-        return fontMetrics;
-    }
-
-    public Rectangle getYesButton() {
-        return yesButton;
-    }
-
-    public Rectangle getNoButton() {
-        return noButton;
+        return fm;
     }
 
     public int getExitSelection() {
@@ -142,14 +128,6 @@ public class MenuRender {
 
     public static int getOPTION_Y() {
         return OPTION_Y;
-    }
-
-    public static String getENABLE() {
-        return ENABLE;
-    }
-    
-    private int getOptionsStartY() {
-        return 100 + GUIService.getFontBold(32).getSize() + 8;
     }
 
     private boolean getOptionState(String option) {
@@ -205,31 +183,28 @@ public class MenuRender {
         g2.drawImage(image, x, y, width, height, null);
     }
 
-    private static void drawLogo(Graphics2D g2) {
+    private static void drawLogo(Graphics2D g2, int containerWidth) {
         if(GUIService.getLogo() == null) { return; }
         BufferedImage img = BooleanService.isDarkMode ?
                 GUIService.getLogo_v2() : Colorblindness.filter(GUIService.getLogo());
         int boardWidth = Board.getSquare() * 8;
         int boardCenterX = render.getOffsetX() + render.scale(
-                GUIService.getEXTRA_WIDTH()) * 2 + boardWidth/2;
-        int logoWidth = GUIService.getLogo().getWidth()/2;
-        int logoHeight = GUIService.getLogo().getHeight()/2;
-        int x = boardCenterX - logoWidth / 2;
-        int y = render.getOffsetY() + render.scale(RenderContext.BASE_HEIGHT) / 7;
+                RenderContext.BASE_WIDTH) * 2 + boardWidth/2;
+        int logoWidth = (int) (GUIService.getLogo().getWidth()/SCALE);
+        int logoHeight = (int) (GUIService.getLogo().getHeight()/SCALE);
+        int x = getCenterX(containerWidth, logoWidth);
+        int y = render.getOffsetY() + render.scale(RenderContext.BASE_HEIGHT)/10;
         g2.drawImage(img, x, y, logoWidth, logoHeight, null);
     }
 
     public void drawGraphics(Graphics2D g2, String[] options) {
-        int boardWidth = render.scale(Board.getSquare() * 8);
-        int totalWidth = boardWidth + 2 * render.scale(GUIService.getEXTRA_WIDTH());
+        g2.setColor(Colorblindness.filter(Colors.EVEN));
+        g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
-        g2.setColor(Colorblindness.filter(GUIService.getNewBackground()));
-        g2.fillRect(0, 0, totalWidth, render.scale(RenderContext.BASE_HEIGHT));
+        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
+        drawLogo(g2, getTotalWidth());
 
-        g2.setFont(GUIService.getFontBold(GUIService.getMENU_FONT()));
-        drawLogo(g2);
-
-        int startY = render.scale(RenderContext.BASE_HEIGHT) / 2 + render.scale(GUIService.getMENU_START_Y());
+        int startY = render.scale(RenderContext.BASE_HEIGHT)/2 + render.scale(GUIService.getMENU_START_Y());
         int spacing = render.scale(GUIService.getMENU_SPACING());
 
         for(int i = 0; i < options.length; i++) {
@@ -237,13 +212,13 @@ public class MenuRender {
             FontMetrics fm = g2.getFontMetrics();
             int textWidth = fm.stringWidth(optionText);
 
-            int x = render.getOffsetX() + (totalWidth - textWidth) / 2 + render.scale(GUIService.getGRAPHICS_OFFSET());
+            int x = getCenterX(getTotalWidth(), textWidth);
             int y = render.getOffsetY() + startY + i * spacing;
 
             Rectangle hitbox = new Rectangle(
-                    render.unscaleX(OFFSET_X),
+                    render.unscaleX(render.getOffsetX()),
                     render.unscaleY(y),
-                    render.unscaleX(render.scale(200)),
+                    render.unscaleX(fm.stringWidth(options[i])),
                     render.unscaleY(render.scale(40))
             );
             boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY());
@@ -263,36 +238,53 @@ public class MenuRender {
     }
 
     public void drawOptionsMenu(Graphics2D g2, String[] options) {
-        int boardWidth = render.scale(Board.getSquare() * 8);
-        int totalWidth = boardWidth + 2 * render.scale(GUIService.getEXTRA_WIDTH());
+        g2.setColor(BooleanService.canBeColorblind ?
+                Colorblindness.filter(Colors.EVEN)
+                : Colors.EVEN);
+        g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
-        g2.setColor(BooleanService.canBeColorblind || BooleanService.isDarkMode
-                ? Colorblindness.filter(GUIService.getNewBackground())
-                : GUIService.getNewBackground());
-        g2.fillRect(0, 0, totalWidth, render.scale(RenderContext.BASE_HEIGHT));
         menuInput.updatePage();
-        g2.setFont(GUIService.getFontBold(32));
-        fontMetrics = g2.getFontMetrics();
+        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
+        fm = g2.getFontMetrics();
 
-        int startY = render.scale(OPTION_Y); // scaled Y
-        int centerX = totalWidth / 2;
+        int headerY = render.getOffsetY() + render.scale(OPTION_Y);
+        int headerWidth = fm.stringWidth(options[0]);
+        g2.setColor(BooleanService.canBeColorblind ?
+                Colorblindness.filter(Colors.ODD)
+                : Colors.ODD);
+        g2.drawString(options[0],
+                getCenterX(getTotalWidth(), headerWidth),
+                headerY);
 
-        int lineHeight = render.scale(fontMetrics.getHeight() + 4);
+        int startY = headerY + render.scale(90);
+        int lineHeight = fm.getHeight() + render.scale(10);
         int itemsPerPage = 8;
 
         int startIndex = (currentPage - 1) * itemsPerPage + 1;
         int endIndex = Math.min(startIndex + itemsPerPage, optionsTweaks.length);
 
-        for (int i = startIndex; i < endIndex; i++) {
+        int gap = render.scale(100);
+        int maxRowWidth = 0;
+        g2.setFont(GUIService.getFont(24));
+
+        for(int i = startIndex; i < endIndex; i++) {
             String enabledOption = ENABLE + options[i];
+            int textWidth = g2.getFontMetrics().stringWidth(enabledOption.toUpperCase());
+            int toggleWidth = render.scale(TOGGLE_ON.getWidth()/2);
+            int rowWidth = textWidth + gap + toggleWidth;
+            if(rowWidth > maxRowWidth) maxRowWidth = rowWidth;
+        }
 
-            g2.setFont(GUIService.getFontBold(24));
+        for(int i = startIndex; i < endIndex; i++) {
+            String enabledOption = ENABLE + options[i];
+            int textWidth = g2.getFontMetrics().stringWidth(enabledOption);
+            int toggleWidth = render.scale(TOGGLE_ON.getWidth()/2);
+            int toggleHeight = render.scale(TOGGLE_ON.getHeight()/2);
 
-            int toggleWidth = render.scale(cbTOGGLE_ON.getWidth() / 2);
-            int toggleHeight = render.scale(cbTOGGLE_ON.getHeight() / 2);
-
-            int toggleX = centerX + render.scale(200);
-            int toggleY = startY - toggleHeight + render.scale(16);
+            int blockX = getCenterX(getTotalWidth(), maxRowWidth);
+            int textX = blockX;
+            int toggleX = blockX + maxRowWidth - toggleWidth;
+            int toggleY = startY - toggleHeight + render.scale(12);
 
             Rectangle toggleHitbox = new Rectangle(
                     render.unscaleX(toggleX),
@@ -306,22 +298,22 @@ public class MenuRender {
             boolean isEnabled = getOptionState(options[i]);
 
             g2.setColor(Colorblindness.filter(GUIService.getNewForeground()));
-            g2.drawString(enabledOption, render.getOffsetX()
-                    + render.scale(OPTION_X), render.getOffsetY() + startY);
+            g2.drawString(enabledOption.toUpperCase(), textX,
+                    render.getOffsetY() + startY);
 
             BufferedImage toggleImage;
-            if (options[i].equals("Dark Mode")) {
+            if(options[i].equals("Dark Mode")) {
                 toggleImage = isEnabled
-                        ? (isSelected || isHovered ? cbDARK_MODE_ON_HIGHLIGHTED : cbDARK_MODE_ON)
-                        : (isSelected || isHovered ? cbDARK_MODE_OFF_HIGHLIGHTED : cbDARK_MODE_OFF);
+                        ? (isSelected || isHovered ? DARK_MODE_ON_HIGHLIGHTED : DARK_MODE_ON)
+                        : (isSelected || isHovered ? DARK_MODE_OFF_HIGHLIGHTED : DARK_MODE_OFF);
             } else {
                 toggleImage = isEnabled
-                        ? (isSelected || isHovered ? cbTOGGLE_ON_HIGHLIGHTED : cbTOGGLE_ON)
-                        : (isSelected || isHovered ? cbTOGGLE_OFF_HIGHLIGHTED : cbTOGGLE_OFF);
+                        ? (isSelected || isHovered ? TOGGLE_ON_HIGHLIGHTED : TOGGLE_ON)
+                        : (isSelected || isHovered ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
             }
-            drawToggle(g2, toggleImage, render.getOffsetX()
-                    + toggleX, render.getOffsetY() + toggleY, toggleWidth,
-                    toggleHeight);
+            drawToggle(g2, toggleImage, render.getOffsetX() + toggleX,
+                    render.getOffsetY() + toggleY, toggleWidth, toggleHeight);
+
             startY += lineHeight;
         }
     }
@@ -332,18 +324,10 @@ public class MenuRender {
             case 1 -> DARK_MODE_OFF;
             case 2 -> DARK_MODE_ON_HIGHLIGHTED;
             case 3 -> DARK_MODE_OFF_HIGHLIGHTED;
-            case 4 -> cbDARK_MODE_ON;
-            case 5 -> cbDARK_MODE_OFF;
-            case 6 -> cbDARK_MODE_ON_HIGHLIGHTED;
-            case 7 -> cbDARK_MODE_OFF_HIGHLIGHTED;
-            case 8 -> TOGGLE_ON;
-            case 9 -> TOGGLE_OFF;
-            case 10 -> TOGGLE_ON_HIGHLIGHTED;
-            case 11 -> TOGGLE_OFF_HIGHLIGHTED;
-            case 12 -> cbTOGGLE_ON;
-            case 13 -> cbTOGGLE_OFF;
-            case 14 -> cbTOGGLE_ON_HIGHLIGHTED;
-            case 15 -> cbTOGGLE_OFF_HIGHLIGHTED;
+            case 4 -> TOGGLE_ON;
+            case 5 -> TOGGLE_OFF;
+            case 6 -> TOGGLE_ON_HIGHLIGHTED;
+            case 7 -> TOGGLE_OFF_HIGHLIGHTED;
             default -> null;
         };
     }

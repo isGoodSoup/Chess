@@ -6,6 +6,7 @@ import org.chess.enums.Tint;
 import org.chess.gui.Sound;
 import org.chess.records.Move;
 import org.chess.render.MenuRender;
+import org.chess.render.RenderContext;
 import org.chess.service.*;
 
 import javax.swing.*;
@@ -31,6 +32,10 @@ public class MoveManager {
         this.moves = service.getBoardService().getMoves();
         this.selectedIndexY = 0;
         this.selectedIndexX = 0;
+    }
+
+    public ServiceFactory getService() {
+        return service;
     }
 
     public Piece getSelectedPiece() {
@@ -96,11 +101,14 @@ public class MoveManager {
     private void dragPiece(Piece currentPiece) {
         if(!BooleanService.isDragging || currentPiece == null) { return; }
 
-        int boardMouseX = mouse.getX() - GUIService.getEXTRA_WIDTH();
+        int originX = service.getGuiService().getBoardRender().getBoardOriginX();
+        int originY = service.getGuiService().getBoardRender().getBoardOriginY();
+
+        int boardMouseX = mouse.getX() - RenderContext.BASE_WIDTH/2;
         currentPiece.setX(boardMouseX - currentPiece.getDragOffsetX());
         currentPiece.setY(mouse.getY() - currentPiece.getDragOffsetY());
-        int targetCol = boardMouseX / Board.getSquare();
-        int targetRow = mouse.getY() / Board.getSquare();
+        int targetCol = boardMouseX/Board.getSquare();
+        int targetRow = mouse.getY()/Board.getSquare();
 
         BooleanService.isLegal =
                 currentPiece.canMove(targetCol, targetRow, service.getPieceService().getPieces())
@@ -182,25 +190,32 @@ public class MoveManager {
     }
 
     private Piece dropPiece(Piece currentPiece) {
-        int boardMouseX = mouse.getX() - GUIService.getEXTRA_WIDTH();
+        if(!BooleanService.isDragging || currentPiece == null) return currentPiece;
 
-        if(BooleanService.isDragging && mouse.wasReleased()
-                && currentPiece != null) {
+        int originX = service.getGuiService().getBoardRender().getBoardOriginX();
+        int originY = service.getGuiService().getBoardRender().getBoardOriginY();
 
+        int boardMouseX = mouse.getX() - originX;
+        int boardMouseY = mouse.getY() - originY;
+
+        if(mouse.wasReleased()) {
             BooleanService.isDragging = false;
-            if(boardMouseX < 0 || boardMouseX >= Board.getSquare() * 8) {
+
+            if(boardMouseX < 0 || boardMouseX >= Board.getSquare() * 8
+                    || boardMouseY < 0 || boardMouseY >= Board.getSquare() * 8) {
                 PieceService.updatePos(currentPiece);
                 return currentPiece;
             }
 
             int targetCol = boardMouseX / Board.getSquare();
-            int targetRow = mouse.getY() / Board.getSquare();
+            int targetRow = boardMouseY / Board.getSquare();
 
             attemptMove(currentPiece, targetCol, targetRow);
 
             currentPiece.setScale(currentPiece.getDEFAULT_SCALE());
             PieceService.nullThisPiece();
         }
+
         return currentPiece;
     }
 

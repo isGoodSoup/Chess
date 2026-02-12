@@ -31,11 +31,12 @@ public class BooleanService {
     public static boolean canResetTable;
     public static boolean canBeColorblind;
     public static boolean canTheme;
+    public static boolean canToggleMoves;
 
     private static final Random random = new Random();
 
     public static void defaultToggles() {
-        isFullscreen = false;
+        isFullscreen = true;
         isDarkMode = false;
         canDoCastling = true;
         canDoEnPassant = true;
