@@ -15,6 +15,7 @@ public class BooleanService {
     public static boolean isPromotionPending;
     public static boolean isTurn;
     public static boolean isDarkMode;
+    public static boolean isFullscreen;
     public static boolean isExitActive;
 
     public static boolean canUndoMoves;
@@ -29,10 +30,12 @@ public class BooleanService {
     public static boolean canStopwatch;
     public static boolean canResetTable;
     public static boolean canBeColorblind;
+    public static boolean canTheme;
 
     private static final Random random = new Random();
 
     public static void defaultToggles() {
+        isFullscreen = false;
         isDarkMode = false;
         canDoCastling = true;
         canDoEnPassant = true;
@@ -43,6 +46,7 @@ public class BooleanService {
         isGameOver = false;
         isExitActive = false;
         canDoChaos = false;
+        canTheme = false;
     }
 
     public static boolean getBoolean() {

@@ -2,6 +2,7 @@ package org.chess.input;
 
 import org.chess.entities.Board;
 import org.chess.render.MenuRender;
+import org.chess.render.RenderContext;
 import org.chess.service.BoardService;
 import org.chess.service.GUIService;
 import org.chess.service.GameService;
@@ -9,6 +10,7 @@ import org.chess.service.GameService;
 import java.awt.*;
 
 public class MenuInput {
+    private final RenderContext render;
     private final GameService gameService;
     private final BoardService boardService;
     private final MoveManager moveManager;
@@ -16,9 +18,11 @@ public class MenuInput {
     private final Mouse mouse;
     private final MenuRender menuRender;
 
-    public MenuInput(MenuRender menuRender, GUIService guiService,
+    public MenuInput(RenderContext render, MenuRender menuRender,
+                     GUIService guiService,
                      GameService gameService, BoardService boardService,
                      MoveManager moveManager, Mouse mouse) {
+        this.render = render;
         this.gameService = gameService;
         this.boardService = boardService;
         this.moveManager = moveManager;
@@ -68,25 +72,26 @@ public class MenuInput {
         int lineHeight = menuRender.getFontMetrics().getHeight() + 4;
         int y = MenuRender.getOPTION_Y() + lineHeight;
 
-        int boardWidth = Board.getSquare() * 8;
-        int totalWidth = boardWidth + 2 * GUIService.getEXTRA_WIDTH();
+        int boardWidth = render.scale(Board.getSquare() * 8);
+        int totalWidth = boardWidth + render.scale(GUIService.getEXTRA_WIDTH()) * 2;
         int centerX = totalWidth / 2;
+
         int toggleWidth = menuRender.getSprite(0).getWidth() / 2;
         int toggleHeight = menuRender.getSprite(0).getHeight() / 2;
-        int toggleX = centerX + 200;
+        int toggleX = centerX + render.scale(200);
 
         for(int i = 1; i < MenuRender.optionsTweaks.length; i++) {
             String option = MenuRender.optionsTweaks[i];
             String enabledOption = MenuRender.getENABLE() + option;
-            int textX = MenuRender.getOPTION_X();
-            int textY = y;
+            int textX = render.scale(MenuRender.getOPTION_X());
+            int textY = render.scale(y);
             int textWidth = menuRender.getFontMetrics().stringWidth(enabledOption);
 
             Rectangle toggleHitbox = new Rectangle(
-                    toggleX,
-                    textY - toggleHeight + 16,
-                    toggleWidth,
-                    toggleHeight
+                    render.unscaleX(toggleX),
+                    render.unscaleY(textY - toggleHeight + 16),
+                    render.unscaleX(toggleWidth),
+                    render.unscaleY(toggleHeight)
             );
 
             if(toggleHitbox.contains(mouse.getX(), mouse.getY())) {
@@ -101,15 +106,18 @@ public class MenuInput {
     public void handleMenuInput() {
         if(!mouse.wasPressed()) { return; }
 
-        int startY = GUIService.getHEIGHT()/2 + GUIService.getMENU_START_Y();
+        int startY = render.scale(RenderContext.BASE_HEIGHT)/2 + GUIService.getMENU_START_Y();
         int spacing = GUIService.getMENU_SPACING();
 
         for(int i = 0; i < MenuRender.optionsMenu.length; i++) {
             int y = startY + i * spacing;
-            boolean isHovered =
-                    GUIService.getHITBOX(menuRender.getOFFSET_X(), y,
-                            200, 40).contains(mouse.getX(),
-                            mouse.getY());
+
+            boolean isHovered = GUIService.getHITBOX(
+                    render.unscaleX(menuRender.getOFFSET_X()),
+                    render.unscaleY(y),
+                    render.unscaleX(200),
+                    render.unscaleY(40)
+            ).contains(mouse.getX(), mouse.getY());
 
             if(isHovered) {
                 guiService.getFx().play(0);

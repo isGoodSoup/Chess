@@ -1,6 +1,7 @@
 package org.chess.service;
 
 import org.chess.entities.*;
+import org.chess.gui.Colors;
 import org.chess.input.Mouse;
 import org.chess.gui.Sound;
 import org.chess.input.MoveManager;
@@ -22,8 +23,6 @@ public class GUIService {
     private static final int GRAPHICS_OFFSET = EXTRA_WIDTH/2;
     private static final int MOVES_CAP = 14;
     private final int TIMER_Y;
-    private static Color background;
-    private static Color foreground;
 
     private final Sound fx;
     private final BoardRender boardRender;
@@ -31,9 +30,11 @@ public class GUIService {
     private final MovesRender moveRender;
 
     private static BufferedImage logo;
+    private static BufferedImage logo_v2;
     private final BufferedImage YES;
     private final BufferedImage NO;
 
+    private final RenderContext render;
     private final PieceService pieceService;
     private final BoardService boardService;
     private final GameService gameService;
@@ -42,12 +43,14 @@ public class GUIService {
     private final Mouse mouse;
     private static PromotionService promotionService;
 
-    public GUIService(PieceService pieceService, BoardService boardService,
+    public GUIService(RenderContext render, PieceService pieceService,
+                      BoardService boardService,
                       GameService gameService,
                       PromotionService promotionService,
                       ModelService modelService,
                       MoveManager moveManager, TimerService timerService,
                       Mouse mouse) {
+        this.render = render;
         this.pieceService = pieceService;
         this.boardService = boardService;
         this.gameService = gameService;
@@ -55,10 +58,12 @@ public class GUIService {
         this.timerService = timerService;
         this.mouse = mouse;
         this.fx = new Sound();
-        this.boardRender = new BoardRender(this, pieceService, boardService, promotionService);
-        this.menuRender  = new MenuRender(this, gameService, boardService,
+        this.boardRender = new BoardRender(render, this, pieceService,
+                boardService, promotionService);
+        this.menuRender  = new MenuRender(render, this, gameService,
+            boardService,
                 moveManager, mouse);
-        this.moveRender  = new MovesRender(boardService, this);
+        this.moveRender  = new MovesRender(render, boardService, this);
 
         this.boardService.setPieces();
         GUIService.promotionService = promotionService;
@@ -66,6 +71,7 @@ public class GUIService {
 
         try {
             logo = getImage("/ui/logo");
+            logo_v2 = getImage("/ui/logo_v2");
             YES = getImage("/ticks/tick_yes");
             NO = getImage("/ticks/tick_no");
         } catch (IOException e) {
@@ -86,16 +92,8 @@ public class GUIService {
         TIMER_Y = 475;
     }
 
-    public static int getWIDTH() {
-        return EXTRA_WIDTH + Board.getSquare() * 8;
-    }
-
     public static int getEXTRA_WIDTH() {
         return EXTRA_WIDTH;
-    }
-
-    public static int getHEIGHT() {
-        return Board.getSquare() * 8;
     }
 
     public static Font getFont(int size) {
@@ -127,25 +125,21 @@ public class GUIService {
     }
 
     public static Color getNewBackground() {
-        return BooleanService.canBeColorblind || BooleanService.isDarkMode
-                ? ColorRender.getColor(background, false) : background;
+        return BooleanService.canBeColorblind
+                ? Colorblindness.filter(Colors.EVEN) : Colors.EVEN;
     }
 
     public static Color getNewForeground() {
-        return BooleanService.canBeColorblind || BooleanService.isDarkMode
-                ? ColorRender.getColor(foreground, true) : foreground;
-    }
-
-    public static void setNewBackground(Color color) {
-        background = color;
-    }
-
-    public static void setNewForeground(Color color) {
-        foreground = color;
+        return BooleanService.canBeColorblind
+                ? Colorblindness.filter(Colors.ODD) : Colors.ODD;
     }
 
     public static BufferedImage getLogo() {
         return logo;
+    }
+
+    public static BufferedImage getLogo_v2() {
+        return logo_v2;
     }
 
     public static int getGRAPHICS_OFFSET() {
@@ -184,7 +178,7 @@ public class GUIService {
     public void drawTimer(Graphics2D g2) {
         g2.setFont(GUIService.getFont(24));
         Color filtered = BooleanService.canBeColorblind || BooleanService.isDarkMode
-                ? ColorRender.getColor(foreground, true) : foreground;
+                ? Colorblindness.filter(Colors.ODD) : Colors.ODD;
         g2.setColor(filtered);
 
         FontMetrics fm = g2.getFontMetrics();
@@ -200,7 +194,7 @@ public class GUIService {
         }
 
         BufferedImage image = isLegal ? YES : NO;
-        image = ColorRender.getSprite(image, true);
+        image = Colorblindness.filter(image);
 
         FontMetrics fm = g2.getFontMetrics(GUIService.getFont(24));
         int size = Board.getSquare();

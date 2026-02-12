@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.chess.enums.Tint;
 import org.chess.enums.Type;
-import org.chess.render.ColorRender;
+import org.chess.render.Colorblindness;
 import org.chess.service.PieceService;
 
 public abstract class Piece {
@@ -47,7 +47,7 @@ public abstract class Piece {
 	}
 
 	public BufferedImage getFilteredSprite(BufferedImage image) {
-		return ColorRender.getSprite(image, true);
+		return Colorblindness.filter(image);
 	}
 
 	public BufferedImage getHovered() {

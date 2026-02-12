@@ -41,6 +41,7 @@ public class Keyboard implements KeyListener {
         return false;
     }
 
+    public boolean wasSelectPressed() { return wasEnterPressed() || wasSpacePressed(); }
     public boolean wasUpPressed() { return wasKeyPressed(KeyEvent.VK_UP); }
     public boolean wasLeftPressed() { return wasKeyPressed(KeyEvent.VK_LEFT); }
     public boolean wasDownPressed() { return wasKeyPressed(KeyEvent.VK_DOWN); }
@@ -55,8 +56,7 @@ public class Keyboard implements KeyListener {
     public boolean wasOnePressed() { return wasKeyPressed(KeyEvent.VK_1); }
     public boolean wasTwoPressed() { return wasKeyPressed(KeyEvent.VK_2); }
     public boolean wasThreePressed() { return wasKeyPressed(KeyEvent.VK_3); }
-
-    public boolean wasSelectPressed() { return wasEnterPressed() || wasSpacePressed(); }
+    public boolean wasF11Pressed() { return wasKeyPressed(KeyEvent.VK_F11); }
 
     private boolean isKeyDown(int keyCode) {
         return keyStates.getOrDefault(keyCode, false);

@@ -3,8 +3,10 @@ package org.chess.service;
 import org.chess.input.Keyboard;
 import org.chess.input.Mouse;
 import org.chess.input.MoveManager;
+import org.chess.render.RenderContext;
 
 public class ServiceFactory {
+    private final RenderContext render;
     private final PieceService piece;
     private final BoardService board;
     private final Mouse mouse;
@@ -17,8 +19,9 @@ public class ServiceFactory {
     private final AnimationService animation;
     private final TimerService timer;
 
-    public ServiceFactory() {
-        this.mouse = new Mouse();
+    public ServiceFactory(RenderContext render) {
+        this.render = render;
+        this.mouse = new Mouse(render);
         this.keyboard = new Keyboard();
         this.animation = new AnimationService();
         this.piece = new PieceService(mouse);
@@ -30,10 +33,10 @@ public class ServiceFactory {
                 model, manager);
         this.board.setServiceFactory(this);
         this.model.setBoardService(board);
-        this.gs = new GameService(board, mouse);
+        this.gs = new GameService(render, board, mouse);
         this.gs.setServiceFactory(this);
         this.timer = new TimerService();
-        this.gui = new GUIService(piece, board, gs, promotion,
+        this.gui = new GUIService(render, piece, board, gs, promotion,
                 model, manager, timer, mouse);
         this.manager.init(this);
     }

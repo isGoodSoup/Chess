@@ -5,18 +5,22 @@ import org.chess.enums.PlayState;
 import org.chess.enums.Tint;
 import org.chess.input.Mouse;
 import org.chess.render.MenuRender;
+import org.chess.render.RenderContext;
 
 public class GameService {
     private static GameState state;
     private static PlayState mode;
     private static Tint currentTurn;
 
+    private static RenderContext render;
     private static BoardService boardService;
     private static Mouse mouse;
 
     private static ServiceFactory service;
 
-    public GameService(BoardService boardService, Mouse mouse) {
+    public GameService(RenderContext render, BoardService boardService,
+                       Mouse mouse) {
+        GameService.render = render;
         GameService.boardService = boardService;
         GameService.mouse = mouse;
     }
@@ -50,7 +54,8 @@ public class GameService {
             return;
         }
 
-        int startY = GUIService.getHEIGHT()/2 + GUIService.getMENU_START_Y();
+        int startY =
+                render.scale(RenderContext.BASE_HEIGHT)/2 + GUIService.getMENU_START_Y();
         int spacing = GUIService.getMENU_SPACING();
 
         for(int i = 0; i < MenuRender.optionsMode.length; i++) {

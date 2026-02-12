@@ -6,6 +6,7 @@ import org.chess.enums.PlayState;
 import org.chess.input.Keyboard;
 import org.chess.input.MoveManager;
 import org.chess.render.MenuRender;
+import org.chess.render.RenderContext;
 import org.chess.service.*;
 
 import javax.swing.*;
@@ -16,7 +17,9 @@ import java.io.Serial;
 public class BoardPanel extends JPanel implements Runnable {
 	@Serial
     private static final long serialVersionUID = -5189356863277669172L;
-	private final int FPS = 60;
+    private final ChessFrame frame;
+    private final RenderContext render;
+    private final int FPS = 60;
 	private Thread thread;
     private long lastUpTime = 0;
     private long lastDownTime = 0;
@@ -26,14 +29,15 @@ public class BoardPanel extends JPanel implements Runnable {
 
     private static ServiceFactory service;
 
-	public BoardPanel() {
+	public BoardPanel(ChessFrame frame) {
         super();
-        service = new ServiceFactory();
+        this.frame = frame;
+        this.render = new RenderContext();
+        service = new ServiceFactory(render);
         GameService.setState(GameState.MENU);
         BooleanService.defaultToggles();
-        final int WIDTH = GUIService.getWIDTH();
-        final int HEIGHT = GUIService.getHEIGHT();
-        MenuRender.drawRandomBackground(BooleanService.getBoolean());
+        final int WIDTH = RenderContext.BASE_WIDTH;
+        final int HEIGHT = RenderContext.BASE_HEIGHT;
         setPreferredSize(new Dimension(WIDTH +
                 GUIService.getEXTRA_WIDTH(), HEIGHT));
         setBackground(GUIService.getNewBackground());
@@ -74,8 +78,15 @@ public class BoardPanel extends JPanel implements Runnable {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g.create();
+        render.updateTransform(getWidth(), getHeight());
+        g2.translate(render.getOffsetX(), render.getOffsetY());
+        g2.scale(render.getScale(), render.getScale());
+        drawGame(g2);
+        g2.dispose();
+    }
 
+    public void drawGame(Graphics2D g2) {
         switch(GameService.getState()) {
             case MENU -> service.getGuiService().getMenuRender().drawGraphics(g2,
                     MenuRender.optionsMenu);
@@ -217,6 +228,15 @@ public class BoardPanel extends JPanel implements Runnable {
 
         if(keyboard.isComboPressed(KeyEvent.VK_CONTROL, KeyEvent.VK_Q)) {
             System.exit(0);
+        }
+
+        if(keyboard.isComboPressed(KeyEvent.VK_CONTROL, KeyEvent.VK_T)
+                && BooleanService.canTheme) {
+            Colors.nextTheme();
+        }
+
+        if(keyboard.wasF11Pressed()) {
+            frame.toggleFullscreen();
         }
     }
 }

@@ -1,5 +1,8 @@
 package org.chess.input;
 
+import org.chess.render.RenderContext;
+import org.chess.service.GUIService;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -9,7 +12,11 @@ public class Mouse extends MouseAdapter {
 	private boolean isHeld;
 	private boolean prevHeld;
 
-	public Mouse() {}
+	private final RenderContext render;
+
+	public Mouse(RenderContext render) {
+		this.render = render;
+	}
 
 	public int getX() {
 		return x;
@@ -54,8 +61,11 @@ public class Mouse extends MouseAdapter {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		isHeld = true;
-		x = e.getX();
-		y = e.getY();
+		double scale = render.getScale();
+		int rawX = e.getX();
+		int rawY = e.getY();
+		x = (int)((rawX - render.getOffsetX()) / scale);
+		y = (int)((rawY - render.getOffsetY()) / scale);
 	}
 
 	@Override
@@ -65,13 +75,26 @@ public class Mouse extends MouseAdapter {
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		x = e.getX();
-		y = e.getY();
+		double scale = render.getScale();
+		int rawX = e.getX();
+		int rawY = e.getY();
+		x = (int)((rawX - render.getOffsetX()) / scale);
+		y = (int)((rawY - render.getOffsetY()) / scale);
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		x = e.getX();
-		y = e.getY();
+		double scale = render.getScale();
+		int rawX = e.getX();
+		int rawY = e.getY();
+		x = (int)((rawX - render.getOffsetX()) / scale);
+		y = (int)((rawY - render.getOffsetY()) / scale);
+	}
+
+	private void updateMousePosition(MouseEvent e) {
+		int rawX = e.getX();
+		int rawY = e.getY();
+		x = render.unscaleX(rawX);
+		y = render.unscaleY(rawY);
 	}
 }
