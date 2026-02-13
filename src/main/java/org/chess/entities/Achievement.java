@@ -1,20 +1,20 @@
 package org.chess.entities;
 
-import org.chess.enums.AchievementType;
+import org.chess.enums.Achievements;
 
 public class Achievement {
-    private AchievementType id;
+    private Achievements id;
     private boolean isUnlocked;
 
-    public Achievement(AchievementType id) {
+    public Achievement(Achievements id) {
         this.id = id;
     }
 
-    public AchievementType getId() {
+    public Achievements getId() {
         return id;
     }
 
-    public void setId(AchievementType id) {
+    public void setId(Achievements id) {
         this.id = id;
     }
 
@@ -24,9 +24,5 @@ public class Achievement {
 
     public void setUnlocked(boolean unlocked) {
         this.isUnlocked = unlocked;
-    }
-
-    public void unlock() {
-        
     }
 }

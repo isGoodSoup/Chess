@@ -65,7 +65,7 @@ public class MovesRender {
 
         int availableWidth = render.scale(RenderContext.BASE_WIDTH) - boardSize - padding * 4;
         int boxWidth = availableWidth/7;
-        int boxHeight = boardSize - 10;
+        int boxHeight = boardSize - 20;
 
         int leftX = boardX - boxWidth - padding + innerPadding;
         int rightX = boardX + boardSize + padding + innerPadding;
@@ -73,9 +73,11 @@ public class MovesRender {
         int rightY = boardY + innerPadding + fm.getAscent();
 
         guiService.drawBox(g2, stroke, boardX - boxWidth - padding,
-                boardY, boxWidth, boxHeight, arcWidth, arcHeight, hasBackground);
+                boardY, boxWidth, boxHeight, arcWidth, arcHeight,
+                hasBackground, false);
         guiService.drawBox(g2, stroke, boardX + boardSize + padding,
-                boardY, boxWidth, boxHeight, arcWidth, arcHeight, hasBackground);
+                boardY, boxWidth, boxHeight, arcWidth, arcHeight,
+                hasBackground, true);
 
         List<Move> moves = boardService.getMoves();
         int startIndex = Math.max(0, moves.size() - GUIService.getMOVES_CAP());

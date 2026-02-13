@@ -131,7 +131,7 @@ public class BoardPanel extends JPanel implements Runnable {
                         .getMenuInput().handleOptionsInput();
                 return;
             }
-            case ACHIEVEMENTS -> {}
+            case ACHIEVEMENTS -> service.getRender().getMenuRender().getMenuInput().handleAchievementsInput();
             default -> service.getBoardService().getGame();
         }
 
@@ -150,8 +150,7 @@ public class BoardPanel extends JPanel implements Runnable {
         Keyboard keyboard = service.getKeyboard();
         GameState state = GameService.getState();
 
-        if((state == GameState.RULES || state == GameState.MODE)
-                && keyboard.wasBPressed()) {
+        if(state != GameState.BOARD && keyboard.wasBPressed()) {
             GameService.setState(GameState.MENU);
             service.getGuiService().getFx().playFX(3);
         }
@@ -201,6 +200,17 @@ public class BoardPanel extends JPanel implements Runnable {
                 }
                 if(keyboard.isRightDown() && now - lastDownTime >= repeatDelay) {
                     move.moveRight(MenuRender.optionsTweaks);
+                    lastDownTime = now;
+                }
+            }
+            case ACHIEVEMENTS -> {
+                if(keyboard.wasSelectPressed()) { move.activate(GameState.ACHIEVEMENTS); }
+                if(keyboard.isUpDown() && now - lastUpTime >= repeatDelay) {
+                    move.moveUp(AchievementService.getAchievementList());
+                    lastUpTime = now;
+                }
+                if(keyboard.isDownDown() && now - lastDownTime >= repeatDelay) {
+                    move.moveDown(AchievementService.getAchievementList());
                     lastDownTime = now;
                 }
             }

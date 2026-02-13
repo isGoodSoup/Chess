@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 
 public class GUIService {
@@ -18,6 +19,7 @@ public class GUIService {
     private static final int MENU_SPACING = 40;
     private static final int MENU_START_Y = 160;
     private static final int MENU_FONT = 32;
+    private static final int MENU_SUBFONT = 24;
     private static final int MOVES_CAP = 28;
     private static final int PADDING = 90;
 
@@ -98,6 +100,10 @@ public class GUIService {
         return MENU_FONT;
     }
 
+    public static int getMENU_SUBFONT() {
+        return MENU_SUBFONT;
+    }
+
     public BufferedImage getYES() {
         return YES;
     }
@@ -131,8 +137,12 @@ public class GUIService {
     }
 
     public BufferedImage getImage(String path) throws IOException {
-        return ImageIO.read(Objects.requireNonNull(
-                getClass().getResourceAsStream(path + ".png")));
+        InputStream stream = getClass().getResourceAsStream(path + ".png");
+        if (stream == null) {
+            System.err.println("Resource not found: " + path + ".png");
+            return null;
+        }
+        return ImageIO.read(stream);
     }
 
     public void drawTimer(Graphics2D g2) {
@@ -162,7 +172,7 @@ public class GUIService {
         int boxHeight = textHeight + 2 * innerPadding;
 
         drawBox(g2, 4, boxX, boxY, boxWidth,
-                boxHeight, 32, 32, true);
+                boxHeight, 32, 32, true, false);
         g2.drawString(time, textX, textY);
     }
 
@@ -186,12 +196,18 @@ public class GUIService {
 
     public void drawBox(Graphics2D g2, int stroke, int x, int y, int width,
                         int height, int arcWidth, int arcHeight,
-                        boolean hasBackground) {
+                        boolean hasBackground, boolean isHighlighted) {
         if(hasBackground) {
             g2.setColor(new Color(0, 0, 0, 180));
             g2.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
         }
-        g2.setColor(new Color(255, 255, 255));
+
+        if(isHighlighted) {
+            g2.setColor(new Color(220, 200, 20));
+        } else {
+            g2.setColor(new Color(255, 255, 255));
+        }
+
         g2.setStroke(new BasicStroke(stroke));
         g2.drawRoundRect(x, y, width, height, arcWidth, arcHeight);
     }

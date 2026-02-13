@@ -18,6 +18,7 @@ public class ServiceFactory {
     private final ModelService model;
     private final AnimationService animation;
     private final TimerService timer;
+    private final AchievementService achievement;
 
     public ServiceFactory(RenderContext render) {
         this.render = render;
@@ -38,6 +39,7 @@ public class ServiceFactory {
         this.timer = new TimerService();
         this.gui = new GUIService(render, piece, board, gs, promotion,
                 model, manager, timer, mouse);
+        this.achievement = new AchievementService();
         this.render.getBoardRender().setBoardService(board);
         this.render.getBoardRender().setPieceService(piece);
         this.render.getBoardRender().setGuiService(gui);
@@ -98,4 +100,8 @@ public class ServiceFactory {
     }
 
     public TimerService getTimerService() { return timer; }
+
+    public AchievementService getAchievementService() {
+        return achievement;
+    }
 }

@@ -1,5 +1,6 @@
 package org.chess.render;
 
+import org.chess.entities.Achievement;
 import org.chess.entities.Board;
 import org.chess.enums.ColorblindType;
 import org.chess.gui.Colors;
@@ -11,6 +12,10 @@ import org.chess.service.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 public class MenuRender {
     public static final String[] optionsMenu = { "NEW GAME",
@@ -48,10 +53,10 @@ public class MenuRender {
     private BufferedImage TOGGLE_OFF_HIGHLIGHTED;
     private static ColorblindType cb;
     private int lastHoveredIndex = -1;
-    private int exitSelection = 0;
+    private int scrollOffset = 0;
     private static int totalWidth;
     private static FontMetrics fm;
-    private int currentPage = 1;
+    public int currentPage = 1;
 
     private static RenderContext render;
     private GameService gameService;
@@ -60,6 +65,7 @@ public class MenuRender {
     private GUIService guiService;
     private Mouse mouse;
     private MenuInput menuInput;
+    private AchievementSprites sprites;
 
     public MenuRender(RenderContext render) {
         MenuRender.render = render;
@@ -67,6 +73,7 @@ public class MenuRender {
     }
 
     public void init() {
+        this.sprites = new AchievementSprites(guiService);
         this.menuInput = new MenuInput(render, this, guiService, gameService,
                 boardService, moveManager, mouse);
         try {
@@ -91,6 +98,7 @@ public class MenuRender {
         TOGGLE_OFF = Colorblindness.filter(TOGGLE_OFF);
         TOGGLE_ON_HIGHLIGHTED = Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED);
         TOGGLE_OFF_HIGHLIGHTED = Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED);
+        AchievementService.lockAllAchievements();
     }
 
     public GameService getGameService() {
@@ -164,10 +172,6 @@ public class MenuRender {
 
     public FontMetrics getFontMetrics() {
         return fm;
-    }
-
-    public int getExitSelection() {
-        return exitSelection;
     }
 
     public static int getOPTION_X() {
@@ -293,7 +297,7 @@ public class MenuRender {
         g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
         menuInput.updatePage();
-        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
+        g2.setFont(GUIService.getFontBold(GUIService.getMENU_FONT()));
         fm = g2.getFontMetrics();
 
         int headerY = render.getOffsetY() + render.scale(OPTION_Y);
@@ -368,7 +372,83 @@ public class MenuRender {
     }
 
     public void drawAchievementsMenu(Graphics2D g2) {
+        Collection<Achievement> achievements =
+                AchievementService.getAllAchievements();
+        List<Achievement> list = new ArrayList<>(achievements);
+        list.sort(Comparator.comparingInt(a -> a.getId().ordinal()));
+
+        String text = "ACHIEVEMENTS";
+        int headerY = render.getOffsetY() + render.scale(OPTION_Y);
+        int headerWidth = fm.stringWidth(text);
+        g2.setFont(GUIService.getFontBold(GUIService.getMENU_FONT()));
+        g2.setColor(BooleanService.canBeColorblind ?
+                Colorblindness.filter(Colors.FOREGROUND)
+                : Colors.FOREGROUND);
+        g2.drawString(text,
+                getCenterX(getTotalWidth(), headerWidth),
+                headerY);
+
+        int stroke = 4;
+        int spacing = 25;
+        int startY = headerY + spacing * 2;
+        int width = RenderContext.BASE_WIDTH/2;
+        int height = 100, arcWidth = 32, arcHeight = 32;
+        int x = getCenterX(getTotalWidth(), width);
+        boolean hasBackground = true;
+
+        int visibleItems = MoveManager.getITEMS_PER_PAGE();
+        int start = scrollOffset;
+        int end = Math.min(start + visibleItems, list.size());
+
+        BufferedImage img = null;
+        for (int i = start; i < end; i++) {
+            Achievement a = list.get(i);
+            Rectangle hitbox = new Rectangle(
+                    x, startY, width, height
+            );
+
+            boolean isHovered = (i == moveManager.getSelectedIndexY()) ||
+                    hitbox.contains(mouse.getX(), mouse.getY());
+
+            int textX = x + render.scale(110);
+            int titleY = startY + render.scale(60);
+            int descY = titleY;
+            g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
+            g2.setColor(Colorblindness.filter(Color.WHITE));
+
+            if(isHovered) {
+                guiService.drawBox(g2, stroke, x, startY,
+                        width, height, arcWidth, arcHeight, hasBackground, true);
+                g2.drawString(a.getId().getDescription(), textX, descY);
+            } else {
+                guiService.drawBox(g2, stroke, x, startY,
+                        width, height, arcWidth, arcHeight, hasBackground, false);
+                g2.drawString(a.getId().getTitle(), textX, titleY);
+            }
+
+            BooleanService.isAchievementLocked = true;
+            img = sprites.getSprite(a);
+
+            if (img != null && !a.isUnlocked()) {
+                img = AchievementLock.filter(img);
+            }
+
+            if (img != null) {
+                int iconSize = render.scale(64);
+                int iconX = x + render.scale(20);
+                int iconY = startY + (height - iconSize) / 2;
+
+                g2.drawImage(img,
+                        iconX,
+                        iconY,
+                        iconSize,
+                        iconSize,
+                        null);
+            }
+            startY += height + spacing;
+        }
     }
+
 
     public BufferedImage getSprite(int i) {
         return switch (i) {

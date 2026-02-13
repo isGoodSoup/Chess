@@ -21,6 +21,8 @@ public class MoveManager {
     private List<Move> moves;
     private int selectedIndexY;
     private int selectedIndexX;
+    private int currentPage = 1;
+    private static final int ITEMS_PER_PAGE = 6;
 
     public MoveManager() {}
 
@@ -63,6 +65,14 @@ public class MoveManager {
 
     public void setGuiService(GUIService gui) {
         this.fx = gui.getFx();
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public static int getITEMS_PER_PAGE() {
+        return ITEMS_PER_PAGE;
     }
 
     private Sound getFx() {
@@ -340,6 +350,13 @@ public class MoveManager {
                         selectedPiece, moveX, moveY);
     }
 
+    public void moveUp(List<Achievement> achievements) {
+        selectedIndexY--;
+        if(selectedIndexY < 0) selectedIndexY = 0;
+        int achievementPage = selectedIndexY/ITEMS_PER_PAGE + 1;
+        getFx().playFX(BooleanService.getRandom(1, 2));
+    }
+
     public void moveUp(String[] options) {
         selectedIndexY--;
         getFx().playFX(BooleanService.getRandom(1, 2));
@@ -359,7 +376,7 @@ public class MoveManager {
 
     public void moveLeft(String[] options) {
         selectedIndexX--;
-        service.getRender().getMenuRender().getMenuInput().previousPage();
+        service.getRender().getMenuRender().getMenuInput().previousPage(options);
         getFx().playFX(4);
         if(selectedIndexX >= options.length) {
             selectedIndexX = 0;
@@ -377,9 +394,16 @@ public class MoveManager {
     public void moveDown(String[] options) {
         selectedIndexY++;
         getFx().playFX(BooleanService.getRandom(1, 2));
-        if(selectedIndexY >= options.length) {
+        if(selectedIndexY < 0) {
             selectedIndexY = 0;
         }
+    }
+
+    public void moveDown(List<Achievement> achievements) {
+        selectedIndexY++;
+        if(selectedIndexY >= achievements.size()) selectedIndexY = achievements.size() - 1;
+        int achievementPage = selectedIndexY / ITEMS_PER_PAGE + 1;
+        getFx().playFX(BooleanService.getRandom(1, 2));
     }
 
     public void moveDown() {
@@ -393,7 +417,7 @@ public class MoveManager {
 
     public void moveRight(String[] options) {
         selectedIndexX++;
-        service.getRender().getMenuRender().getMenuInput().nextPage();
+        service.getRender().getMenuRender().getMenuInput().nextPage(options);
         getFx().playFX(4);
         if(selectedIndexX >= options.length) {
             selectedIndexX = 0;
@@ -433,8 +457,11 @@ public class MoveManager {
                 getFx().playFX(3);
                 if (selectedIndexY == 0) { return; }
                 String option = MenuRender.optionsTweaks[selectedIndexY];
-                getFx().playFX(0);
                 service.getRender().getMenuRender().toggleOption(option);
+            }
+            case ACHIEVEMENTS -> {
+                getFx().playFX(5);
+                if (selectedIndexY == 0) { return; }
             }
             case BOARD -> keyboardMove();
         }

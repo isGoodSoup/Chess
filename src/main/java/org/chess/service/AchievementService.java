@@ -1,31 +1,61 @@
 package org.chess.service;
 
 import org.chess.entities.Achievement;
-import org.chess.enums.AchievementType;
+import org.chess.enums.Achievements;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class AchievementService {
-    private final Map<AchievementType, Achievement> achievements;
+    private static Map<Achievements, Achievement> achievements;
+    private static List<Achievement> achievementList;
 
     public AchievementService() {
-        this.achievements = new HashMap<>();
-        for(AchievementType type : AchievementType.values()) {
+        achievements = new HashMap<>();
+        achievementList = new ArrayList<>(achievements.values());
+        for(Achievements type : Achievements.values()) {
             achievements.put(type, new Achievement(type));
         }
     }
 
-    public void unlockAchievement(AchievementType type) {
+    public void unlockAchievement(Achievements type) {
         Achievement achievement = achievements.get(type);
-        if (achievement != null && !achievement.isUnlocked()) {
-            achievement.unlock();
+        if(achievement != null && !achievement.isUnlocked()) {
+            unlock(achievement);
             System.out.println("Achievement Unlocked: " + type.getTitle());
         }
     }
 
-    public Collection<Achievement> getAllAchievements() {
+    public static void unlockAllAchievements() {
+        for(Map.Entry<Achievements, Achievement> a
+                : achievements.entrySet()) {
+            a.getValue().setUnlocked(true);
+        }
+    }
+
+    public static void lockAllAchievements() {
+        for(Map.Entry<Achievements, Achievement> a
+                : achievements.entrySet()) {
+            a.getValue().setUnlocked(false);
+        }
+    }
+
+    public static Collection<Achievement> getAllAchievements() {
         return achievements.values();
+    }
+
+    public static List<Achievement> getAchievementList() {
+        achievementList.sort(Comparator.comparingInt(a -> a.getId().ordinal()));
+        return achievementList;
+    }
+
+    public Collection<Achievement> getUnlockedAchievements() {
+        return achievements.values()
+                .stream()
+                .filter(Achievement::isUnlocked)
+                .toList();
+    }
+
+    private void unlock(Achievement achievement) {
+        achievement.setUnlocked(true);
     }
 }

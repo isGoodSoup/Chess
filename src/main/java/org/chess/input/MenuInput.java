@@ -1,14 +1,15 @@
 package org.chess.input;
 
-import org.chess.entities.Board;
+import org.chess.entities.Achievement;
 import org.chess.render.MenuRender;
 import org.chess.render.RenderContext;
-import org.chess.service.BoardService;
-import org.chess.service.BooleanService;
-import org.chess.service.GUIService;
-import org.chess.service.GameService;
+import org.chess.service.*;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 public class MenuInput {
     private final RenderContext render;
@@ -34,7 +35,22 @@ public class MenuInput {
 
     public boolean updatePage() {
         int itemsPerPage = 8;
-        int totalPages = (MenuRender.optionsTweaks.length - 1 + itemsPerPage - 1) / itemsPerPage;
+        int totalPages =
+                (AchievementService.getAchievementList().size() - 1 + itemsPerPage - 1) / itemsPerPage;
+        int newPage = moveManager.getSelectedIndexX() / itemsPerPage + 1;
+        newPage = Math.max(1, Math.min(newPage, totalPages));
+
+        if(newPage != menuRender.getCurrentPage()) {
+            menuRender.setCurrentPage(newPage);
+            moveManager.setSelectedIndexY(0);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updatePage(String[] options) {
+        int itemsPerPage = 8;
+        int totalPages = (options.length - 1 + itemsPerPage - 1) / itemsPerPage;
         int newPage = moveManager.getSelectedIndexX() / itemsPerPage + 1;
         newPage = Math.max(1, Math.min(newPage, totalPages));
 
@@ -56,14 +72,34 @@ public class MenuInput {
         updatePage();
     }
 
+    public void previousPage(String[] options) {
+        int itemsPerPage = 8;
+        int currentIndex = moveManager.getSelectedIndexX();
+
+        if(currentIndex >= itemsPerPage) {
+            moveManager.setSelectedIndexX(currentIndex - itemsPerPage);
+        }
+        updatePage(options);
+    }
+
     public void nextPage() {
         int itemsPerPage = 8;
         int currentIndex = moveManager.getSelectedIndexX();
 
-        if(currentIndex + itemsPerPage < MenuRender.optionsTweaks.length) {
+        if(currentIndex + itemsPerPage < AchievementService.getAchievementList().size()) {
             moveManager.setSelectedIndexX(currentIndex + itemsPerPage);
         }
         updatePage();
+    }
+
+    public void nextPage(String[] options) {
+        int itemsPerPage = 8;
+        int currentIndex = moveManager.getSelectedIndexX();
+
+        if(currentIndex + itemsPerPage < options.length) {
+            moveManager.setSelectedIndexX(currentIndex + itemsPerPage);
+        }
+        updatePage(options);
     }
 
 
@@ -165,4 +201,37 @@ public class MenuInput {
             }
         }
     }
+
+    public void handleAchievementsInput() {
+        int itemsPerPage = 6;
+        Collection<Achievement> achievements = AchievementService.getAllAchievements();
+        List<Achievement> list = new ArrayList<>(achievements);
+        list.sort(Comparator.comparingInt(a -> a.getId().ordinal()));
+
+        int startIndex = (menuRender.getCurrentPage() - 1) * itemsPerPage;
+        int endIndex = Math.min(startIndex + itemsPerPage, list.size());
+
+        int relativeIndex = moveManager.getSelectedIndexY();
+        if(relativeIndex < 0) relativeIndex = 0;
+        if(relativeIndex >= endIndex - startIndex) relativeIndex = endIndex - startIndex - 1;
+
+        Achievement selected = list.get(startIndex + relativeIndex);
+
+        for(int i = startIndex; i < endIndex; i++) {
+            int y = render.getOffsetY() + render.scale(MenuRender.getOPTION_Y()) + 50 + (i - startIndex) * (100 + 25);
+            int x = render.getMenuRender().getTotalWidth()/4;
+            Rectangle hitbox = new Rectangle(x, y, RenderContext.BASE_WIDTH/2, 100);
+
+            if(hitbox.contains(mouse.getX(), mouse.getY()) && mouse.wasPressed()) {
+                moveManager.setSelectedIndexY(i - startIndex);
+                selected = list.get(i);
+                break;
+            }
+        }
+
+        if(mouse.wasPressed() || boardService.getServiceFactory().getKeyboard().wasSelectPressed()) {
+            menuRender.getGuiService().getFx().play(5);
+        }
+    }
+
 }
