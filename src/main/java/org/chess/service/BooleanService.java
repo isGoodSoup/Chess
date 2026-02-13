@@ -16,7 +16,6 @@ public class BooleanService {
     public static boolean isFullscreen;
     public static boolean isExitActive;
     public static boolean isAchievementLocked;
-    public static boolean isThisAchievement;
 
     public static boolean canUndoMoves;
     public static boolean canDoAchievements;
@@ -35,17 +34,29 @@ public class BooleanService {
     public static boolean canToggleMoves;
 
     public static boolean doFirstMove;
+    public static boolean doFirstMoveUnlock;
     public static boolean doRuleToggles;
+    public static boolean doRuleTogglesUnlock;
     public static boolean doCheckmate;
-    public static boolean doCastling;
+    public static boolean doCheckmateUnlock;
+    public static boolean doMasterCastling;
+    public static boolean doMasterCastlingUnlock;
     public static boolean doKingPromoter;
+    public static boolean doKingPromoterUnlock;
     public static boolean doQuickWin;
+    public static boolean doQuickWinUnlock;
     public static boolean doCheckOver;
+    public static boolean doCheckOverUnlock;
     public static boolean doHundred;
+    public static boolean doHundredUnlock;
     public static boolean doAllPieces;
+    public static boolean doAllPiecesUnlock;
     public static boolean doHardGame;
+    public static boolean doHardGameUnlock;
     public static boolean doUntouchable;
+    public static boolean doUntouchableUnlock;
     public static boolean doGrandmaster;
+    public static boolean doGrandmasterUnlock;
 
     private static final Random random = new Random();
 

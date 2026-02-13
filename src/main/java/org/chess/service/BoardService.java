@@ -235,6 +235,6 @@ public class BoardService {
         pieces.clear();
         clearBoardState();
 
-        // TODO
+
     }
 }

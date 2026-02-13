@@ -163,6 +163,7 @@ public class BoardPanel extends JPanel implements Runnable {
                 service.getSaveManager().autoSave();
             }
             GameService.setState(GameState.MENU);
+            service.getMovesManager().setSelectedIndexY(0);
             service.getGuiService().getFx().playFX(0);
         }
 
@@ -323,13 +324,31 @@ public class BoardPanel extends JPanel implements Runnable {
         if(BooleanService.doFirstMove) {
             service.getAchievementService().unlock(Achievements.FIRST_MOVE);
             BooleanService.doFirstMove = false;
-            BooleanService.isThisAchievement = true;
+            BooleanService.doFirstMoveUnlock = true;
             playFX();
         }
         if(BooleanService.doRuleToggles) {
             service.getAchievementService().unlock(Achievements.SECRET_TOGGLES);
             BooleanService.doRuleToggles = false;
-            BooleanService.isThisAchievement = true;
+            BooleanService.doRuleTogglesUnlock = true;
+            playFX();
+        }
+        if(BooleanService.doMasterCastling) {
+            service.getAchievementService().unlock(Achievements.CASTLING_MASTER);
+            BooleanService.doMasterCastling = false;
+            BooleanService.doMasterCastlingUnlock = true;
+            playFX();
+        }
+        if(BooleanService.doQuickWin) {
+            service.getAchievementService().unlock(Achievements.QUICK_WIN);
+            BooleanService.doQuickWin = false;
+            BooleanService.doQuickWinUnlock = true;
+            playFX();
+        }
+        if(BooleanService.doKingPromoter) {
+            service.getAchievementService().unlock(Achievements.KING_PROMOTER);
+            BooleanService.doKingPromoter = false;
+            BooleanService.doKingPromoterUnlock = true;
             playFX();
         }
     }

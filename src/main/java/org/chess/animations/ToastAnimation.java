@@ -13,9 +13,9 @@ public class ToastAnimation implements Animation {
     private final BufferedImage icon;
     private double time = 0;
     private static final double SLIDE_TIME = 0.5;
-    private static final double STAY_TIME = 3.0;
+    private static final double STAY_TIME = 2.0;
     private static final int SLIDE_DISTANCE = 180;
-    private static final int WIDTH = 600;
+    private static final int WIDTH = 800;
     private static final int HEIGHT = 125;
     private static final int ARC = 25;
     private final int baseY;
@@ -24,7 +24,7 @@ public class ToastAnimation implements Animation {
         this.title = title;
         this.description = description;
         this.icon = icon;
-        this.baseY = panelHeight - 140;
+        this.baseY = panelHeight - 160;
     }
 
     @Override
@@ -60,11 +60,12 @@ public class ToastAnimation implements Animation {
         }
 
         g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
-        g2.setColor(Color.WHITE);
+        g2.setColor(Color.YELLOW);
         FontMetrics fm = g2.getFontMetrics();
-        int textX = x + 20 + (icon != null ? iconSize + 16 : 0);
+        int textX = x + 20 + (icon != null ? iconSize + 32 : 0);
         int textY = y + (HEIGHT + fm.getAscent()) / 2 - 24;
         g2.drawString(title, textX, textY);
+        g2.setColor(Color.WHITE);
         g2.drawString(description, textX, textY + 40);
     }
 

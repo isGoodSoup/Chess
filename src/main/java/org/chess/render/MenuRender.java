@@ -228,7 +228,14 @@ public class MenuRender {
             case "Undo Moves" -> BooleanService.canUndoMoves ^= true;
             case "Reset Table" -> BooleanService.canResetTable ^= true;
             case "Colorblind Mode" -> BooleanService.canBeColorblind ^= true;
-            case "Themes" -> BooleanService.canTheme ^= true;
+            case "Themes" -> {
+                BooleanService.canTheme ^= true;
+                if(!BooleanService.doRuleTogglesUnlock) {
+                    if(!BooleanService.doRuleToggles) {
+                        BooleanService.doRuleToggles = true;
+                    }
+                }
+            }
         }
     }
 

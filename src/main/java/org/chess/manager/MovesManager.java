@@ -25,6 +25,8 @@ public class MovesManager {
     private int selectedIndexY;
     private int selectedIndexX;
     private int currentPage = 1;
+    private int moveTracker = 0;
+    private int castlingTracker = 0;
     private static final int ITEMS_PER_PAGE = 6;
 
     public MovesManager() {}
@@ -154,16 +156,29 @@ public class MovesManager {
             }).start();
         }
 
-        if (service.getPieceService().isKingInCheck(GameService.getCurrentTurn())
-                && service.getModelService().getAiTurn() == null) {
-            BooleanService.isGameOver = true;
-        }
-
-        if(!BooleanService.isThisAchievement) {
+        if(!BooleanService.doFirstMoveUnlock) {
             if(!BooleanService.doFirstMove) {
                 BooleanService.doFirstMove = true;
             }
         }
+
+        moveTracker++;
+        if(moveTracker == 4  && isCheckmate()) {
+            if(!BooleanService.doQuickWinUnlock) {
+                if(!BooleanService.doQuickWin) {
+                    BooleanService.doQuickWin = true;
+                }
+            }
+        }
+    }
+
+    private boolean isCheckmate() {
+        if(service.getPieceService().isKingInCheck(GameService.getCurrentTurn())
+                && service.getModelService().getAiTurn() == null) {
+            BooleanService.isGameOver = true;
+            return true;
+        }
+        return false;
     }
 
     public void keyboardMove() {
@@ -227,6 +242,14 @@ public class MovesManager {
                         p.setHasMoved(true);
                         break;
                     }
+                }
+            }
+        }
+        castlingTracker++;
+        if(castlingTracker == 10) {
+            if(!BooleanService.doMasterCastlingUnlock) {
+                if(!BooleanService.doMasterCastling) {
+                    BooleanService.doMasterCastling = true;
                 }
             }
         }
@@ -365,11 +388,6 @@ public class MovesManager {
     public void moveRight(String[] options) {
         service.getRender().getMenuRender().getMenuInput().nextPage(options);
         getFx().playFX(4);
-        if(!BooleanService.isThisAchievement) {
-            if(!BooleanService.doRuleToggles) {
-                BooleanService.doRuleToggles = true;
-            }
-        }
     }
 
     public void moveRight() {

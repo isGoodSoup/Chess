@@ -66,5 +66,11 @@ public class PromotionService {
         if(promotingPawn == pawn) { promotingPawn = null; }
         BooleanService.isPromotionPending = false;
         pieceService.switchTurns();
+
+        if(!BooleanService.doKingPromoterUnlock) {
+            if(!BooleanService.doKingPromoter) {
+                BooleanService.doKingPromoter = true;
+            }
+        }
     }
 }
