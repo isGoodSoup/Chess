@@ -213,7 +213,7 @@ public class BoardPanel extends JPanel implements Runnable {
                 }
                 if(keyboard.isRightDown() && now - lastDownTime >= repeatDelay) {
                     service.getGuiService().getFx().playFX(4);
-                    service.getRender().getMenuRender().getMenuInput().nextPage(AchievementService.getAchievementList());
+                    service.getRender().getMenuRender().getMenuInput().nextPage();
                     lastDownTime = now;
                 }
             }

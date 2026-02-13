@@ -38,14 +38,15 @@ public class MenuInput {
         }
     }
 
-    public void nextPage(List<Achievement> achievements) {
-        int itemsPerPage = 8;
-        int totalPages = (achievements.size() + itemsPerPage - 1) / itemsPerPage;
+    public void nextPage() {
+        int itemsPerPage = MoveManager.getITEMS_PER_PAGE();
+        int totalItems = AchievementService.getAllAchievements().size();
+        int totalPages = (totalItems + itemsPerPage - 1) / itemsPerPage;
 
-        int currentPage = menuRender.getCurrentPage();
-        if(currentPage < totalPages) {
-            menuRender.setCurrentPage(currentPage + 1);
-            moveManager.setSelectedIndexY(0);
+        int current = menuRender.getCurrentPage();
+
+        if(current < totalPages) {
+            menuRender.setCurrentPage(current + 1);
         }
     }
 
