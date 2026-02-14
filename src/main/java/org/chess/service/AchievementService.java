@@ -11,6 +11,7 @@ import java.util.*;
 public class AchievementService {
     private Map<Achievements, Achievement> achievements;
     private List<Achievement> achievementList;
+    private List<Achievement> sortedList;
     private AnimationService animationService;
 
     public AchievementService() {
@@ -19,6 +20,7 @@ public class AchievementService {
             achievements.put(type, new Achievement(type));
         }
         achievementList = new ArrayList<>(achievements.values());
+        getSortedAchievements();
     }
 
     public AnimationService getAnimationService() {
@@ -76,5 +78,14 @@ public class AchievementService {
                 .stream()
                 .filter(Achievement::isUnlocked)
                 .toList();
+    }
+
+    public List<Achievement> getSortedAchievements() {
+        Collection<Achievement> achievements = achievementList;
+        sortedList = new ArrayList<>(achievements);
+        sortedList.sort(
+                Comparator.comparingInt(a -> a.getId().ordinal())
+        );
+        return sortedList;
     }
 }

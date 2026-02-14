@@ -15,18 +15,15 @@ import org.chess.service.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 public class MenuRender {
     public static final String[] optionsMenu = { "NEW GAME", "LOAD SAVE",
             "ACHIEVEMENTS", "SETTINGS", "EXIT" };
-    public static final String[] optionsMode = { "PLAYER", "AI" };
     public static final GameSettings[] optionsTweaks = GameSettings.values();
     private static final String SETTINGS = "SETTINGS";
     private static final String ACHIEVEMENTS = "ACHIEVEMENTS";
+    private static final String SAVES = "SAVE FILES";
     public static String ENABLE = "Enable ";
     private static final String CHECKMATE = "Checkmate!";
     private static final String STALEMATE = "Stalemate";
@@ -225,7 +222,7 @@ public class MenuRender {
             g2.drawString(optionText, x, y);
 
             if(isHovered && lastHoveredIndex != i) {
-                guiService.getFx().play(BooleanService.getRandom(1, 2));
+                guiService.getFx().playFX(BooleanService.getRandom(1, 2));
                 lastHoveredIndex = i;
             }
         }
@@ -322,11 +319,10 @@ public class MenuRender {
     }
 
     public void drawAchievementsMenu(Graphics2D g2) {
-        Collection<Achievement> achievements =
-                boardService.getServiceFactory().getAchievementService().getAchievementList();
-        List<Achievement> list = new ArrayList<>(achievements);
-        list.sort(Comparator.comparingInt(a -> a.getId().ordinal()));
-
+        List<Achievement> list =
+                boardService.getServiceFactory()
+                        .getAchievementService()
+                        .getSortedAchievements();
         int stroke = 4;
         int x = 32, y = 32;
         int arc = 40;
@@ -339,13 +335,9 @@ public class MenuRender {
         String text = ACHIEVEMENTS;
         int headerY = render.getOffsetY() + render.scale(OPTION_Y);
         int headerWidth = fm.stringWidth(text);
-        g2.setFont(GUIService.getFontBold(GUIService.getMENU_FONT()));
-        g2.setColor(BooleanService.canBeColorblind ?
-                Colorblindness.filter(Colors.FOREGROUND)
-                : Colors.FOREGROUND);
-        g2.drawString(text,
-                getCenterX(getTotalWidth(), headerWidth),
-                headerY);
+        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
+        g2.setColor(Colorblindness.filter(Color.WHITE));
+        g2.drawString(text, getCenterX(getTotalWidth(), headerWidth), headerY);
 
         int spacing = 25;
         int startY = headerY + spacing * 2;
@@ -410,8 +402,6 @@ public class MenuRender {
 
     public void drawSavesMenu(Graphics2D g2) {
         List<Save> saves = gameService.getSaveManager().getSaves();
-        String text = "SAVE FILES";
-
         int stroke = 4;
         int x = 32, y = 32;
         int arc = 40;
@@ -421,17 +411,13 @@ public class MenuRender {
                 render.scale(RenderContext.BASE_HEIGHT - y * 2), arc, arc, true,
                 false, 255);
 
-        g2.setFont(GUIService.getFontBold(GUIService.getMENU_FONT()));
+        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
         FontMetrics fm = g2.getFontMetrics();
 
         int headerY = render.getOffsetY() + render.scale(OPTION_Y);
-        int headerWidth = fm.stringWidth(text);
-        g2.setColor(BooleanService.canBeColorblind ?
-                Colorblindness.filter(Colors.FOREGROUND)
-                : Colors.FOREGROUND);
-        g2.drawString(text,
-                getCenterX(getTotalWidth(), headerWidth),
-                headerY);
+        int headerWidth = fm.stringWidth(SAVES);
+        g2.setColor(Colorblindness.filter(Color.WHITE));
+        g2.drawString(SAVES, getCenterX(getTotalWidth(), headerWidth), headerY);
 
         if(saves.isEmpty()) {
             return;
@@ -505,6 +491,8 @@ public class MenuRender {
             case 3 -> TOGGLE_OFF;
             case 4 -> TOGGLE_ON_HIGHLIGHTED;
             case 5 -> TOGGLE_OFF_HIGHLIGHTED;
+            case 6 -> HARD_MODE_ON;
+            case 7 -> HARD_MODE_ON_HIGHLIGHTED;
             default -> null;
         };
     }

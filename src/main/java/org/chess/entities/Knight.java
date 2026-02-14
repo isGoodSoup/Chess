@@ -28,7 +28,7 @@ public class Knight extends Piece {
 
 		int colDiff = Math.abs(targetCol - getCol());
 		int rowDiff = Math.abs(targetRow - getRow());
-
+		
 		if((colDiff == 2 && rowDiff == 1) || (colDiff == 1 && rowDiff == 2)) {
 			return isValidSquare(this, targetCol, targetRow, board);
 		}
