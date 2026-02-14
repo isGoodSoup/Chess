@@ -85,10 +85,10 @@ public class MovesRender {
 
         GUIService.drawBox(g2, stroke, boardX - boxWidth - padding,
                 boardY, boxWidth, boxHeight, arcWidth, arcHeight,
-                hasBackground, false);
+                hasBackground, false, 255);
         GUIService.drawBox(g2, stroke, boardX + boardSize + padding,
                 boardY, boxWidth, boxHeight, arcWidth, arcHeight,
-                hasBackground, true);
+                hasBackground, true, 255);
 
         List<Move> moves = movesManager.getMoves();
         int startIndex = Math.max(0, moves.size() - GUIService.getMOVES_CAP());

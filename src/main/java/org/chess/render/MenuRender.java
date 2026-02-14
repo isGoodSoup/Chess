@@ -33,14 +33,14 @@ public class MenuRender {
     private static final int OPTION_X = 100;
     private static final int OPTION_Y = 160;
     private static final float SCALE = 1.5f;
-    private transient BufferedImage DARK_MODE_ON;
-    private transient BufferedImage DARK_MODE_OFF;
-    private transient BufferedImage DARK_MODE_ON_HIGHLIGHTED;
-    private transient BufferedImage DARK_MODE_OFF_HIGHLIGHTED;
     private transient BufferedImage TOGGLE_ON;
     private transient BufferedImage TOGGLE_OFF;
     private transient BufferedImage TOGGLE_ON_HIGHLIGHTED;
     private transient BufferedImage TOGGLE_OFF_HIGHLIGHTED;
+    private transient BufferedImage DARK_MODE_ON;
+    private transient BufferedImage DARK_MODE_ON_HIGHLIGHTED;
+    private transient BufferedImage HARD_MODE_ON;
+    private transient BufferedImage HARD_MODE_ON_HIGHLIGHTED;
     private static ColorblindType cb;
     private int lastHoveredIndex = -1;
     private int scrollOffset = 0;
@@ -67,27 +67,27 @@ public class MenuRender {
         this.mouseInput = new MouseInput(render, this, guiService, gameService,
                 boardService, movesManager, mouse);
         try {
-            DARK_MODE_ON = guiService.getImage("/ui/dark-mode_on");
-            DARK_MODE_OFF = guiService.getImage("/ui/dark-mode_off");
-            DARK_MODE_ON_HIGHLIGHTED = guiService.getImage("/ui/dark-mode_on-h");
-            DARK_MODE_OFF_HIGHLIGHTED = guiService.getImage("/ui/dark-mode_off-h");
             TOGGLE_ON = guiService.getImage("/ui/toggle_on");
             TOGGLE_OFF = guiService.getImage("/ui/toggle_off");
-            TOGGLE_ON_HIGHLIGHTED = guiService.getImage("/ui/toggle_on-h");
-            TOGGLE_OFF_HIGHLIGHTED = guiService.getImage("/ui/toggle_off-h");
+            TOGGLE_ON_HIGHLIGHTED = guiService.getImage("/ui/toggle_onh");
+            TOGGLE_OFF_HIGHLIGHTED = guiService.getImage("/ui/toggle_offh");
+            DARK_MODE_ON = guiService.getImage("/ui/dark-mode_on");
+            DARK_MODE_ON_HIGHLIGHTED = guiService.getImage("/ui/dark-mode_onh");
+            HARD_MODE_ON = guiService.getImage("/ui/hardmode_on");
+            HARD_MODE_ON_HIGHLIGHTED = guiService.getImage("/ui/hardmode_onh");
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        DARK_MODE_ON = Colorblindness.filter(DARK_MODE_ON);
-        DARK_MODE_OFF = Colorblindness.filter(DARK_MODE_OFF);
-        DARK_MODE_ON_HIGHLIGHTED = Colorblindness.filter(DARK_MODE_ON_HIGHLIGHTED);
-        DARK_MODE_OFF_HIGHLIGHTED =
-                Colorblindness.filter(DARK_MODE_OFF_HIGHLIGHTED);
         TOGGLE_ON = Colorblindness.filter(TOGGLE_ON);
         TOGGLE_OFF = Colorblindness.filter(TOGGLE_OFF);
         TOGGLE_ON_HIGHLIGHTED = Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED);
         TOGGLE_OFF_HIGHLIGHTED = Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED);
+        DARK_MODE_ON = Colorblindness.filter(DARK_MODE_ON);
+        DARK_MODE_ON_HIGHLIGHTED = Colorblindness.filter(DARK_MODE_ON_HIGHLIGHTED);
+        HARD_MODE_ON = Colorblindness.filter(HARD_MODE_ON);
+        HARD_MODE_ON_HIGHLIGHTED =
+                Colorblindness.filter(HARD_MODE_ON_HIGHLIGHTED);
     }
 
     public GameService getGameService() {
@@ -219,7 +219,7 @@ public class MenuRender {
                     || (i == movesManager.getSelectedIndexY());
 
             Color foreground = Colorblindness.filter(Colors.FOREGROUND);
-            Color textColor = isHovered ? Color.YELLOW : foreground;
+            Color textColor = isHovered ? Color.WHITE : foreground;
 
             g2.setColor(textColor);
             g2.drawString(optionText, x, y);
@@ -235,13 +235,22 @@ public class MenuRender {
         g2.setColor(Colorblindness.filter(Colors.BACKGROUND));
         g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
-        g2.setFont(GUIService.getFontBold(GUIService.getMENU_FONT()));
+        int stroke = 4;
+        int x = 32, y = 32;
+        int arc = 40;
+
+        GUIService.drawBox(g2, stroke, x, y,
+                render.scale(RenderContext.BASE_WIDTH - x * 2),
+                render.scale(RenderContext.BASE_HEIGHT - y * 2), arc, arc, true,
+                false, 255);
+
+        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
         fm = g2.getFontMetrics();
 
         String header = SETTINGS;
         int headerY = render.getOffsetY() + render.scale(OPTION_Y);
         int headerWidth = fm.stringWidth(header);
-        g2.setColor(Colorblindness.filter(Colors.FOREGROUND));
+        g2.setColor(Colorblindness.filter(Color.WHITE));
         g2.drawString(header, getCenterX(getTotalWidth(), headerWidth),headerY);
 
         int startY = headerY + render.scale(90);
@@ -288,7 +297,6 @@ public class MenuRender {
                     mouse.getY()) || (i == movesManager.getSelectedIndexY());
             boolean isEnabled = option.get();
 
-            g2.setColor(Colorblindness.filter(Colors.FOREGROUND));
             g2.drawString(enabledOption.toUpperCase(), textX,
                     render.getOffsetY() + startY);
 
@@ -296,7 +304,11 @@ public class MenuRender {
             if(options[i] == GameSettings.DARK_MODE) {
                 toggleImage = isEnabled
                         ? (isHovered ? DARK_MODE_ON_HIGHLIGHTED : DARK_MODE_ON)
-                        : (isHovered ? DARK_MODE_OFF_HIGHLIGHTED : DARK_MODE_OFF);
+                        : (isHovered ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
+            } else if(options[i] == GameSettings.HARD_MODE) {
+                toggleImage = isEnabled
+                        ? (isHovered ? HARD_MODE_ON_HIGHLIGHTED : HARD_MODE_ON)
+                        : (isHovered ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
             } else {
                 toggleImage = isEnabled
                         ? (isHovered ? TOGGLE_ON_HIGHLIGHTED : TOGGLE_ON)
@@ -315,6 +327,15 @@ public class MenuRender {
         List<Achievement> list = new ArrayList<>(achievements);
         list.sort(Comparator.comparingInt(a -> a.getId().ordinal()));
 
+        int stroke = 4;
+        int x = 32, y = 32;
+        int arc = 40;
+
+        GUIService.drawBox(g2, stroke, x, y,
+                render.scale(RenderContext.BASE_WIDTH - x * 2),
+                render.scale(RenderContext.BASE_HEIGHT - y * 2), arc, arc, true,
+                false, 255);
+
         String text = ACHIEVEMENTS;
         int headerY = render.getOffsetY() + render.scale(OPTION_Y);
         int headerWidth = fm.stringWidth(text);
@@ -326,12 +347,11 @@ public class MenuRender {
                 getCenterX(getTotalWidth(), headerWidth),
                 headerY);
 
-        int stroke = 4;
         int spacing = 25;
         int startY = headerY + spacing * 2;
         int width = RenderContext.BASE_WIDTH/2;
         int height = 100, arcWidth = 32, arcHeight = 32;
-        int x = getCenterX(getTotalWidth(), width);
+        x = getCenterX(getTotalWidth(), width);
         boolean hasBackground = true;
 
         int itemsPerPage = MovesManager.getITEMS_PER_PAGE();
@@ -355,11 +375,13 @@ public class MenuRender {
 
             if(isHovered) {
                 GUIService.drawBox(g2, stroke, x, startY,
-                        width, height, arcWidth, arcHeight, hasBackground, true);
+                        width, height, arcWidth, arcHeight, hasBackground,
+                        true, 0);
                 g2.drawString(a.getId().getDescription(), textX, descY);
             } else {
                 GUIService.drawBox(g2, stroke, x, startY,
-                        width, height, arcWidth, arcHeight, hasBackground, false);
+                        width, height, arcWidth, arcHeight, hasBackground,
+                        false, 0);
                 g2.drawString(a.getId().getTitle(), textX, titleY);
             }
 
@@ -390,6 +412,15 @@ public class MenuRender {
         List<Save> saves = gameService.getSaveManager().getSaves();
         String text = "SAVE FILES";
 
+        int stroke = 4;
+        int x = 32, y = 32;
+        int arc = 40;
+
+        GUIService.drawBox(g2, stroke, x, y,
+                render.scale(RenderContext.BASE_WIDTH - x * 2),
+                render.scale(RenderContext.BASE_HEIGHT - y * 2), arc, arc, true,
+                false, 255);
+
         g2.setFont(GUIService.getFontBold(GUIService.getMENU_FONT()));
         FontMetrics fm = g2.getFontMetrics();
 
@@ -406,12 +437,11 @@ public class MenuRender {
             return;
         }
 
-        int stroke = 4;
         int spacing = 25;
         int startY = headerY + spacing * 2;
         int width = RenderContext.BASE_WIDTH/2;
         int height = 100, arcWidth = 32, arcHeight = 32;
-        int x = getCenterX(getTotalWidth(), width);
+        x = getCenterX(getTotalWidth(), width);
         boolean hasBackground = true;
 
         int itemsPerPage = MovesManager.getITEMS_PER_PAGE();
@@ -436,10 +466,11 @@ public class MenuRender {
             if(isHovered) {
                 GUIService.drawBox(g2, stroke, x, startY,
                         width, height, arcWidth, arcHeight, hasBackground,
-                        true);
+                        true, 0);
             } else {
                 GUIService.drawBox(g2, stroke, x, startY,
-                        width, height, arcWidth, arcHeight, hasBackground, false);
+                        width, height, arcWidth, arcHeight, hasBackground,
+                        false, 0);
             }
 
             g2.drawString(s.name(), textX, descY);
@@ -469,13 +500,11 @@ public class MenuRender {
     public BufferedImage getSprite(int i) {
         return switch (i) {
             case 0 -> DARK_MODE_ON;
-            case 1 -> DARK_MODE_OFF;
-            case 2 -> DARK_MODE_ON_HIGHLIGHTED;
-            case 3 -> DARK_MODE_OFF_HIGHLIGHTED;
-            case 4 -> TOGGLE_ON;
-            case 5 -> TOGGLE_OFF;
-            case 6 -> TOGGLE_ON_HIGHLIGHTED;
-            case 7 -> TOGGLE_OFF_HIGHLIGHTED;
+            case 1 -> DARK_MODE_ON_HIGHLIGHTED;
+            case 2 -> TOGGLE_ON;
+            case 3 -> TOGGLE_OFF;
+            case 4 -> TOGGLE_ON_HIGHLIGHTED;
+            case 5 -> TOGGLE_OFF_HIGHLIGHTED;
             default -> null;
         };
     }

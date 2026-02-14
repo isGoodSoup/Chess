@@ -176,7 +176,7 @@ public class GUIService {
         int boxHeight = textHeight + 2 * innerPadding;
 
         drawBox(g2, 4, boxX, boxY, boxWidth,
-                boxHeight, 32, 32, true, false);
+                boxHeight, 32, 32, true, false, 255);
         g2.drawString(time, textX, textY);
     }
 
@@ -201,9 +201,10 @@ public class GUIService {
 
     public static void drawBox(Graphics2D g2, int stroke, int x, int y, int width,
                                int height, int arcWidth, int arcHeight,
-                               boolean hasBackground, boolean isHighlighted) {
+                               boolean hasBackground, boolean isHighlighted,
+                               int alpha) {
         if(hasBackground) {
-            g2.setColor(new Color(0, 0, 0, 180));
+            g2.setColor(new Color(0, 0, 0, alpha));
             g2.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
         }
 

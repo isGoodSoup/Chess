@@ -91,7 +91,7 @@ public class BoardRender {
             int squareSize = render.scale(Board.getSquare());
             GUIService.drawBox(g2, 4, getBoardOriginX() + hoverX * squareSize,
                     getBoardOriginY() + hoverY * squareSize, squareSize,
-                    squareSize, 16, 16, true, false);
+                    squareSize, 16, 16, true, false, 180);
         }
 
         Piece selectedPiece = pieceService.getMoveManager() != null
