@@ -5,9 +5,9 @@ import org.vertex.engine.enums.Type;
 
 import java.util.List;
 
-public class Checkers extends Piece {
+public class Checker extends Piece {
 
-    public Checkers(Tint color, int col, int row) {
+    public Checker(Tint color, int col, int row) {
         super(color, col, row);
         this.id = Type.CHECKERS;
     }

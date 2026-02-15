@@ -126,8 +126,7 @@ public enum GameSettings {
             return BooleanService.isDarkMode;
         }
         public void toggle() {
-            BooleanService.isDarkMode ^= true;
-            Colors.toggleDarkTheme();
+            Colors.toggleDarkMode();
         }
     },
     THEMES("Themes") {

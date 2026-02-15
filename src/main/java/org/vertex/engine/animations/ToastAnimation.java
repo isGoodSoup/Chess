@@ -50,7 +50,7 @@ public class ToastAnimation implements Animation {
             y += (int)(t * SLIDE_DISTANCE);
         }
 
-        g2.setColor(Colorblindness.filter(Colors.FOREGROUND));
+        g2.setColor(Colorblindness.filter(Colors.getForeground()));
         g2.setStroke(new BasicStroke(4));
         g2.drawRoundRect(x, y, WIDTH, HEIGHT, ARC, ARC);
         g2.setColor(Colorblindness.filter(Colors.SETTINGS));
@@ -62,12 +62,12 @@ public class ToastAnimation implements Animation {
         }
 
         g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
-        g2.setColor(Colorblindness.filter(Colors.HIGHLIGHT));
+        g2.setColor(Colorblindness.filter(Colors.getHighlight()));
         FontMetrics fm = g2.getFontMetrics();
         int textX = x + 20 + (icon != null ? iconSize + 32 : 0);
         int textY = y + (HEIGHT + fm.getAscent()) / 2 - 24;
         g2.drawString(title, textX, textY);
-        g2.setColor(Colorblindness.filter(Colors.WHITE_FOREGROUND));
+        g2.setColor(Colorblindness.filter(Colors.getForeground()));
         g2.drawString(description, textX, textY + 40);
     }
 

@@ -114,7 +114,7 @@ public class BoardRender {
     }
 
     public void drawBaseBoard(Graphics2D g2) {
-        g2.setColor(Colorblindness.filter(Colors.getBACKGROUND()));
+        g2.setColor(Colorblindness.filter(Colors.getBackground()));
         g2.fillRect(0, 0, RenderContext.BASE_WIDTH, RenderContext.BASE_HEIGHT);
         final int ROW = boardService.getBoard().getROW();
         final int COL = boardService.getBoard().getCOL();
@@ -129,14 +129,15 @@ public class BoardRender {
         int originX = getBoardOriginX() - (edgeSize - boardSize)/2;
         int originY = getBoardOriginY() - (edgeSize - boardSize)/2;
 
-        g2.setColor(Colorblindness.filter(Colors.getEDGE()));
+        g2.setColor(Colorblindness.filter(Colors.getEdge()));
         g2.fillRect(originX, originY, edgeSize, edgeSize);
 
         for (int row = 0; row < ROW; row++) {
             for (int col = 0; col < COL; col++) {
                 boolean isEven = (row + col) % 2 == 0;
-                g2.setColor(isEven ? Colorblindness.filter(Colors.getBACKGROUND())
-                        : Colorblindness.filter(Colors.getFOREGROUND()));
+                g2.setColor(isEven ?
+                        Colorblindness.filter(Colors.getBackground())
+                        : Colorblindness.filter(Colors.getForeground()));
                 g2.fillRect(
                         getBoardOriginX() + col * SQUARE,
                         getBoardOriginY() + row * SQUARE,
@@ -145,8 +146,8 @@ public class BoardRender {
                 );
 
                 g2.setFont(GUIService.getFont(16));
-                g2.setColor(isEven ? Colorblindness.filter(Colors.getFOREGROUND())
-                        : Colorblindness.filter(Colors.getBACKGROUND()));
+                g2.setColor(isEven ? Colorblindness.filter(Colors.getForeground())
+                        : Colorblindness.filter(Colors.getBackground()));
                 g2.drawString(
                         boardService.getSquareNameAt(col, row),
                         getBoardOriginX() + col * SQUARE + PADDING,

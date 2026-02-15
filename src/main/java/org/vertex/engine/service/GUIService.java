@@ -3,6 +3,7 @@ package org.vertex.engine.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.Board;
+import org.vertex.engine.enums.Theme;
 import org.vertex.engine.gui.Colors;
 import org.vertex.engine.gui.Sound;
 import org.vertex.engine.input.Mouse;
@@ -29,6 +30,7 @@ public class GUIService {
     private final RenderContext render;
     private final Sound fx;
 
+    private static BufferedImage oldLogo;
     private static BufferedImage logo;
     private static BufferedImage logo_v2;
     private final transient BufferedImage YES;
@@ -62,8 +64,9 @@ public class GUIService {
         this.boardService.setPieces();
         GUIService.promotionService = promotionService;
         logo = null;
-
+        oldLogo = null;
         try {
+            oldLogo = getImage("/ui/logo");
             logo = getImage("/ui/logo_v4-1");
             logo_v2 = getImage("/ui/logo_v4-2");
             YES = getImage("/ticks/tick_yes");
@@ -121,8 +124,12 @@ public class GUIService {
         return logo;
     }
 
-    public static BufferedImage getLogo_v2() {
+    public static BufferedImage getLogoV2() {
         return logo_v2;
+    }
+
+    public static BufferedImage getOldLogo() {
+        return oldLogo;
     }
 
     public static int getMOVES_CAP() {
@@ -151,7 +158,7 @@ public class GUIService {
     }
 
     public void drawTimer(Graphics2D g2) {
-        Color filtered = Colorblindness.filter(Colors.WHITE_FOREGROUND);
+        Color filtered = Colorblindness.filter(Theme.DEFAULT.getBackground());
 
         int boardX = render.getBoardRender().getBoardOriginX();
         int boardY = render.getBoardRender().getBoardOriginY();
@@ -209,9 +216,9 @@ public class GUIService {
         }
 
         if(isHighlighted) {
-            g2.setColor(Colorblindness.filter(Colors.YELLOW_HIGHLIGHT));
+            g2.setColor(Colorblindness.filter(Colors.getHighlight()));
         } else {
-            g2.setColor(Colorblindness.filter(Colors.FOREGROUND));
+            g2.setColor(Colorblindness.filter(Colors.getForeground()));
         }
 
         g2.setStroke(new BasicStroke(stroke));

@@ -176,9 +176,16 @@ public class MenuRender {
 
     private static void drawLogo(Graphics2D g2, int containerWidth) {
         if(GUIService.getLogo() == null) { return; }
-        BufferedImage img =
-                BooleanService.isDarkMode || Colors.BACKGROUND == Colors.BLACK_BACKGROUND ?
-                GUIService.getLogo_v2() : Colorblindness.filter(GUIService.getLogo());
+        BufferedImage img;
+        if(Colors.getBackground() == Theme.LEGACY.getBackground()) {
+            img = GUIService.getOldLogo();
+        } else if(BooleanService.isDarkMode || Colors.getBackground() == Theme.BLACK.getBackground()) {
+            img = GUIService.getLogoV2();
+        } else {
+            img = GUIService.getLogo();
+        }
+
+        img = Colorblindness.filter(img);
         int boardWidth = Board.getSquare() * 8;
         int boardCenterX = render.getOffsetX() + render.scale(
                 RenderContext.BASE_WIDTH) * 2 + boardWidth/2;
@@ -190,7 +197,7 @@ public class MenuRender {
     }
 
     public void drawGraphics(Graphics2D g2, GameMenu[] options) {
-        g2.setColor(Colorblindness.filter(Colors.BACKGROUND));
+        g2.setColor(Colorblindness.filter(Colors.getBackground()));
         g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
         g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
@@ -218,7 +225,7 @@ public class MenuRender {
             boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY())
                     || (i == movesManager.getSelectedIndexY());
 
-            Color foreground = Colorblindness.filter(Colors.FOREGROUND);
+            Color foreground = Colorblindness.filter(Colors.getForeground());
             Color textColor = isHovered ? Colors.getHighlight() : foreground;
 
             g2.setColor(textColor);
@@ -232,7 +239,7 @@ public class MenuRender {
     }
 
     public void drawGamesMenu(Graphics2D g2, Games[] games) {
-        g2.setColor(Colorblindness.filter(Colors.BACKGROUND));
+        g2.setColor(Colorblindness.filter(Colors.getBackground()));
         g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
         g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
@@ -260,7 +267,7 @@ public class MenuRender {
             boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY())
                     || (i == movesManager.getSelectedIndexY());
 
-            Color foreground = Colorblindness.filter(Colors.FOREGROUND);
+            Color foreground = Colorblindness.filter(Colors.getForeground());
             Color textColor = isHovered ? Colors.getHighlight() : foreground;
 
             g2.setColor(textColor);
@@ -274,7 +281,7 @@ public class MenuRender {
     }
 
     public void drawOptionsMenu(Graphics2D g2, GameSettings[] options) {
-        g2.setColor(Colorblindness.filter(Colors.BACKGROUND));
+        g2.setColor(Colorblindness.filter(Colors.getBackground()));
         g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
 
         int stroke = 4;
@@ -521,9 +528,7 @@ public class MenuRender {
 
         int headerY = render.getOffsetY() + render.scale(200);
         int headerWidth = fm.stringWidth(CHECKMATE);
-        g2.setColor(BooleanService.canBeColorblind ?
-                Colorblindness.filter(Colors.FOREGROUND)
-                : Colors.FOREGROUND);
+        g2.setColor(Colorblindness.filter(Colors.getForeground()));
         String text = GameService.getState() == GameState.CHECKMATE ?
                 CHECKMATE : STALEMATE;
         g2.drawString(text, getCenterX(getTotalWidth(), headerWidth),headerY);

@@ -41,17 +41,12 @@ public abstract class Piece {
 	}
 
 	public BufferedImage getSprite() {
-
 		String pieceName = getClass().getSimpleName().toLowerCase();
-
 		Games game = GameService.getGame();
 		String prefix = game.getSpritePrefix();
-
 		Theme theme = Colors.getTheme();
-		String colorName = theme.getColorName(color);
-
+		String colorName = theme.getColor(color);
 		String path = "/pieces/" + prefix + pieceName + "_" + colorName;
-
 		return PieceService.getImage(path);
 	}
 

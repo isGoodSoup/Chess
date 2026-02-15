@@ -43,13 +43,13 @@ public class BoardPanel extends JPanel implements Runnable {
         this.render = new RenderContext();
         service = new ServiceFactory(render);
         GameService.setState(GameState.MENU);
-        Colors.setDefaultTheme();
+        Colors.setTheme(Theme.DEFAULT);
         BooleanService.defaultToggles();
         final int WIDTH = RenderContext.BASE_WIDTH;
         final int HEIGHT = RenderContext.BASE_HEIGHT;
         log.debug("Set size(s): {}, {}", WIDTH, HEIGHT);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        setBackground(Colorblindness.filter(Colors.BACKGROUND));
+        setBackground(Colorblindness.filter(Colors.getBackground()));
         addMouseListener(service.getMouseService());
         addMouseMotionListener(service.getMouseService());
         log.debug("Mouse listener inserted");

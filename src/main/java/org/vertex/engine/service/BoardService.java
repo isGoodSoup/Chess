@@ -209,7 +209,7 @@ public class BoardService {
                 for (int row = 0; row <= 2; row++) {
                     for (int col = 0; col < 8; col++) {
                         if ((row + col) % 2 != 0) {
-                            Checkers black = new Checkers(Tint.DARK, col, row);
+                            Checker black = new Checker(Tint.DARK, col, row);
                             pieces.add(black);
                             boardState[row][col] = black;
                         }
@@ -219,7 +219,7 @@ public class BoardService {
                 for (int row = 5; row <= 7; row++) {
                     for (int col = 0; col < 8; col++) {
                         if ((row + col) % 2 != 0) {
-                            Checkers white = new Checkers(Tint.LIGHT, col, row);
+                            Checker white = new Checker(Tint.LIGHT, col, row);
                             pieces.add(white);
                             boardState[row][col] = white;
                         }
