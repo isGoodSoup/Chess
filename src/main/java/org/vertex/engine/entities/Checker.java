@@ -9,7 +9,7 @@ public class Checker extends Piece {
 
     public Checker(Tint color, int col, int row) {
         super(color, col, row);
-        this.id = Type.CHECKERS;
+        this.id = Type.CHECKER;
     }
 
     @Override
@@ -37,6 +37,8 @@ public class Checker extends Piece {
 
     @Override
     public Piece copy() {
-        return null;
+        Checker p = new Checker(getColor(), getCol(), getRow());
+        p.setHasMoved(hasMoved());
+        return p;
     }
 }

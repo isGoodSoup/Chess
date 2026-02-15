@@ -1,16 +1,20 @@
 package org.vertex.engine.service;
 
-import org.vertex.engine.entities.Pawn;
-import org.vertex.engine.entities.Piece;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vertex.engine.entities.*;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.input.Mouse;
 
 public class PromotionService {
     private Tint promotionColor;
     private Piece promotingPawn;
+    private int promotionTracker;
 
     private static Mouse mouse;
     private final PieceService pieceService;
+
+    private static final Logger log = LoggerFactory.getLogger(PromotionService.class);
 
     public PromotionService(PieceService pieceService, Mouse mouse) {
         this.pieceService = pieceService;
@@ -33,45 +37,62 @@ public class PromotionService {
         this.promotingPawn = promotingPawn;
     }
 
+    public int getPromotionTracker() {
+        return promotionTracker;
+    }
+
     public boolean checkPromotion(Piece p) {
-        if(p instanceof Pawn) {
-            if((p.getColor() == Tint.LIGHT && p.getRow() == 0) ||
+        if (p instanceof Pawn) {
+            if ((p.getColor() == Tint.LIGHT && p.getRow() == 0) ||
                     (p.getColor() == Tint.DARK && p.getRow() == 7)) {
-                BooleanService.isPromotionActive = true;
-                promotingPawn = p;
+                return true;
+            }
+        }
+
+        if (!(p instanceof King)) {
+            if ((p.getColor() == Tint.LIGHT && p.getRow() == 0) ||
+                    (p.getColor() == Tint.DARK && p.getRow() == 7)) {
                 return true;
             }
         }
         return false;
     }
 
-    public void autoPromote(Piece pawn) {
-        if(!BooleanService.canPromote) { return; }
-        if(!(pawn instanceof Pawn)) { return; }
-        if(pawn == null) { return; }
+    public Piece autoPromote(Piece piece) {
+        if(piece == null || !BooleanService.canPromote) return piece;
+        if(!checkPromotion(piece)) return piece;
+        log.info("Promotion: {}, {}", piece.getRow(), piece.getCol());
 
-        Tint side = pawn.getColor();
-        Piece promotedPiece = BooleanService.getRandomPiece(pawn, pawn.getColor());
-        Piece promotingPawn = pawn;
+        Piece promotedPiece = null;
+        if(piece instanceof Pawn) {
+            promotedPiece = new Queen(piece.getColor(), piece.getRow(),
+                    piece.getCol());
+        }
+        else {
+            promotedPiece = new King(pieceService, piece.getColor(),
+                    piece.getRow(), piece.getCol());
+        }
 
-        pieceService.getPieces().remove(pawn);
+        pieceService.getPieces().remove(piece);
         pieceService.getPieces().add(promotedPiece);
-        BoardService.getBoardState()
-                [promotedPiece.getCol()][promotedPiece.getRow()] = promotedPiece;
-        this.promotingPawn = null;
+        promotedPiece.setX(promotedPiece.getRow() * Board.getSquare());
+        promotedPiece.setY(promotedPiece.getCol() * Board.getSquare());
 
-        if (pieceService.getHeldPiece() == pawn) {
+        BoardService.getBoardState()
+                [promotedPiece.getRow()][promotedPiece.getCol()] =
+                promotedPiece;
+
+        if(pieceService.getHeldPiece() == piece) {
             PieceService.nullThisPiece();
         }
 
-        if(promotingPawn == pawn) { promotingPawn = null; }
         BooleanService.isPromotionActive = false;
+        promotionTracker++;
         pieceService.switchTurns();
 
-        if(!BooleanService.doKingPromoterUnlock) {
-            if(!BooleanService.doKingPromoter) {
-                BooleanService.doKingPromoter = true;
-            }
+        if(promotionTracker == 10 && !BooleanService.doKingPromoter) {
+            BooleanService.doKingPromoter = true;
         }
+        return promotedPiece;
     }
 }

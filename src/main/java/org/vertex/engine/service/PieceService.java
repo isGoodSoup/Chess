@@ -3,6 +3,7 @@ package org.vertex.engine.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.*;
+import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.enums.Type;
 import org.vertex.engine.input.Mouse;
@@ -107,7 +108,7 @@ public class PieceService {
     public int getPieceValue(Piece p) {
         return switch(p.getId()) {
             case PAWN -> 10;
-            case CHECKERS -> 20;
+            case CHECKER -> 20;
             case KNIGHT, BISHOP -> 30;
             case ROOK -> 50;
             case QUEEN -> 90;
@@ -279,6 +280,7 @@ public class PieceService {
     }
 
     public boolean isKingInCheck(Tint kingColor) {
+        if(GameService.getGame() != Games.CHESS) { return false; }
         Piece king = getKing(kingColor);
 
         for(Piece p : pieces) {
@@ -317,16 +319,18 @@ public class PieceService {
         simPiece.setCol(targetCol);
         simPiece.setRow(targetRow);
 
-        Piece king = simPieces.stream()
-                .filter(p -> p instanceof King
-                        && p.getColor() == piece.getColor())
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("King must exist after cloning"));
+        if(GameService.getGame() == Games.CHESS) {
+            Piece king = simPieces.stream()
+                    .filter(p -> p instanceof King
+                            && p.getColor() == piece.getColor())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("King must exist after cloning"));
 
-        for (Piece enemy : simPieces) {
-            if (enemy.getColor() != piece.getColor() &&
-                    enemy.canMove(king.getCol(), king.getRow(), simPieces)) {
-                return true;
+            for (Piece enemy : simPieces) {
+                if (enemy.getColor() != piece.getColor() &&
+                        enemy.canMove(king.getCol(), king.getRow(), simPieces)) {
+                    return true;
+                }
             }
         }
         return false;

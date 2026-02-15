@@ -152,21 +152,14 @@ public class MovesManager {
         if(service.getPromotionService().checkPromotion(piece)) {
             BooleanService.isPromotionActive = true;
             service.getPromotionService().setPromotionColor(piece.getColor());
+            Piece promoted = service.getPromotionService().autoPromote(piece);
+            log.info("Promoted Pawn to Queen");
+            selectedPiece = promoted;
         } else {
             service.getPieceService().switchTurns();
         }
 
-        if (BooleanService.canAIPlay &&
-                GameService.getCurrentTurn() == Tint.DARK) {
-
-            new Thread(() -> {
-                Move aiMove = service.getModelService().getAiTurn();
-                if (aiMove != null) {
-                    SwingUtilities.invokeLater(() ->
-                            service.getModelService().executeMove(aiMove));
-                }
-            }).start();
-        }
+        service.getModelService().triggerAiMoveIfNeeded();
 
         if(isCheckmate()) {
             victoryTracker++;
@@ -257,8 +250,9 @@ public class MovesManager {
             }
             service.getAnimationService().startMove(selectedPiece, moveX, moveY);
             attemptMove(selectedPiece, moveX, moveY);
-            selectedPiece.setScale(selectedPiece.getDEFAULT_SCALE());
-            selectedPiece = null;
+            if (selectedPiece != null) {
+                selectedPiece = null;
+            }
         }
     }
 

@@ -1,13 +1,15 @@
 package org.vertex.engine.service;
 
-import org.vertex.engine.entities.Pawn;
 import org.vertex.engine.entities.Piece;
+import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.Tint;
+import org.vertex.engine.interfaces.Ruleset;
 import org.vertex.engine.records.Move;
 import org.vertex.engine.records.MoveScore;
+import org.vertex.engine.rulesets.CheckersRuleset;
+import org.vertex.engine.rulesets.ChessRuleset;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import javax.swing.*;
 import java.util.Comparator;
 import java.util.List;
 
@@ -16,6 +18,7 @@ public class ModelService {
     private final AnimationService animationService;
     private final PromotionService promotionService;
     private BoardService boardService;
+    private Ruleset rule;
 
     public ModelService(PieceService pieceService,
                         AnimationService animationService,
@@ -25,99 +28,61 @@ public class ModelService {
         this.promotionService = promotionService;
     }
 
+    public Ruleset getRule() {
+        return rule;
+    }
+
+    public void setRule(Ruleset rule) {
+        this.rule = rule;
+    }
+
     public void setBoardService(BoardService boardService) {
         this.boardService = boardService;
     }
 
+    public Ruleset createRuleSet(Games type) {
+        return switch(type) {
+            case CHESS -> new ChessRuleset(pieceService, boardService);
+            case CHECKERS -> new CheckersRuleset(pieceService, boardService);
+        };
+    }
+
     public Move getAiTurn() {
-        List<MoveScore> moves = getAllLegalMoves(GameService.getCurrentTurn());
-        if(moves.isEmpty()) { return null; }
-        Collections.shuffle(moves);
+        if(rule == null) {
+            throw new IllegalStateException("Invalid ruleset: not set or null");
+        }
+        List<MoveScore> moves = rule.getAllLegalMoves(GameService.getCurrentTurn());
+        if(moves.isEmpty()) return null;
+
         moves.sort(Comparator.comparingInt(MoveScore::score).reversed());
-        Move bestMove = moves.getFirst().move();
-
-        Piece p = bestMove.piece();
-        if(p.getColor() == Tint.DARK) {
-            animationService.startMove(p, bestMove.targetCol(),
-                    bestMove.targetRow());
-        }
-
-        if(p instanceof Pawn) {
-            boolean hasReachedEnd =
-                    (p.getColor() == Tint.LIGHT && p.getRow() == 0)
-                            || (p.getColor() == Tint.DARK && p.getCol() == 8);
-            if(hasReachedEnd) { promotionService.autoPromote(p); }
-        }
-        return bestMove;
-    }
-
-    public List<MoveScore> getAllLegalMoves(Tint color) {
-        List<MoveScore> moves = new ArrayList<>();
-        for(Piece p : pieceService.getPieces()) {
-            if(p.getColor() != color) { continue; }
-            for(int col = 0; col < 8; col++) {
-                for(int row = 0; row < 8; row++) {
-                    if(!isLegalMove(p, col, row)) { continue; }
-                    Move move = new Move(p, p.getCol(), p.getRow(), col, row,
-                            p.getColor(), null);
-                    moves.add(new MoveScore(move, evaluateMove(move)));
-                }
-            }
-        }
-        return moves;
-    }
-
-    private boolean isLegalMove(Piece p, int col, int row) {
-        Piece target = PieceService.getPieceAt(col, row,
-                pieceService.getPieces());
-        if(!p.canMove(col, row, pieceService.getPieces())) {
-            return false;
-        }
-
-        if(target != null && target.getColor() == p.getColor()) {
-            return false;
-        }
-        return !pieceService.wouldLeaveKingInCheck(p, col, row);
-    }
-
-    private int evaluateMove(Move move) {
-        int score = 0;
-        Piece p = move.piece();
-
-        for(Piece enemy : pieceService.getPieces()) {
-            if(enemy.getCol() == move.targetCol() && enemy.getRow() == move.targetRow()) {
-                score += pieceService.getPieceValue(enemy);
-                break;
-            }
-        }
-
-        int oldCol = p.getCol();
-        int oldRow = p.getRow();
-        p.setCol(move.targetCol());
-        p.setRow(move.targetRow());
-
-        if(pieceService.isPieceThreatened(p)) {
-            score -= pieceService.getPieceValue(p);
-        }
-
-        p.setCol(oldCol);
-        p.setRow(oldRow);
-        return score;
+        return moves.getFirst().move();
     }
 
     public void executeMove(Move move) {
+        if(move == null) { return; }
         Piece p = move.piece();
-        p.setPreCol(p.getCol());
-        p.setPreRow(p.getRow());
-
         if(p.getColor() == Tint.DARK) {
             animationService.startMove(p, move.targetCol(), move.targetRow());
         }
-
         BoardService.getMovesManager()
-                .attemptMove(p, move.targetCol(), move.targetRow());
+                .attemptMove(move.piece(), move.targetCol(), move.targetRow());
+    }
 
-        PieceService.nullThisPiece();
-        BooleanService.isLegal = false;
+    public void triggerAiMoveIfNeeded() {
+        if(!BooleanService.canAIPlay ||
+                GameService.getCurrentTurn() != Tint.DARK ||
+                BooleanService.isAIMoving) return;
+        new Thread(() -> {
+            Move AIMove = getAiTurn();
+            if(AIMove != null) {
+                SwingUtilities.invokeLater(() -> {
+                    executeMove(AIMove);
+                    BooleanService.isAIMoving = false;
+                });
+            } else {
+                BooleanService.isAIMoving = false;
+            }
+        }).start();
     }
 }
+

@@ -61,7 +61,6 @@ public class GUIService {
         this.timerService = timerService;
         this.mouse = mouse;
         this.fx = new Sound();
-        this.boardService.setPieces();
         GUIService.promotionService = promotionService;
         logo = null;
         oldLogo = null;

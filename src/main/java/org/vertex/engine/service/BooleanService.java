@@ -6,6 +6,7 @@ import org.vertex.engine.enums.Tint;
 import java.util.Random;
 
 public class BooleanService {
+    public static boolean isAIMoving;
     public static boolean canMove;
     public static boolean isValidSquare;
     public static boolean isLegal;

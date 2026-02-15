@@ -3,6 +3,7 @@ package org.vertex.engine.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.*;
+import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.Time;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.gui.Sound;
@@ -112,8 +113,14 @@ public class BoardService {
         pieceService.getPieces().clear();
     }
 
-    public String getSquareNameAt(int row, int col) {
-        return squares[row][col];
+    public String[][] getSquares() {
+        return squares;
+    }
+
+    public String getSquareNameAt(int col, int row) {
+        int rankIndex = board.getROW() - 1 - row;
+        char fileChar = (char) ('a' + col);
+        return "" + fileChar + (rankIndex + 1);
     }
 
     public void startBoard() {
@@ -150,7 +157,13 @@ public class BoardService {
     }
 
     public void setPieces() {
-        switch(GameService.getGame()) {
+        Games game = GameService.getGame();
+        log.info("Current game: {}", GameService.getGame());
+        if(game == null) {
+            throw new IllegalStateException("Game type not set before board initialization.");
+        }
+
+        switch(game) {
             case CHESS -> {
                 List<Piece> pieces = pieceService.getPieces();
                 pieces.clear();

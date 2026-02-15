@@ -6,6 +6,7 @@ public enum Games {
     CHESS("CHESS", "") {
         @Override
         public void setup(GameService gameService) {
+            GameService.setGame(this);
             GameService.setState(GameState.BOARD);
             gameService.startNewGame();
         }
@@ -14,10 +15,16 @@ public enum Games {
         public int getBoardSize() {
             return 8;
         }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
     },
-    CHECKERS("CHECKERS", "checkers_") {
+    CHECKERS("CHECKERS", "checker_") {
         @Override
         public void setup(GameService gameService) {
+            GameService.setGame(this);
             GameService.setState(GameState.BOARD);
             gameService.startNewGame(); // TODO
         }
@@ -25,6 +32,11 @@ public enum Games {
         @Override
         public int getBoardSize() {
             return 8;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
         }
     };
 
@@ -44,9 +56,7 @@ public enum Games {
         return spritePrefix;
     }
 
-    public boolean isEnabled() {
-        return true;
-    }
+    public abstract boolean isEnabled();
 
     public abstract int getBoardSize();
 

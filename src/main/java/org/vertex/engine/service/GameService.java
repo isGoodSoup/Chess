@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.enums.*;
 import org.vertex.engine.input.Mouse;
+import org.vertex.engine.interfaces.Ruleset;
 import org.vertex.engine.manager.SaveManager;
 import org.vertex.engine.records.Save;
 import org.vertex.engine.render.RenderContext;
@@ -30,7 +31,6 @@ public class GameService {
 
     public GameService(RenderContext render, BoardService boardService,
                        Mouse mouse) {
-        GameService.game = Games.CHESS;
         GameService.render = render;
         GameService.boardService = boardService;
         GameService.mouse = mouse;
@@ -113,6 +113,8 @@ public class GameService {
         } else {
             service.getSaveManager().saveGame(currentSave);
         }
+        Ruleset rule = service.getModelService().createRuleSet(game);
+        service.getModelService().setRule(rule);
     }
 
     public void continueGame(String saveName) {

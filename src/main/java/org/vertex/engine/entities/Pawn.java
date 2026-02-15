@@ -72,8 +72,8 @@ public class Pawn extends Piece {
 		return false;
 	}
 
-	public void movePiece(Piece p, int newCol, int newRow) {
-		PieceService.movePiece(p, newCol, newRow);
+	public void movePiece(Piece p, int newRow, int newCol) {
+		PieceService.movePiece(p, newRow, newCol);
         setTwoStepsAhead(Math.abs(newRow - getPreRow()) == 2);
 		if (Math.abs(newRow - getPreRow()) == 2) {
 			setHasMoved(true);

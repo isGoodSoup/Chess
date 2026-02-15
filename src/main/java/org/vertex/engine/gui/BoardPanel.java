@@ -43,7 +43,7 @@ public class BoardPanel extends JPanel implements Runnable {
         this.render = new RenderContext();
         service = new ServiceFactory(render);
         GameService.setState(GameState.MENU);
-        Colors.setTheme(Theme.DEFAULT);
+        Colors.setTheme(Theme.LEGACY);
         BooleanService.defaultToggles();
         final int WIDTH = RenderContext.BASE_WIDTH;
         final int HEIGHT = RenderContext.BASE_HEIGHT;

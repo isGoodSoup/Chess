@@ -98,7 +98,7 @@ public class MovesRender {
             boolean isLast = (i == moves.size() - 1);
 
             String moveText = boardService.getSquareNameAt(move.fromRow(),
-                    move.fromCol()) + " > " + boardService.getSquareNameAt(move.targetRow(), move.targetCol());
+                    move.fromCol()) + " > " + boardService.getSquareNameAt(move.targetCol(), move.targetRow());
 
             if (move.color() == Tint.LIGHT) {
                 g2.setColor(isLast ? Color.YELLOW : Color.WHITE);

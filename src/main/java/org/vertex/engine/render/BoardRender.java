@@ -114,27 +114,24 @@ public class BoardRender {
     }
 
     public void drawBaseBoard(Graphics2D g2) {
-        g2.setColor(Colorblindness.filter(Colors.getBackground()));
-        g2.fillRect(0, 0, RenderContext.BASE_WIDTH, RenderContext.BASE_HEIGHT);
         final int ROW = boardService.getBoard().getROW();
         final int COL = boardService.getBoard().getCOL();
         final int SQUARE = render.scale(Board.getSquare());
         final int PADDING = render.scale(Board.getPadding());
 
-        int square = render.scale(Board.getSquare());
         float edgePadding = 0.15f;
-        int boardSize = square * boardService.getBoard().getCOL();
+        int boardSize = SQUARE * COL;
         int edgeSize = (int) (boardSize * (1 + edgePadding));
-
         int originX = getBoardOriginX() - (edgeSize - boardSize)/2;
         int originY = getBoardOriginY() - (edgeSize - boardSize)/2;
 
         g2.setColor(Colorblindness.filter(Colors.getEdge()));
         g2.fillRect(originX, originY, edgeSize, edgeSize);
 
-        for (int row = 0; row < ROW; row++) {
-            for (int col = 0; col < COL; col++) {
+        for(int row = 0; row < ROW; row++) {
+            for(int col = 0; col < COL; col++) {
                 boolean isEven = (row + col) % 2 == 0;
+
                 g2.setColor(isEven ?
                         Colorblindness.filter(Colors.getBackground())
                         : Colorblindness.filter(Colors.getForeground()));
@@ -146,13 +143,30 @@ public class BoardRender {
                 );
 
                 g2.setFont(GUIService.getFont(16));
-                g2.setColor(isEven ? Colorblindness.filter(Colors.getForeground())
-                        : Colorblindness.filter(Colors.getBackground()));
-                g2.drawString(
-                        boardService.getSquareNameAt(col, row),
-                        getBoardOriginX() + col * SQUARE + PADDING,
-                        getBoardOriginY() + row * SQUARE + SQUARE - PADDING
-                );
+
+                if (col == 0) {
+                    String number = String.valueOf(ROW - row);
+                    g2.setColor(isEven ? Colorblindness.filter(Colors.getForeground())
+                            : Colorblindness.filter(Colors.getBackground()));
+                    g2.drawString(
+                            number,
+                            getBoardOriginX() + col * SQUARE + PADDING,
+                            getBoardOriginY() + row * SQUARE + SQUARE - PADDING
+                    );
+                }
+
+                if (row == ROW - 1) {
+                    char letter = (char) ('a' + col);
+                    g2.setColor(isEven ? Colorblindness.filter(Colors.getForeground())
+                            : Colorblindness.filter(Colors.getBackground()));
+
+                    FontMetrics fm = g2.getFontMetrics();
+                    int letterWidth = fm.stringWidth(String.valueOf(letter));
+                    int drawX = getBoardOriginX() + col * SQUARE + SQUARE - PADDING - letterWidth;
+                    int drawY = getBoardOriginY() + row * SQUARE + SQUARE - PADDING;
+                    g2.drawString(String.valueOf(letter), drawX, drawY);
+                }
+
             }
         }
     }

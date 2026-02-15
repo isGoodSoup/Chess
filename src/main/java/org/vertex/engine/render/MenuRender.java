@@ -525,6 +525,7 @@ public class MenuRender {
     }
 
     public void drawSandboxMenu(Graphics2D g2) {
+        if(!BooleanService.canDoSandbox) { return; }
 
     }
 
