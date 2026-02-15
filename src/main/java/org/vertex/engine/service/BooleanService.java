@@ -43,8 +43,8 @@ public class BooleanService {
     public static boolean doRuleTogglesUnlock;
     public static boolean doCheckmate;
     public static boolean doCheckmateUnlock;
-    public static boolean doMasterCastling;
-    public static boolean doMasterCastlingUnlock;
+    public static boolean doCastlingMaster;
+    public static boolean doCastlingMasterUnlock;
     public static boolean doKingPromoter;
     public static boolean doKingPromoterUnlock;
     public static boolean doQuickWin;

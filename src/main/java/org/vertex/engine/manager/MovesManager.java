@@ -13,7 +13,6 @@ import org.vertex.engine.records.Save;
 import org.vertex.engine.render.MenuRender;
 import org.vertex.engine.service.*;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -167,6 +166,14 @@ public class MovesManager {
             }
         }
 
+        if(service.getPieceService().getCheckingTracker() == 4 && isCheckmate() &&
+        !BooleanService.doCheckOverUnlock) {
+            if(!BooleanService.doCheckOver) {
+                BooleanService.doCheckOver = true;
+                service.getPieceService().setCheckingTracker(0);
+            }
+        }
+
         moveTracker++;
         if(moveTracker == 4  && isCheckmate()) {
             if(!BooleanService.doQuickWinUnlock) {
@@ -299,9 +306,9 @@ public class MovesManager {
         }
 
         if(castlingTracker == 10) {
-            if(!BooleanService.doMasterCastlingUnlock) {
-                if(!BooleanService.doMasterCastling) {
-                    BooleanService.doMasterCastling = true;
+            if(!BooleanService.doCastlingMasterUnlock) {
+                if(!BooleanService.doCastlingMaster) {
+                    BooleanService.doCastlingMaster = true;
                 }
             }
         }

@@ -24,6 +24,7 @@ public class PieceService {
     private int dragOffsetY;
     private int hoveredSquareX = -1;
     private int hoveredSquareY = -1;
+    private int checkingTracker;
 
     private static MovesManager movesManager;
     private static BoardService boardService;
@@ -71,6 +72,14 @@ public class PieceService {
     public void setHoveredSquare(int col, int row) {
         this.hoveredSquareX = col;
         this.hoveredSquareY = row;
+    }
+
+    public int getCheckingTracker() {
+        return checkingTracker;
+    }
+
+    public void setCheckingTracker(int checkingTracker) {
+        this.checkingTracker = checkingTracker;
     }
 
     public int getHoveredSquareX() {
@@ -289,6 +298,7 @@ public class PieceService {
             if(p.getColor() != kingColor) {
                 if(p.canMove(king.getCol(), king.getRow(), pieces)) {
                     checkingPiece = p;
+                    checkingTracker++;
                     return true;
                 }
             }

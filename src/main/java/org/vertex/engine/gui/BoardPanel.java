@@ -323,10 +323,16 @@ public class BoardPanel extends JPanel implements Runnable {
             BooleanService.doRuleTogglesUnlock = true;
             playFX();
         }
-        if(BooleanService.doMasterCastling) {
+        if(BooleanService.doCheckOver) {
+            service.getAchievementService().unlock(Achievements.CHECK_OVER);
+            BooleanService.doCheckOver = false;
+            BooleanService.doCheckOverUnlock = true;
+            playFX();
+        }
+        if(BooleanService.doCastlingMaster) {
             service.getAchievementService().unlock(Achievements.CASTLING_MASTER);
-            BooleanService.doMasterCastling = false;
-            BooleanService.doMasterCastlingUnlock = true;
+            BooleanService.doCastlingMaster = false;
+            BooleanService.doCastlingMasterUnlock = true;
             playFX();
         }
         if(BooleanService.doQuickWin) {

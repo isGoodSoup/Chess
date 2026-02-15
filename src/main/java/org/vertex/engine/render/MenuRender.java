@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 public class MenuRender {
     public static final GameMenu[] MENU = GameMenu.values();
@@ -458,6 +459,31 @@ public class MenuRender {
     public void drawSandboxMenu(Graphics2D g2) {
         if(!BooleanService.canDoSandbox) { return; }
 
+        int stroke = 6;
+        int boardX = render.getBoardRender().getBoardOriginX();
+        int boardY = render.getBoardRender().getBoardOriginY();
+        int boardWidth = Board.getSquare() * boardService.getBoard().getCOL();
+
+        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
+        FontMetrics fm = g2.getFontMetrics();
+        String input = "";
+        int textWidth = fm.stringWidth(input);
+        int textHeight = fm.getAscent() + fm.getDescent();
+
+        int innerPadding = render.scale(30);
+        int padding = render.scale(90);
+
+        int textX = boardX + (boardWidth - textWidth)/2;
+        int textY = boardY - padding - fm.getDescent();
+
+        int boxX = textX - innerPadding;
+        int boxY = textY - fm.getAscent() - innerPadding;
+        int boxWidth = textWidth + 2 * innerPadding;
+        int boxHeight = textHeight + 2 * innerPadding;
+        int arc = 32;
+
+        GUIService.drawBox(g2, stroke, boxX, boxY, boxWidth,
+                boxHeight, arc, arc, true, false, 255);
     }
 
     public void drawCheckmate(Graphics2D g2) {
