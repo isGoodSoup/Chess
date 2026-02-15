@@ -35,8 +35,8 @@ public class PromotionService {
 
     public boolean checkPromotion(Piece p) {
         if(p instanceof Pawn) {
-            if((p.getColor() == Tint.WHITE && p.getRow() == 0) ||
-                    (p.getColor() == Tint.BLACK && p.getRow() == 7)) {
+            if((p.getColor() == Tint.LIGHT && p.getRow() == 0) ||
+                    (p.getColor() == Tint.DARK && p.getRow() == 7)) {
                 BooleanService.isPromotionActive = true;
                 promotingPawn = p;
                 return true;

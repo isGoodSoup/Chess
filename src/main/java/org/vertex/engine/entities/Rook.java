@@ -11,7 +11,6 @@ public class Rook extends Piece {
 	public Rook(Tint color, int col, int row) {
 		super(color, col, row);
 		this.id = Type.ROOK;
-		loadSprite(this);
 	}
 
 	@Override

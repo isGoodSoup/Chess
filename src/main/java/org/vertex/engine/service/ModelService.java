@@ -37,15 +37,15 @@ public class ModelService {
         Move bestMove = moves.getFirst().move();
 
         Piece p = bestMove.piece();
-        if(p.getColor() == Tint.BLACK) {
+        if(p.getColor() == Tint.DARK) {
             animationService.startMove(p, bestMove.targetCol(),
                     bestMove.targetRow());
         }
 
         if(p instanceof Pawn) {
             boolean hasReachedEnd =
-                    (p.getColor() == Tint.WHITE && p.getRow() == 0)
-                            || (p.getColor() == Tint.BLACK && p.getCol() == 8);
+                    (p.getColor() == Tint.LIGHT && p.getRow() == 0)
+                            || (p.getColor() == Tint.DARK && p.getCol() == 8);
             if(hasReachedEnd) { promotionService.autoPromote(p); }
         }
         return bestMove;
@@ -110,7 +110,7 @@ public class ModelService {
         p.setPreCol(p.getCol());
         p.setPreRow(p.getRow());
 
-        if(p.getColor() == Tint.BLACK) {
+        if(p.getColor() == Tint.DARK) {
             animationService.startMove(p, move.targetCol(), move.targetRow());
         }
 

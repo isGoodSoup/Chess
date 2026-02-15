@@ -66,11 +66,7 @@ public class BoardPanel extends JPanel implements Runnable {
     @Override
     public void run() {
         Timer timer = new Timer(1000/FPS, e -> {
-            try {
-                update();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            update();
             updateMouse();
             updateAnimations(1.0/FPS);
             repaint();
@@ -95,13 +91,13 @@ public class BoardPanel extends JPanel implements Runnable {
         g2.scale(render.getScale(), render.getScale());
         try {
             drawGame(g2);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
         g2.dispose();
     }
 
-    public void drawGame(Graphics2D g2) throws InterruptedException {
+    public void drawGame(Graphics2D g2) throws InterruptedException, IOException {
         switch(GameService.getState()) {
             case MENU -> service.getRender().getMenuRender().drawGraphics(g2,
                     MenuRender.MENU);
@@ -131,7 +127,7 @@ public class BoardPanel extends JPanel implements Runnable {
         service.getAnimationService().render(g2);
     }
 
-    private void update() throws IOException {
+    private void update() {
         checkKeyboardInput();
         checkMouseInput();
         service.getTimerService().update();

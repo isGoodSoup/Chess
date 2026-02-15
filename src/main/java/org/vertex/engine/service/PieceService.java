@@ -11,11 +11,11 @@ import org.vertex.engine.manager.MovesManager;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.io.InputStream;
+import java.util.*;
 
 public class PieceService {
+    private static Map<String, BufferedImage> cache;
     private static Piece currentPiece;
     private final List<Piece> pieces;
     private Piece checkingPiece;
@@ -34,6 +34,7 @@ public class PieceService {
     public PieceService(Mouse mouse) {
         this.mouse = mouse;
         pieces = new ArrayList<>();
+        cache = new HashMap<>();
     }
 
     public BoardService getBoardService() {
@@ -86,19 +87,27 @@ public class PieceService {
     }
 
     public static BufferedImage getImage(String path) {
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(Objects.requireNonNull(
-                    PieceService.class.getResourceAsStream(path + ".png")));
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-        return img;
+        return cache.computeIfAbsent(path, key -> {
+            try(InputStream stream =
+                         PieceService.class.getResourceAsStream(key + ".png")) {
+                if(stream == null) {
+                    throw new IllegalStateException("Missing resource: " + key);
+                }
+                return ImageIO.read(stream);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load image: " + key, e);
+            }
+        });
+    }
+
+    public static void clearCache() {
+        cache.clear();
     }
 
     public int getPieceValue(Piece p) {
         return switch(p.getId()) {
             case PAWN -> 10;
+            case CHECKERS -> 20;
             case KNIGHT, BISHOP -> 30;
             case ROOK -> 50;
             case QUEEN -> 90;
@@ -207,7 +216,7 @@ public class PieceService {
 
     public void switchTurns() {
         GameService.setCurrentTurn(
-                GameService.getCurrentTurn() == Tint.WHITE ? Tint.BLACK : Tint.WHITE
+                GameService.getCurrentTurn() == Tint.LIGHT ? Tint.DARK : Tint.LIGHT
         );
     }
 

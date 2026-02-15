@@ -11,7 +11,6 @@ public class Knight extends Piece {
 	public Knight(Tint color, int col, int row) {
 		super(color, col, row);
 		this.id = Type.KNIGHT;
-		loadSprite(this);
 	}
 
 	@Override

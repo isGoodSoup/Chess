@@ -99,7 +99,7 @@ public class BoardService {
             p.setPreRow(p.getPreRow());
             p.setX(col * Board.getSquare());
             p.setY(row * Board.getSquare());
-            p.loadSprite(p);
+            p.getSprite();
             boardArray[row][col] = p;
         }
         board.setPieces(boardArray);
@@ -157,37 +157,37 @@ public class BoardService {
                 clearBoardState();
 
                 for(int col = 0; col < 8; col++) {
-                    Pawn whitePawn = new Pawn(Tint.WHITE, col, 6);
-                    Pawn blackPawn = new Pawn(Tint.BLACK, col, 1);
+                    Pawn whitePawn = new Pawn(Tint.LIGHT, col, 6);
+                    Pawn blackPawn = new Pawn(Tint.DARK, col, 1);
                     pieces.add(whitePawn);
                     pieces.add(blackPawn);
                 }
 
-                Rook wR1 = new Rook(Tint.WHITE, 0, 7);
-                Rook wR2 = new Rook(Tint.WHITE, 7, 7);
-                Rook bR1 = new Rook(Tint.BLACK, 0, 0);
-                Rook bR2 = new Rook(Tint.BLACK, 7, 0);
+                Rook wR1 = new Rook(Tint.LIGHT, 0, 7);
+                Rook wR2 = new Rook(Tint.LIGHT, 7, 7);
+                Rook bR1 = new Rook(Tint.DARK, 0, 0);
+                Rook bR2 = new Rook(Tint.DARK, 7, 0);
                 pieces.addAll(List.of(wR1, wR2, bR1, bR2));
 
-                Knight wN1 = new Knight(Tint.WHITE, 1, 7);
-                Knight wN2 = new Knight(Tint.WHITE, 6, 7);
-                Knight bN1 = new Knight(Tint.BLACK, 1, 0);
-                Knight bN2 = new Knight(Tint.BLACK, 6, 0);
+                Knight wN1 = new Knight(Tint.LIGHT, 1, 7);
+                Knight wN2 = new Knight(Tint.LIGHT, 6, 7);
+                Knight bN1 = new Knight(Tint.DARK, 1, 0);
+                Knight bN2 = new Knight(Tint.DARK, 6, 0);
                 pieces.addAll(List.of(wN1, wN2, bN1, bN2));
 
-                Bishop wB1 = new Bishop(Tint.WHITE, 2, 7);
-                Bishop wB2 = new Bishop(Tint.WHITE, 5, 7);
-                Bishop bB1 = new Bishop(Tint.BLACK, 2, 0);
-                Bishop bB2 = new Bishop(Tint.BLACK, 5, 0);
+                Bishop wB1 = new Bishop(Tint.LIGHT, 2, 7);
+                Bishop wB2 = new Bishop(Tint.LIGHT, 5, 7);
+                Bishop bB1 = new Bishop(Tint.DARK, 2, 0);
+                Bishop bB2 = new Bishop(Tint.DARK, 5, 0);
                 pieces.addAll(List.of(wB1, wB2, bB1, bB2));
 
-                Queen wQ = new Queen(Tint.WHITE, 3, 7);
-                Queen bQ = new Queen(Tint.BLACK, 3, 0);
+                Queen wQ = new Queen(Tint.LIGHT, 3, 7);
+                Queen bQ = new Queen(Tint.DARK, 3, 0);
                 pieces.add(wQ);
                 pieces.add(bQ);
 
-                King wK = new King(pieceService, Tint.WHITE, 4, 7);
-                King bK = new King(pieceService, Tint.BLACK, 4, 0);
+                King wK = new King(pieceService, Tint.LIGHT, 4, 7);
+                King bK = new King(pieceService, Tint.DARK, 4, 0);
                 pieces.add(wK);
                 pieces.add(bK);
 
@@ -198,7 +198,7 @@ public class BoardService {
                     p.setY(p.getRow() * squareSize);
                 }
 
-                GameService.setCurrentTurn(Tint.WHITE);
+                GameService.setCurrentTurn(Tint.LIGHT);
                 PieceService.nullThisPiece();
             }
             case CHECKERS -> {
@@ -209,7 +209,7 @@ public class BoardService {
                 for (int row = 0; row <= 2; row++) {
                     for (int col = 0; col < 8; col++) {
                         if ((row + col) % 2 != 0) {
-                            Checkers black = new Checkers(Tint.BLACK, col, row);
+                            Checkers black = new Checkers(Tint.DARK, col, row);
                             pieces.add(black);
                             boardState[row][col] = black;
                         }
@@ -219,7 +219,7 @@ public class BoardService {
                 for (int row = 5; row <= 7; row++) {
                     for (int col = 0; col < 8; col++) {
                         if ((row + col) % 2 != 0) {
-                            Checkers white = new Checkers(Tint.WHITE, col, row);
+                            Checkers white = new Checkers(Tint.LIGHT, col, row);
                             pieces.add(white);
                             boardState[row][col] = white;
                         }
@@ -231,7 +231,7 @@ public class BoardService {
                     p.setX(p.getCol() * squareSize);
                     p.setY(p.getRow() * squareSize);
                 }
-                GameService.setCurrentTurn(Tint.WHITE);
+                GameService.setCurrentTurn(Tint.LIGHT);
                 PieceService.nullThisPiece();
             }
         }
@@ -259,18 +259,18 @@ public class BoardService {
             List<Integer> back = entry.getValue();
 
             for(int col : front) {
-                pieces.add(pieceService.getRandomPiece(Tint.WHITE, col, 6));
-                pieces.add(pieceService.getRandomPiece(Tint.BLACK, col, 1));
+                pieces.add(pieceService.getRandomPiece(Tint.LIGHT, col, 6));
+                pieces.add(pieceService.getRandomPiece(Tint.DARK, col, 1));
             }
 
             for(int col : back) {
                 if(col == 4) { continue; }
-                pieces.add(pieceService.getRandomPiece(Tint.WHITE, col, 7));
-                pieces.add(pieceService.getRandomPiece(Tint.BLACK, col, 0));
+                pieces.add(pieceService.getRandomPiece(Tint.LIGHT, col, 7));
+                pieces.add(pieceService.getRandomPiece(Tint.DARK, col, 0));
             }
         }
-        pieces.add(new King(pieceService, Tint.WHITE, 4, 7));
-        pieces.add(new King(pieceService, Tint.BLACK, 4, 0));
+        pieces.add(new King(pieceService, Tint.LIGHT, 4, 7));
+        pieces.add(new King(pieceService, Tint.DARK, 4, 0));
     }
 
     private void setSandboxPieces() {
@@ -285,8 +285,8 @@ public class BoardService {
         pieces.clear();
         clearBoardState();
 
-        pieces.add(pieceService.getRandomPiece(Tint.WHITE, 5, 6));
-        pieces.add(new King(pieceService, Tint.WHITE, 4, 7));
-        pieces.add(new King(pieceService, Tint.BLACK, 4, 0));
+        pieces.add(pieceService.getRandomPiece(Tint.LIGHT, 5, 6));
+        pieces.add(new King(pieceService, Tint.LIGHT, 4, 7));
+        pieces.add(new King(pieceService, Tint.DARK, 4, 0));
     }
 }

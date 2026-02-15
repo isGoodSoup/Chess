@@ -1,5 +1,6 @@
 package org.vertex.engine.gui;
 
+import org.vertex.engine.enums.Theme;
 import org.vertex.engine.service.BooleanService;
 
 import java.awt.*;
@@ -56,6 +57,7 @@ public class Colors {
             new Color[]{LOGO_BACKGROUND, LOGO_FOREGROUND, LOGO_EDGE, LOGO_HIGHLIGHT},
             new Color[]{FAIRY_BACKGROUND, FAIRY_FOREGROUND, FAIRY_EDGE, FAIRY_HIGHLIGHT}
     );
+    private static Theme theme = Theme.DEFAULT;
     private static int themeIndex = 0;
 
     public static Color getHighlight() {
@@ -95,6 +97,14 @@ public class Colors {
         FOREGROUND = DEFAULT_FOREGROUND;
         EDGE = DEFAULT_EDGE;
         HIGHLIGHT = DEFAULT_HIGHLIGHT;
+    }
+
+    public static Theme getTheme() {
+        return theme;
+    }
+
+    public static void setTheme(Theme theme) {
+        Colors.theme = theme;
     }
 
     public static Color getBACKGROUND() {

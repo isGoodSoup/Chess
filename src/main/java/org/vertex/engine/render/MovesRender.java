@@ -100,7 +100,7 @@ public class MovesRender {
             String moveText = boardService.getSquareNameAt(move.fromRow(),
                     move.fromCol()) + " > " + boardService.getSquareNameAt(move.targetRow(), move.targetCol());
 
-            if (move.color() == Tint.WHITE) {
+            if (move.color() == Tint.LIGHT) {
                 g2.setColor(isLast ? Color.YELLOW : Color.WHITE);
                 g2.drawString(moveText, rightX, rightY);
                 rightY += fm.getHeight() + render.scale(4);

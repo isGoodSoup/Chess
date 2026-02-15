@@ -1,10 +1,8 @@
 package org.vertex.engine.entities;
 
-import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.enums.Type;
 import org.vertex.engine.service.BooleanService;
-import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.PieceService;
 
 import java.util.List;
@@ -16,22 +14,6 @@ public class King extends Piece {
 		super(color, col, row);
 		this.id = Type.KING;
 		this.pieceService = pieceService;
-		String name = getClass().getSimpleName().toLowerCase();
-		if(color == Tint.WHITE) {
-			if(GameService.getGame() == Games.CHESS) {
-				sprite = PieceService.getImage("/pieces/" + name +"_white");
-			} else if(GameService.getGame() == Games.CHECKERS) {
-				sprite = PieceService.getImage("/pieces/" + name +
-						"checkers_white");
-			}
-		} else {
-			if(GameService.getGame() == Games.CHESS) {
-				sprite = PieceService.getImage("/pieces/" + name +"_black");
-			} else if(GameService.getGame() == Games.CHECKERS) {
-				sprite = PieceService.getImage("/pieces/" + name +
-						"checkers_black");
-			}
-		}
 	}
 
 	@Override

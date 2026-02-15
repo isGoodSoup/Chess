@@ -2,21 +2,20 @@ package org.vertex.engine.entities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vertex.engine.enums.Games;
+import org.vertex.engine.enums.Theme;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.enums.Type;
+import org.vertex.engine.gui.Colors;
 import org.vertex.engine.render.Colorblindness;
-import org.vertex.engine.service.GUIService;
+import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.PieceService;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 public abstract class Piece {
 	protected Type id;
-	protected transient BufferedImage sprite;
 	private int x, y;
 	private int col, row, preCol, preRow;
 	private static final double DEFAULT_SCALE = 1.0;
@@ -38,21 +37,22 @@ public abstract class Piece {
 		this.y = getY(row);
 		this.preCol = col;
 		this.preRow = row;
-		this.sprite = loadSprite(this);
+		getSprite();
 	}
 
-	public BufferedImage loadSprite(Piece piece) {
-		String name = piece.getClass().getSimpleName().toLowerCase();
-        return getImage("/pieces/" + name + "_" + themeColor);
-    }
+	public BufferedImage getSprite() {
 
-	public BufferedImage getImage(String path) {
-		InputStream stream = getClass().getResourceAsStream(path + ".png");
-		if (stream == null) {
-			log.error("Resource not found: {}.png", path);
-			return null;
-		}
-		return ImageIO.read(stream);
+		String pieceName = getClass().getSimpleName().toLowerCase();
+
+		Games game = GameService.getGame();
+		String prefix = game.getSpritePrefix();
+
+		Theme theme = Colors.getTheme();
+		String colorName = theme.getColorName(color);
+
+		String path = "/pieces/" + prefix + pieceName + "_" + colorName;
+
+		return PieceService.getImage(path);
 	}
 
 	public Type getId() {
@@ -63,16 +63,8 @@ public abstract class Piece {
 		this.id = id;
 	}
 
-	public BufferedImage getSprite() {
-		return sprite;
-	}
-
 	public BufferedImage getFilteredSprite(BufferedImage image) {
 		return Colorblindness.filter(image);
-	}
-
-	public void setSprite(BufferedImage sprite) {
-		this.sprite = sprite;
 	}
 
 	public int getPreCol() {
@@ -214,15 +206,5 @@ public abstract class Piece {
 	public boolean isValidSquare(Piece piece, int targetCol, int targetRow,
 							   List<Piece> board) {
 		return PieceService.isValidSquare(piece, targetCol, targetRow, board);
-	}
-
-	public void restoreFromSave(int row, int col, GUIService guiService) {
-		this.row = row;
-		this.col = col;
-		this.preRow = row;
-		this.preCol = col;
-		this.x = getX(col);
-		this.y = getY(row);
-		loadSprite(guiService);
 	}
 }

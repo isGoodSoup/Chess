@@ -3,7 +3,7 @@ package org.vertex.engine.enums;
 import org.vertex.engine.service.GameService;
 
 public enum Games {
-    CHESS("CHESS") {
+    CHESS("CHESS", "") {
         @Override
         public void setup(GameService gameService) {
             GameService.setState(GameState.BOARD);
@@ -15,7 +15,7 @@ public enum Games {
             return 8;
         }
     },
-    CHECKERS("CHECKERS") {
+    CHECKERS("CHECKERS", "checkers_") {
         @Override
         public void setup(GameService gameService) {
             GameService.setState(GameState.BOARD);
@@ -29,20 +29,26 @@ public enum Games {
     };
 
     private final String label;
+    private final String spritePrefix;
 
-    Games(String label) {
+    Games(String label, String spritePrefix) {
         this.label = label;
+        this.spritePrefix = spritePrefix;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public abstract int getBoardSize();
+    public String getSpritePrefix() {
+        return spritePrefix;
+    }
 
     public boolean isEnabled() {
         return true;
     }
+
+    public abstract int getBoardSize();
 
     public abstract void setup(GameService gameService);
 }

@@ -157,7 +157,7 @@ public class MovesManager {
         }
 
         if (BooleanService.canAIPlay &&
-                GameService.getCurrentTurn() == Tint.BLACK) {
+                GameService.getCurrentTurn() == Tint.DARK) {
 
             new Thread(() -> {
                 Move aiMove = service.getModelService().getAiTurn();
@@ -324,7 +324,7 @@ public class MovesManager {
         int movedSquares = Math.abs(targetRow - oldRow);
 
         if(captured == null && Math.abs(targetCol - currentPiece.getPreCol()) == 1) {
-            int dir = (currentPiece.getColor() == Tint.WHITE) ? -1 : 1;
+            int dir = (currentPiece.getColor() == Tint.LIGHT) ? -1 : 1;
             if(targetRow - oldRow == dir) {
                 for(Piece p : service.getPieceService().getPieces()) {
                     if(p instanceof Pawn &&

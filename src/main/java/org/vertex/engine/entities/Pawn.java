@@ -11,7 +11,6 @@ public class Pawn extends Piece {
 	public Pawn(Tint color, int col, int row) {
 		super(color, col, row);
 		this.id = Type.PAWN;
-		loadSprite(this);
 	}
 
 	@Override
@@ -19,7 +18,7 @@ public class Pawn extends Piece {
 		if(!isWithinBoard(targetCol, targetRow) || isSameSquare(this, targetCol, targetRow))
 			return false;
 
-		int direction = (getColor() == Tint.WHITE) ? -1 : 1;
+		int direction = (getColor() == Tint.LIGHT) ? -1 : 1;
 
 		Piece pieceAtTarget = PieceService.getPieceAt(targetCol, targetRow, board);
 

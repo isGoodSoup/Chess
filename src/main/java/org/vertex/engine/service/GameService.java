@@ -89,12 +89,12 @@ public class GameService {
     }
 
     public static boolean isBlackTurn() {
-        return currentTurn == Tint.BLACK;
+        return currentTurn == Tint.DARK;
     }
 
     public void startNewGame() {
         Save currentSave = service.getSaveManager().getCurrentSave();
-        setCurrentTurn(Tint.WHITE);
+        setCurrentTurn(Tint.LIGHT);
         service.getMovesManager().setMoves(new ArrayList<>());
         BooleanService.isCheckmate = false;
         BooleanService.isPromotionActive = false;

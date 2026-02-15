@@ -11,7 +11,6 @@ public class Bishop extends Piece {
 	public Bishop(Tint color, int col, int row) {
 		super(color, col, row);
 		this.id = Type.BISHOP;
-		loadSprite(this);
 	}
 
 	@Override
