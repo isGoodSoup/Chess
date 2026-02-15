@@ -8,7 +8,6 @@ import org.vertex.engine.entities.Piece;
 import org.vertex.engine.entities.Rook;
 import org.vertex.engine.enums.*;
 import org.vertex.engine.gui.Sound;
-import org.vertex.engine.input.Mouse;
 import org.vertex.engine.records.Move;
 import org.vertex.engine.records.Save;
 import org.vertex.engine.render.MenuRender;
@@ -23,7 +22,6 @@ public class MovesManager {
     private int moveX = 4;
     private int moveY = 6;
     private ServiceFactory service;
-    private Mouse mouse;
     private Sound fx;
     private List<Move> moves;
     private int selectedIndexY;
@@ -41,7 +39,6 @@ public class MovesManager {
 
     public void init(ServiceFactory service) {
         this.service = service;
-        this.mouse = service.getMouseService();
         this.fx = service.getGuiService().getFx();
         this.moves = new ArrayList<>();
         this.selectedIndexY = 0;
@@ -366,6 +363,34 @@ public class MovesManager {
         }
         return false;
     }
+    public void previousPage() {
+        int currentPage = service.getRender().getMenuRender().getCurrentPage();
+        if(currentPage > 1) {
+            service.getRender().getMenuRender().setCurrentPage(currentPage - 1);
+        }
+    }
+
+    public void nextPage() {
+        int itemsPerPage = MovesManager.getITEMS_PER_PAGE();
+        int totalItems =service.getAchievementService().getAllAchievements().size();
+        int totalPages = (totalItems + itemsPerPage - 1) / itemsPerPage;
+
+        int current = service.getRender().getMenuRender().getCurrentPage();
+
+        if(current < totalPages) {
+            service.getRender().getMenuRender().setCurrentPage(current + 1);
+        }
+    }
+
+    public void nextPage(Object[] options) {
+        int itemsPerPage = 8;
+        int totalPages = (options.length + itemsPerPage - 1) / itemsPerPage;
+
+        int currentPage = service.getRender().getMenuRender().getCurrentPage();
+        if(currentPage < totalPages) {
+            service.getRender().getMenuRender().setCurrentPage(currentPage + 1);
+        }
+    }
 
     public void updateKeyboardHover() {
         List<Piece> selectablePieces = service.getPieceService()
@@ -449,7 +474,7 @@ public class MovesManager {
 
     public void moveLeft(Object[] options) {
         MenuRender menu = service.getRender().getMenuRender();
-        menu.getMouseInput().previousPage();
+        previousPage();
 
         int itemsPerPage = 8;
         int newPage = menu.getCurrentPage();
@@ -502,7 +527,7 @@ public class MovesManager {
 
     public void moveRight(Object[] options) {
         MenuRender menu = service.getRender().getMenuRender();
-        menu.getMouseInput().nextPage(options);
+        nextPage(options);
 
         int itemsPerPage = 8;
         int newPage = menu.getCurrentPage();
@@ -525,16 +550,6 @@ public class MovesManager {
                     if (selected.isEnabled(service.getGameService())) {
                         getFx().playFX(3);
                         selected.run(service.getGameService());
-                    }
-                }
-            }
-            case GAMES -> {
-                Games[] options = MenuRender.GAMES;
-                if(selectedIndexY >= 0 && selectedIndexY < options.length) {
-                    Games selected = options[selectedIndexY];
-                    if (selected.isEnabled()) {
-                        getFx().playFX(3);
-                        selected.setup(service.getGameService());
                     }
                 }
             }

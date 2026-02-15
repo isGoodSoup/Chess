@@ -4,21 +4,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.*;
 import org.vertex.engine.enums.Tint;
-import org.vertex.engine.input.Mouse;
 
 public class PromotionService {
     private Tint promotionColor;
     private Piece promotingPawn;
     private int promotionTracker;
 
-    private static Mouse mouse;
     private final PieceService pieceService;
 
     private static final Logger log = LoggerFactory.getLogger(PromotionService.class);
 
-    public PromotionService(PieceService pieceService, Mouse mouse) {
+    public PromotionService(PieceService pieceService) {
         this.pieceService = pieceService;
-        PromotionService.mouse = mouse;
     }
 
     public Tint getPromotionColor() {
@@ -48,19 +45,12 @@ public class PromotionService {
                 return true;
             }
         }
-
-        if (!(p instanceof King)) {
-            if ((p.getColor() == Tint.LIGHT && p.getRow() == 0) ||
-                    (p.getColor() == Tint.DARK && p.getRow() == 7)) {
-                return true;
-            }
-        }
         return false;
     }
 
     public Piece autoPromote(Piece piece) {
-        if(piece == null || !BooleanService.canPromote) return piece;
-        if(!checkPromotion(piece)) return piece;
+        if(piece == null || !BooleanService.canPromote) { return piece; }
+        if(!checkPromotion(piece)) { return piece; }
         log.info("Promotion: {}, {}", piece.getRow(), piece.getCol());
 
         Piece promotedPiece = null;
@@ -82,9 +72,8 @@ public class PromotionService {
                 [promotedPiece.getRow()][promotedPiece.getCol()] =
                 promotedPiece;
 
-        if(pieceService.getHeldPiece() == piece) {
-            PieceService.nullThisPiece();
-        }
+        pieceService.setHeldPiece(promotedPiece);
+        pieceService.setHoveredPieceKeyboard(promotedPiece);
 
         BooleanService.isPromotionActive = false;
         promotionTracker++;

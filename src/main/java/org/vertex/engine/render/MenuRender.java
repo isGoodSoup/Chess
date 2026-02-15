@@ -4,8 +4,6 @@ import org.vertex.engine.entities.Achievement;
 import org.vertex.engine.entities.Board;
 import org.vertex.engine.enums.*;
 import org.vertex.engine.gui.Colors;
-import org.vertex.engine.input.Mouse;
-import org.vertex.engine.input.MouseInput;
 import org.vertex.engine.manager.MovesManager;
 import org.vertex.engine.records.Save;
 import org.vertex.engine.service.BoardService;
@@ -51,8 +49,6 @@ public class MenuRender {
     private BoardService boardService;
     private MovesManager movesManager;
     private GUIService guiService;
-    private Mouse mouse;
-    private MouseInput mouseInput;
     private AchievementSprites sprites;
 
     public MenuRender(RenderContext render) {
@@ -62,8 +58,6 @@ public class MenuRender {
 
     public void init() {
         this.sprites = new AchievementSprites(guiService);
-        this.mouseInput = new MouseInput(render, this, guiService, gameService,
-                boardService, movesManager, mouse);
         try {
             TOGGLE_ON = guiService.getImage("/ui/toggle_on");
             TOGGLE_OFF = guiService.getImage("/ui/toggle_off");
@@ -118,18 +112,6 @@ public class MenuRender {
 
     public void setGuiService(GUIService guiService) {
         this.guiService = guiService;
-    }
-
-    public Mouse getMouse() {
-        return mouse;
-    }
-
-    public void setMouse(Mouse mouse) {
-        this.mouse = mouse;
-    }
-
-    public MouseInput getMouseInput() {
-        return mouseInput;
     }
 
     public static ColorblindType getCb() {
@@ -222,58 +204,15 @@ public class MenuRender {
                     fm.getHeight()
             );
 
-            boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY())
-                    || (i == movesManager.getSelectedIndexY());
+            boolean isSelected = i == movesManager.getSelectedIndexY();
 
             Color foreground = Colorblindness.filter(Colors.getForeground());
-            Color textColor = isHovered ? Colors.getHighlight() : foreground;
+            Color textColor = isSelected ? Colors.getHighlight() : foreground;
 
             g2.setColor(textColor);
             g2.drawString(option, x, y);
 
-            if(isHovered && lastHoveredIndex != i) {
-                guiService.getFx().playFX(BooleanService.getRandom(1, 2));
-                lastHoveredIndex = i;
-            }
-        }
-    }
-
-    public void drawGamesMenu(Graphics2D g2, Games[] games) {
-        g2.setColor(Colorblindness.filter(Colors.getBackground()));
-        g2.fillRect(0, 0, getTotalWidth(), render.scale(RenderContext.BASE_HEIGHT));
-
-        g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
-        drawLogo(g2, getTotalWidth());
-
-        int startY = render.scale(RenderContext.BASE_HEIGHT)/2 + render.scale(GUIService.getMENU_START_Y());
-        int spacing = render.scale(GUIService.getMENU_SPACING());
-
-        for(int i = 0; i < games.length; i++) {
-            Games op = games[i];
-            String option = op.getLabel();
-            fm = g2.getFontMetrics();
-            int textWidth = fm.stringWidth(option);
-
-            int x = getCenterX(getTotalWidth(), textWidth);
-            int y = render.getOffsetY() + startY + i * spacing;
-
-            Rectangle hitbox = new Rectangle(
-                    x,
-                    y - fm.getAscent(),
-                    textWidth,
-                    fm.getHeight()
-            );
-
-            boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY())
-                    || (i == movesManager.getSelectedIndexY());
-
-            Color foreground = Colorblindness.filter(Colors.getForeground());
-            Color textColor = isHovered ? Colors.getHighlight() : foreground;
-
-            g2.setColor(textColor);
-            g2.drawString(option, x, y);
-
-            if(isHovered && lastHoveredIndex != i) {
+            if(isSelected && lastHoveredIndex != i) {
                 guiService.getFx().playFX(BooleanService.getRandom(1, 2));
                 lastHoveredIndex = i;
             }
@@ -336,15 +275,7 @@ public class MenuRender {
             int toggleX = blockX + maxRowWidth - toggleWidth;
             int toggleY = startY - toggleHeight;
 
-            Rectangle toggleHitbox = new Rectangle(
-                    toggleX,
-                    toggleY,
-                    toggleWidth,
-                    toggleHeight
-            );
-
-            boolean isHovered = toggleHitbox.contains(mouse.getX(),
-                    mouse.getY()) || (i == movesManager.getSelectedIndexY());
+            boolean isSelected = i == movesManager.getSelectedIndexY();
             boolean isEnabled = option.get();
 
             g2.drawString(enabledOption.toUpperCase(), textX,
@@ -353,16 +284,16 @@ public class MenuRender {
             BufferedImage toggleImage;
             if(options[i] == GameSettings.DARK_MODE) {
                 toggleImage = isEnabled
-                        ? (isHovered ? DARK_MODE_ON_HIGHLIGHTED : DARK_MODE_ON)
-                        : (isHovered ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
+                        ? (isSelected ? DARK_MODE_ON_HIGHLIGHTED : DARK_MODE_ON)
+                        : (isSelected ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
             } else if(options[i] == GameSettings.HARD_MODE) {
                 toggleImage = isEnabled
-                        ? (isHovered ? HARD_MODE_ON_HIGHLIGHTED : HARD_MODE_ON)
-                        : (isHovered ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
+                        ? (isSelected ? HARD_MODE_ON_HIGHLIGHTED : HARD_MODE_ON)
+                        : (isSelected ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
             } else {
                 toggleImage = isEnabled
-                        ? (isHovered ? TOGGLE_ON_HIGHLIGHTED : TOGGLE_ON)
-                        : (isHovered ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
+                        ? (isSelected ? TOGGLE_ON_HIGHLIGHTED : TOGGLE_ON)
+                        : (isSelected ? TOGGLE_OFF_HIGHLIGHTED : TOGGLE_OFF);
             }
             drawToggle(g2, toggleImage, render.getOffsetX() + toggleX,
                     render.getOffsetY() + toggleY, toggleWidth, toggleHeight);
@@ -414,7 +345,7 @@ public class MenuRender {
                     x, startY, width, height
             );
 
-            boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY());
+            boolean isSelected = i == movesManager.getSelectedIndexY();
 
             int textX = x + render.scale(110);
             int titleY = startY + render.scale(60);
@@ -425,7 +356,7 @@ public class MenuRender {
                     ? Color.WHITE : Colors.getForeground()));
             g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
 
-            if(isHovered) {
+            if(isSelected) {
                 GUIService.drawBox(g2, stroke, x, startY,
                         width, height, arcWidth, arcHeight, hasBackground,
                         true, 255);
@@ -501,7 +432,7 @@ public class MenuRender {
                     x, startY, width, height
             );
 
-            boolean isHovered = hitbox.contains(mouse.getX(), mouse.getY());
+            boolean isSelected = i == movesManager.getSelectedIndexY();
 
             int textX = x + render.scale(110);
             int titleY = startY + render.scale(60);
@@ -509,7 +440,7 @@ public class MenuRender {
             g2.setFont(GUIService.getFont(GUIService.getMENU_FONT()));
             g2.setColor(Colorblindness.filter(Color.WHITE));
 
-            if(isHovered) {
+            if(isSelected) {
                 GUIService.drawBox(g2, stroke, x, startY,
                         width, height, arcWidth, arcHeight, hasBackground,
                         true, 255);

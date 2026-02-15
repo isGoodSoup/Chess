@@ -7,7 +7,6 @@ import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.Time;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.gui.Sound;
-import org.vertex.engine.input.Mouse;
 import org.vertex.engine.manager.MovesManager;
 import org.vertex.engine.manager.SaveManager;
 import org.vertex.engine.records.Save;
@@ -22,7 +21,6 @@ public class BoardService {
     private final Map<List<Integer>, List<Integer>> columns;
 
     private final PieceService pieceService;
-    private final Mouse mouse;
     private final PromotionService promotionService;
     private final ModelService modelService;
     private static MovesManager movesManager;
@@ -31,14 +29,13 @@ public class BoardService {
     private ServiceFactory serviceFactory;
     private static final Logger log = LoggerFactory.getLogger(BoardService.class);
 
-    public BoardService(PieceService pieceService, Mouse mouse,
+    public BoardService(PieceService pieceService,
                         PromotionService promotionService,
                         ModelService modelService,
                         MovesManager movesManager) {
         this.board = new Board();
         this.fx = new Sound();
         this.pieceService = pieceService;
-        this.mouse = mouse;
         this.promotionService = promotionService;
         this.modelService = modelService;
         BoardService.movesManager = movesManager;

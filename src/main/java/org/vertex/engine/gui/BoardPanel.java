@@ -50,8 +50,6 @@ public class BoardPanel extends JPanel implements Runnable {
         log.debug("Set size(s): {}, {}", WIDTH, HEIGHT);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Colorblindness.filter(Colors.getBackground()));
-        addMouseListener(service.getMouseService());
-        addMouseMotionListener(service.getMouseService());
         log.debug("Mouse listener inserted");
         addKeyListener(service.getKeyboard());
         log.debug("Keyboard listener inserted");
@@ -67,15 +65,10 @@ public class BoardPanel extends JPanel implements Runnable {
     public void run() {
         Timer timer = new Timer(1000/FPS, e -> {
             update();
-            updateMouse();
             updateAnimations(1.0/FPS);
             repaint();
         });
         timer.start();
-    }
-
-    public void updateMouse() {
-        service.getMouseService().update();
     }
 
     public void updateAnimations(double delta) {
@@ -101,7 +94,6 @@ public class BoardPanel extends JPanel implements Runnable {
         switch(GameService.getState()) {
             case MENU -> service.getRender().getMenuRender().drawGraphics(g2,
                     MenuRender.MENU);
-            case GAMES -> service.getRender().getMenuRender().drawGamesMenu(g2, MenuRender.GAMES);
             case SAVES -> service.getRender().getMenuRender().drawSavesMenu(g2);
             case BOARD -> {
                 service.getRender().getBoardRender().drawBoard(g2);
@@ -129,7 +121,6 @@ public class BoardPanel extends JPanel implements Runnable {
 
     private void update() {
         checkKeyboardInput();
-        checkMouseInput();
         service.getTimerService().update();
         service.getBoardService().resetBoard();
         checkAchievements();
@@ -139,25 +130,6 @@ public class BoardPanel extends JPanel implements Runnable {
                 case PLAYER -> BooleanService.canAIPlay = false;
                 case AI -> BooleanService.canAIPlay = true;
             }
-        }
-    }
-
-    private void checkMouseInput() {
-        switch(GameService.getState()) {
-            case MENU -> {
-                service.getRender().getMenuRender()
-                        .getMouseInput().handleMenuInput(MenuRender.MENU);
-                return;
-            }
-            case GAMES -> service.getRender().getMenuRender().getMouseInput().handleGamesMenu(MenuRender.GAMES);
-            case SAVES -> service.getRender().getMenuRender().getMouseInput().handleSavesInput();
-            case RULES -> {
-                service.getRender().getMenuRender()
-                        .getMouseInput().handleOptionsInput();
-                return;
-            }
-            case ACHIEVEMENTS -> {}
-            default -> {}
         }
     }
 
@@ -196,17 +168,6 @@ public class BoardPanel extends JPanel implements Runnable {
                     lastDownTime = now;
                 }
             }
-            case GAMES -> {
-                if(keyboard.wasSelectPressed()) { move.activate(GameState.GAMES); }
-                if(keyboard.isUpDown() && now - lastUpTime >= repeatDelay) {
-                    move.moveUp(MenuRender.MENU);
-                    lastUpTime = now;
-                }
-                if(keyboard.isDownDown() && now - lastDownTime >= repeatDelay) {
-                    move.moveDown(MenuRender.MENU);
-                    lastDownTime = now;
-                }
-            }
             case SAVES -> {
                 List<Save> saves = service.getSaveManager().getSaves();
                 int itemsPerPage = MovesManager.getITEMS_PER_PAGE();
@@ -226,7 +187,7 @@ public class BoardPanel extends JPanel implements Runnable {
                     if(service.getRender().getMenuRender().getCurrentPage() > 0) {
                         service.getGuiService().getFx().playFX(4);
                     }
-                    service.getRender().getMenuRender().getMouseInput().previousPage();
+                    service.getMovesManager().previousPage();
                     service.getMovesManager().setSelectedIndexY(
                             (service.getRender().getMenuRender().getCurrentPage() - 1) * itemsPerPage
                     );
@@ -234,7 +195,7 @@ public class BoardPanel extends JPanel implements Runnable {
                 }
                 if(keyboard.isRightDown() && now - lastDownTime >= repeatDelay) {
                     service.getGuiService().getFx().playFX(4);
-                    service.getRender().getMenuRender().getMouseInput().nextPage();
+                    service.getMovesManager().nextPage();
                     service.getMovesManager().setSelectedIndexY(
                             (service.getRender().getMenuRender().getCurrentPage() - 1) * itemsPerPage
                     );
@@ -280,12 +241,12 @@ public class BoardPanel extends JPanel implements Runnable {
                     if(service.getRender().getMenuRender().getCurrentPage() > 0) {
                         service.getGuiService().getFx().playFX(4);
                     }
-                    service.getRender().getMenuRender().getMouseInput().previousPage();
+                    service.getMovesManager().previousPage();
                     lastUpTime = now;
                 }
                 if(keyboard.isRightDown() && now - lastDownTime >= repeatDelay) {
                     service.getGuiService().getFx().playFX(4);
-                    service.getRender().getMenuRender().getMouseInput().nextPage();
+                    service.getMovesManager().nextPage();
                     lastDownTime = now;
                 }
             }
@@ -296,22 +257,18 @@ public class BoardPanel extends JPanel implements Runnable {
                 if(keyboard.wasSelectPressed()) { move.activate(GameState.BOARD); }
                 if(keyboard.isUpDown() && now - lastUpTime >= repeatDelay) {
                     move.moveUp();
-                    move.updateKeyboardHover();
                     lastUpTime = now;
                 }
                 if(keyboard.isDownDown() && now - lastDownTime >= repeatDelay) {
                     move.moveDown();
-                    move.updateKeyboardHover();
                     lastDownTime = now;
                 }
                 if(keyboard.isLeftDown() && now - lastLeftTime >= repeatDelay) {
                     move.moveLeft();
-                    move.updateKeyboardHover();
                     lastLeftTime = now;
                 }
                 if(keyboard.isRightDown() && now - lastRightTime >= repeatDelay) {
                     move.moveRight();
-                    move.updateKeyboardHover();
                     lastRightTime = now;
                 }
                 if(keyboard.isComboPressed(KeyEvent.VK_CONTROL,

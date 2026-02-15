@@ -3,7 +3,6 @@ package org.vertex.engine.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.enums.*;
-import org.vertex.engine.input.Mouse;
 import org.vertex.engine.interfaces.Ruleset;
 import org.vertex.engine.manager.SaveManager;
 import org.vertex.engine.records.Save;
@@ -21,7 +20,6 @@ public class GameService {
 
     private static RenderContext render;
     private static BoardService boardService;
-    private static Mouse mouse;
 
     private static ServiceFactory service;
     public static SaveManager saveManager;
@@ -29,11 +27,9 @@ public class GameService {
     private static final Logger log =
             LoggerFactory.getLogger(GameService.class);
 
-    public GameService(RenderContext render, BoardService boardService,
-                       Mouse mouse) {
+    public GameService(RenderContext render, BoardService boardService) {
         GameService.render = render;
         GameService.boardService = boardService;
-        GameService.mouse = mouse;
     }
 
     public static GameMenu getGameMenu() {

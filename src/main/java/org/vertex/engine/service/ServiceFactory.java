@@ -1,7 +1,6 @@
 package org.vertex.engine.service;
 
 import org.vertex.engine.input.Keyboard;
-import org.vertex.engine.input.Mouse;
 import org.vertex.engine.manager.MovesManager;
 import org.vertex.engine.manager.SaveManager;
 import org.vertex.engine.render.RenderContext;
@@ -10,7 +9,6 @@ public class ServiceFactory {
     private final RenderContext render;
     private final PieceService piece;
     private final BoardService board;
-    private final Mouse mouse;
     private final Keyboard keyboard;
     private final GUIService gui;
     private final GameService gs;
@@ -24,28 +22,27 @@ public class ServiceFactory {
 
     public ServiceFactory(RenderContext render) {
         this.render = render;
-        this.mouse = new Mouse(render);
         this.keyboard = new Keyboard();
         this.animation = new AnimationService();
-        this.piece = new PieceService(mouse);
-        this.promotion = new PromotionService(piece, mouse);
+        this.piece = new PieceService();
+        this.promotion = new PromotionService(piece);
         this.model = new ModelService(piece, animation, promotion);
         this.movesManager = new MovesManager();
         this.piece.setMoveManager(movesManager);
         this.render.setMovesManager(movesManager);
-        this.board = new BoardService(piece, mouse, promotion,
+        this.board = new BoardService(piece, promotion,
                 model, movesManager);
         this.piece.setBoardService(board);
         this.board.setServiceFactory(this);
         this.model.setBoardService(board);
-        this.gs = new GameService(render, board, mouse);
+        this.gs = new GameService(render, board);
         this.saveManager = new SaveManager();
         this.saveManager.setServiceFactory(this);
         this.gs.setServiceFactory(this);
         this.gs.setSaveManager(saveManager);
         this.timer = new TimerService();
         this.gui = new GUIService(render, piece, board, gs, promotion,
-                model, movesManager, timer, mouse);
+                model, movesManager, timer);
         this.achievement = new AchievementService();
         this.achievement.setAnimationService(animation);
         this.achievement.setSaveManager(saveManager);
@@ -57,7 +54,6 @@ public class ServiceFactory {
         this.render.getMenuRender().setGuiService(gui);
         this.render.getMenuRender().setGameService(gs);
         this.render.getMenuRender().setMoveManager(movesManager);
-        this.render.getMenuRender().setMouse(mouse);
         this.render.getMovesRender().setBoardService(board);
         this.render.getMovesRender().setGuiService(gui);
         this.render.getMovesRender().setMovesManager(movesManager);
@@ -75,10 +71,6 @@ public class ServiceFactory {
 
     public BoardService getBoardService() {
         return board;
-    }
-
-    public Mouse getMouseService() {
-        return mouse;
     }
 
     public Keyboard getKeyboard() {

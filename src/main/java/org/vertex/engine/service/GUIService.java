@@ -6,7 +6,6 @@ import org.vertex.engine.entities.Board;
 import org.vertex.engine.enums.Theme;
 import org.vertex.engine.gui.Colors;
 import org.vertex.engine.gui.Sound;
-import org.vertex.engine.input.Mouse;
 import org.vertex.engine.manager.MovesManager;
 import org.vertex.engine.render.Colorblindness;
 import org.vertex.engine.render.RenderContext;
@@ -41,7 +40,6 @@ public class GUIService {
     private final GameService gameService;
     private final ModelService modelService;
     private final TimerService timerService;
-    private final Mouse mouse;
     private static PromotionService promotionService;
 
     private static final Logger log = LoggerFactory.getLogger(GUIService.class);
@@ -51,15 +49,13 @@ public class GUIService {
                       GameService gameService,
                       PromotionService promotionService,
                       ModelService modelService,
-                      MovesManager movesManager, TimerService timerService,
-                      Mouse mouse) {
+                      MovesManager movesManager, TimerService timerService) {
         this.render = render;
         this.pieceService = pieceService;
         this.boardService = boardService;
         this.gameService = gameService;
         this.modelService = modelService;
         this.timerService = timerService;
-        this.mouse = mouse;
         this.fx = new Sound();
         GUIService.promotionService = promotionService;
         logo = null;
@@ -141,10 +137,6 @@ public class GUIService {
 
     public Sound getFx() {
         return fx;
-    }
-
-    public Mouse getMouse() {
-        return mouse;
     }
 
     public BufferedImage getImage(String path) throws IOException {

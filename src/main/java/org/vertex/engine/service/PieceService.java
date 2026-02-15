@@ -6,7 +6,6 @@ import org.vertex.engine.entities.*;
 import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.enums.Type;
-import org.vertex.engine.input.Mouse;
 import org.vertex.engine.manager.MovesManager;
 
 import javax.imageio.ImageIO;
@@ -28,12 +27,10 @@ public class PieceService {
 
     private static MovesManager movesManager;
     private static BoardService boardService;
-    private final Mouse mouse;
 
     private static final Logger log = LoggerFactory.getLogger(PieceService.class);
 
-    public PieceService(Mouse mouse) {
-        this.mouse = mouse;
+    public PieceService() {
         pieces = new ArrayList<>();
         cache = new HashMap<>();
     }
@@ -54,8 +51,13 @@ public class PieceService {
         PieceService.movesManager = movesManager;
     }
 
+
     public Piece getHeldPiece() {
         return movesManager.getSelectedPiece();
+    }
+
+    public void setHeldPiece(Piece piece) {
+        movesManager.setSelectedPiece(piece);
     }
 
     public Piece getHoveredPieceKeyboard() {
