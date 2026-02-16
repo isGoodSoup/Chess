@@ -170,6 +170,13 @@ public class PieceService {
         BoardService.getBoardState()[p.getRow()][p.getCol()] = p;
     }
 
+    public void replacePiece(Piece p, Piece p2) {
+        removePiece(p);
+        p2.setCol(p.getCol());
+        p2.setRow(p.getRow());
+        addPiece(p2);
+    }
+
     public void removePiece(Piece p) {
         synchronized(pieces) {
             pieces.remove(p);

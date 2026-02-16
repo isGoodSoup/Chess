@@ -150,8 +150,12 @@ public class MovesManager {
             BooleanService.isPromotionActive = true;
             service.getPromotionService().setPromotionColor(piece.getColor());
             Piece promoted = service.getPromotionService().autoPromote(piece);
+            service.getPieceService().replacePiece(piece, promoted);
             log.info("Promoted piece");
-            selectedPiece = promoted;
+            moveX = promoted.getCol();
+            moveY = promoted.getRow();
+            selectedPiece = null;
+            service.getPieceService().setHoveredPieceKeyboard(promoted);
         } else {
             service.getPieceService().switchTurns();
         }

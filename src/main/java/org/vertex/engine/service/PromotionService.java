@@ -78,8 +78,8 @@ public class PromotionService {
                 [promotedPiece.getRow()][promotedPiece.getCol()] =
                 promotedPiece;
 
-        pieceService.setHeldPiece(promotedPiece);
-        pieceService.setHoveredPieceKeyboard(promotedPiece);
+        PieceService.nullThisPiece();
+        pieceService.setHoveredPieceKeyboard(null);
 
         BooleanService.isPromotionActive = false;
         if(piece instanceof Pawn pawn) {
