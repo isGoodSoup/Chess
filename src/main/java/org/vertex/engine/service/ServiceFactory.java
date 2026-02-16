@@ -47,6 +47,7 @@ public class ServiceFactory {
         this.gui = new GUIService(render, piece, board, gs, promotion,
                 model, movesManager, timer);
         this.achievement = new AchievementService(eventBus);
+        this.achievement.setService(this);
         this.achievement.setAnimationService(animation);
         this.achievement.setSaveManager(saveManager);
         this.render.getBoardRender().setBoardService(board);
