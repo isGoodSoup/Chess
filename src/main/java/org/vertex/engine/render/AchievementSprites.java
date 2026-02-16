@@ -28,7 +28,7 @@ public class AchievementSprites {
     private void loadSprites() {
         log.info("Loading achievement sprites...");
         try {
-            defaultSprite = guiService.getImage("/achievements/a00_128x128");
+            defaultSprite = guiService.getImage("/achievements/a00_256x");
         } catch (IOException e) {
             log.error("Default achievement sprite missing!");
             defaultSprite = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);

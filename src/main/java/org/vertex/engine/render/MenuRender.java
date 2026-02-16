@@ -399,8 +399,8 @@ public class MenuRender {
         }
 
         if(BooleanService.canZoomIn) {
-            int zoomWidth  = render.scale(RenderContext.BASE_WIDTH / 3);
-            int zoomHeight = render.scale(RenderContext.BASE_HEIGHT / 3);
+            int zoomWidth  = render.scale(RenderContext.BASE_WIDTH/2);
+            int zoomHeight = render.scale(RenderContext.BASE_HEIGHT/2);
             int zoomX = getCenterX(getTotalWidth(), zoomWidth);
             int zoomY = getCenterY(render.scale(RenderContext.BASE_HEIGHT), zoomHeight);
 
