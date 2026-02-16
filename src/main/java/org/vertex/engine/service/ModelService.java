@@ -63,6 +63,7 @@ public class ModelService {
         Piece p = move.piece();
         if(p.getColor() == Tint.DARK) {
             animationService.startMove(p, move.targetCol(), move.targetRow());
+            boardService.getServiceFactory().getSound().playFX(0);
         }
         BoardService.getMovesManager()
                 .attemptMove(move.piece(), move.targetCol(), move.targetRow());

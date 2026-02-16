@@ -15,6 +15,7 @@ import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.PieceService;
 import org.vertex.engine.service.ServiceFactory;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +64,11 @@ public class MovesManager {
 
     public void attemptMove(Piece piece, int targetCol, int targetRow) {
         if(BooleanService.isCheckmate) { return; }
+        boolean isHumanMove = isHumanTurn(GameService.getCurrentTurn());
+
+        if(isHumanMove) {
+            service.getTimerService().pause();
+        }
 
         for(Piece p : service.getPieceService().getPieces()) {
             if(p instanceof Pawn && p.getColor() == GameService.getCurrentTurn()) {
@@ -121,7 +127,11 @@ public class MovesManager {
             service.getPieceService().switchTurns();
         }
 
-        service.getModelService().triggerAIMove();
+        new Timer(BooleanService.getRandom(1500, 3000),
+                e -> service.getModelService().triggerAIMove()) {{
+            setRepeats(false);
+            start();
+        }};
 
         if(isCheckmate()) {
             eventBus.fire(new CheckmateEvent(piece,
@@ -136,6 +146,14 @@ public class MovesManager {
         if(isStalemate()) {
             eventBus.fire(new StalemateEvent(piece));
         }
+
+        if(isHumanMove) {
+            service.getTimerService().resume();
+        }
+    }
+
+    private boolean isHumanTurn(Tint turn) {
+        return turn == Tint.LIGHT;
     }
 
     private boolean isCheckmate() {
@@ -165,8 +183,10 @@ public class MovesManager {
                 BooleanService.isCheckmate = true;
                 service.getTimerService().stop();
                 GameService.setState(GameState.CHECKMATE);
-                log.info("Checkmate to {}",
-                        selectedPiece.getOtherPiece().getColor());
+                if(selectedPiece != null) {
+                    log.info("Checkmate to {}",
+                            selectedPiece.getOtherPiece().getColor());
+                }
                 return true;
             }
         }

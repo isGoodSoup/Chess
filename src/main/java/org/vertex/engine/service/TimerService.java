@@ -7,6 +7,7 @@ public class TimerService {
     private long lastTime;
     private long timeNanos;
     private static Time mode;
+    private boolean isPaused;
     private static final long TWO_MINUTES = 120L * 1_000_000_000L;
 
     public TimerService() {
@@ -24,13 +25,21 @@ public class TimerService {
         }
     }
 
+    public void pause() {
+        if(!isActive) { return; }
+        isPaused = true;
+    }
+
+    public void resume() {
+        isPaused = false;
+    }
+
     public void stop() {
         isActive = false;
     }
 
     public void reset() {
         isActive = false;
-
         if(mode == Time.TIMER) {
             timeNanos = TWO_MINUTES;
         } else {
@@ -40,8 +49,13 @@ public class TimerService {
 
     public void update() {
         if(!isActive) { return; }
-
         long now = System.nanoTime();
+
+        if(isPaused) {
+            lastTime = now;
+            return;
+        }
+
         long delta = now - lastTime;
         lastTime = now;
 
