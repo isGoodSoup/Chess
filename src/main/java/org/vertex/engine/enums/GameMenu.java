@@ -12,9 +12,7 @@ public enum GameMenu {
     LOAD_GAME("LOAD GAME") {
         @Override
         public void run(GameService gameService) {
-            if(!gameService.getSaveManager().getSaves().isEmpty()) {
-                GameService.setState(GameState.SAVES);
-            }
+            GameService.setState(GameState.SAVES);
         }
     },
     SETTINGS("SETTINGS") {
