@@ -4,6 +4,7 @@ import org.vertex.engine.service.BooleanService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.Serial;
 
 public class Frame extends JFrame {
@@ -13,11 +14,14 @@ public class Frame extends JFrame {
 	private final BoardPanel panel;
 	private final GraphicsDevice gd;
 	private Rectangle windowedBounds;
+	private final Cursor blank;
 
     public Frame() {
 		super(TITLE);
+		blank = Toolkit.getDefaultToolkit().createCustomCursor(
+				new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB),
+				new Point(0, 0), "blank");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setUndecorated(false);
 		setResizable(false);
 		panel = new BoardPanel(this);
 		add(panel);
@@ -25,8 +29,9 @@ public class Frame extends JFrame {
 		gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice();
 		setLocationRelativeTo(null);
-		toggleFullscreen();
 		setVisible(true);
+		toggleFullscreen();
+		setCursor(blank);
 		panel.requestFocusInWindow();
 		panel.launch();
 	}
@@ -49,6 +54,11 @@ public class Frame extends JFrame {
 		}
 		BooleanService.isFullscreen = !BooleanService.isFullscreen;
 		setVisible(true);
+		setCursor(blank);
 		if(wasFocused) { panel.requestFocus(); }
+	}
+
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(Frame::new);
 	}
 }

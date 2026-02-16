@@ -52,6 +52,7 @@ public class BoardPanel extends JPanel implements Runnable {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Colorblindness.filter(Colors.getBackground()));
         addKeyListener(service.getKeyboard());
+        setCursor(new Cursor(0));
         log.debug("Keyboard listener inserted");
         setFocusable(true);
 	}
