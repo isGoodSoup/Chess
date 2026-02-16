@@ -32,6 +32,12 @@ public class Frame extends JFrame {
 		setVisible(true);
 		toggleFullscreen();
 		setCursor(blank);
+		JLayeredPane layered = getLayeredPane();
+		JPanel overlay = new JPanel();
+		overlay.setOpaque(false);
+		overlay.setBounds(0, 0, getWidth(), getHeight());
+		overlay.setCursor(blank);
+		layered.add(overlay, JLayeredPane.DRAG_LAYER);
 		panel.requestFocusInWindow();
 		panel.launch();
 	}
