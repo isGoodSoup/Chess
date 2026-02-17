@@ -14,21 +14,19 @@ import java.util.Map;
 public class AchievementSprites {
     private static final Map<Achievements, BufferedImage> SPRITES =
             new EnumMap<>(Achievements.class);
-    private final GUIService guiService;
     private static BufferedImage defaultSprite;
 
     private static final Logger log =
             LoggerFactory.getLogger(AchievementSprites.class);
 
-    public AchievementSprites(GUIService guiService) {
-        this.guiService = guiService;
+    public AchievementSprites() {
         loadSprites();
     }
 
     private void loadSprites() {
         log.info("Loading achievement sprites...");
         try {
-            defaultSprite = guiService.getImage("/achievements/a00_256x");
+            defaultSprite = GUIService.getImage("/achievements/a00_256x");
         } catch (IOException e) {
             log.error("Default achievement sprite missing!");
             defaultSprite = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
@@ -43,7 +41,7 @@ public class AchievementSprites {
     private void load(Achievements type, String path) {
         try {
             log.info("Achievement sprite for: {}", type.getTitle());
-            SPRITES.put(type, guiService.getImage(path));
+            SPRITES.put(type, GUIService.getImage(path));
         } catch (IOException e) {
             log.error("Missing achievement sprite: {}", path);
             SPRITES.put(type, defaultSprite);

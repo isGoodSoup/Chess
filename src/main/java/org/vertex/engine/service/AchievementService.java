@@ -23,6 +23,7 @@ public class AchievementService {
     private Map<Long, Integer> promotionCount;
     private Map<Long, Integer> checkCount;
 
+    private Set<Long> unlockedIDs;
     private Set<Tint> kingsChecked;
 
     private int castlingCount = 0;
@@ -46,6 +47,7 @@ public class AchievementService {
         this.promotionCount = new HashMap<>();
         this.checkCount = new HashMap<>();
 
+        this.unlockedIDs = new HashSet<>();
         this.kingsChecked = new HashSet<>();
 
         this.isFirstCapture = true;
@@ -104,6 +106,12 @@ public class AchievementService {
     public void unlock(Achievements type) {
         if(!BooleanService.canDoAchievements) { return; }
         Achievement achievement = achievements.get(type);
+
+        if (unlockedIDs.contains(type.getId())) {
+            return;
+        }
+
+        unlockedIDs.add(type.getId());
         if(achievement != null && !achievement.isUnlocked()) {
             achievement.setUnlocked(true);
             animationService.add(new ToastAnimation
@@ -156,9 +164,18 @@ public class AchievementService {
                 .toList();
     }
 
-    public void setUnlockedAchievements(List<Achievement> achievements) {
-        List<Achievement> a = getAchievementList();
-        a = achievements;
+    public void setUnlockedAchievements(List<Achievement> loadedAchievements) {
+        unlockedIDs.clear();
+
+        for (Achievement loaded : loadedAchievements) {
+            Achievements type = loaded.getId();
+            Achievement existing = achievements.get(type);
+
+            if (existing != null) {
+                existing.setUnlocked(true);
+                unlockedIDs.add(type.getId());
+            }
+        }
     }
 
     public List<Achievement> getSortedAchievements() {
