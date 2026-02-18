@@ -38,9 +38,7 @@ public class BoardService {
         this.promotionService = promotionService;
         this.modelService = modelService;
         BoardService.movesManager = movesManager;
-        boardState = new Piece[board.getRow()][board.getCol()];
         this.columns = new HashMap<>();
-        precomputeSquares();
     }
 
     public ServiceFactory getServiceFactory() {
@@ -69,6 +67,16 @@ public class BoardService {
 
     public Map<List<Integer>, List<Integer>> getColumns() {
         return columns;
+    }
+
+    public void prepBoard() {
+        Games game = GameService.getGame();
+        if (game == null) {
+            throw new IllegalStateException("Game must be selected before starting the board");
+        }
+        board.setSize(game);
+        boardState = new Piece[board.getRow()][board.getCol()];
+        precomputeSquares();
     }
 
     private void precomputeSquares() {

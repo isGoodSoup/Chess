@@ -55,6 +55,7 @@ public class GameService {
         service.getMovesManager().setMoves(new ArrayList<>());
         BooleanService.isCheckmate = false;
         BooleanService.isPromotionActive = false;
+        boardService.prepBoard();
         boardService.startBoard();
         Save newSave = new Save(
                 getGame(),
@@ -82,6 +83,7 @@ public class GameService {
             startNewGame();
             return;
         }
+        boardService.prepBoard();
         boardService.restoreSprites(loaded, service.getGuiService());
         service.getPieceService().getPieces().clear();
         service.getPieceService().getPieces().addAll(loaded.pieces());

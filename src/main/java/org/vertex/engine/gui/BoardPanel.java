@@ -46,7 +46,6 @@ public class BoardPanel extends JPanel implements Runnable {
         BooleanService.defaultToggles();
         final int WIDTH = RenderContext.BASE_WIDTH;
         final int HEIGHT = RenderContext.BASE_HEIGHT;
-        log.debug("Set size(s): {}, {}", WIDTH, HEIGHT);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Colorblindness.filter(Colors.getBackground()));
         addKeyListener(service.getKeyboard());

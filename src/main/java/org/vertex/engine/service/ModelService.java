@@ -8,6 +8,7 @@ import org.vertex.engine.records.Move;
 import org.vertex.engine.records.MoveScore;
 import org.vertex.engine.rulesets.CheckersRuleset;
 import org.vertex.engine.rulesets.ChessRuleset;
+import org.vertex.engine.rulesets.ShogiRuleset;
 
 import javax.swing.*;
 import java.util.Comparator;
@@ -44,6 +45,7 @@ public class ModelService {
         return switch(type) {
             case CHESS -> new ChessRuleset(pieceService, boardService);
             case CHECKERS -> new CheckersRuleset(pieceService, boardService);
+            case SHOGI -> new ShogiRuleset(pieceService, boardService);
         };
     }
 

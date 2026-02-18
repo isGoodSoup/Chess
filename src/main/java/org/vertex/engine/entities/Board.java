@@ -1,7 +1,6 @@
 package org.vertex.engine.entities;
 
 import org.vertex.engine.enums.Games;
-import org.vertex.engine.service.GameService;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -14,17 +13,24 @@ public class Board implements Serializable {
 	private static final int HALF_SQUARE = SQUARE/2;
 	private static final int PADDING = 8;
 	private Map<Games, Integer> grids = new HashMap<>();
-	private Piece[][] pieces = new Piece[ROW][COL];
+	private Piece[][] pieces;
 
 	public Board() {
-		COL = grids.get(GameService.getGame());
-		ROW = grids.get(GameService.getGame());
+		init();
 	}
 
 	public void init() {
 		grids.put(Games.CHESS, 8);
 		grids.put(Games.CHECKERS, 8);
 		grids.put(Games.SHOGI, 9);
+	}
+
+	public void setSize(Games game) {
+		Integer size = grids.get(game);
+		if (size == null) throw new IllegalStateException("Grid not defined for game: " + game);
+		COL = size;
+		ROW = size;
+		pieces = new Piece[ROW][COL];
 	}
 
 	public Map<Games, Integer> getGrids() {
