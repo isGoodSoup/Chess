@@ -159,7 +159,7 @@ public class PieceService {
             case 3 -> new Bishop(color, col, row);
             case 4 -> new Knight(color, col, row);
             case 5 -> new Queen(color, col, row);
-            case 6 -> new King(this, color, col, row);
+            case 6 -> new King(this, null, color, col, row);
             default -> new Pawn(color, col, row);
         };
     }

@@ -21,6 +21,7 @@ public class BoardService {
     private final PieceService pieceService;
     private final PromotionService promotionService;
     private final ModelService modelService;
+    private GameService gameService;
     private static MovesManager movesManager;
     private static SaveManager saveManager;
 
@@ -47,6 +48,14 @@ public class BoardService {
 
     public void setService(ServiceFactory service) {
         this.service = service;
+    }
+
+    public GameService getGameService() {
+        return gameService;
+    }
+
+    public void setGameService(GameService gameService) {
+        this.gameService = gameService;
     }
 
     public Board getBoard() {
@@ -214,8 +223,8 @@ public class BoardService {
                 pieces.add(wQ);
                 pieces.add(bQ);
 
-                King wK = new King(pieceService, Tint.LIGHT, 4, 7);
-                King bK = new King(pieceService, Tint.DARK, 4, 0);
+                King wK = new King(pieceService, gameService, Tint.LIGHT, 4, 7);
+                King bK = new King(pieceService, gameService, Tint.DARK, 4, 0);
                 pieces.add(wK);
                 pieces.add(bK);
 
@@ -299,8 +308,8 @@ public class BoardService {
                         pieces.add(pieceService.getRandomPiece(Tint.DARK, col, 0));
                     }
                 }
-                pieces.add(new King(pieceService, Tint.LIGHT, 4, 7));
-                pieces.add(new King(pieceService, Tint.DARK, 4, 0));
+                pieces.add(new King(pieceService, gameService, Tint.LIGHT, 4, 7));
+                pieces.add(new King(pieceService, gameService, Tint.DARK, 4, 0));
             }
             case CHECKERS -> {}
         }

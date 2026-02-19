@@ -12,6 +12,7 @@ public class PromotionService {
     private Piece promotingPawn;
 
     private final PieceService pieceService;
+    private GameService gameService;
     private final EventBus event;
 
     private static final Logger log = LoggerFactory.getLogger(PromotionService.class);
@@ -35,6 +36,14 @@ public class PromotionService {
 
     public void setPromotingPawn(Piece promotingPawn) {
         this.promotingPawn = promotingPawn;
+    }
+
+    public GameService getGameService() {
+        return gameService;
+    }
+
+    public void setGameService(GameService gameService) {
+        this.gameService = gameService;
     }
 
     public boolean checkPromotion(Piece p) {
@@ -65,7 +74,7 @@ public class PromotionService {
                     piece.getCol());
         }
         else {
-            promotedPiece = new King(pieceService, piece.getColor(),
+            promotedPiece = new King(pieceService, gameService, piece.getColor(),
                     piece.getRow(), piece.getCol());
         }
 

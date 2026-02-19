@@ -220,7 +220,7 @@ public class MenuRender {
             }
         }
 
-        int startX = centerX - totalWidth / 2;
+        int startX = centerX - totalWidth/2;
         int currentX = startX;
 
         for(int i = 0; i < options.length; i++) {

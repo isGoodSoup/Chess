@@ -51,6 +51,9 @@ public class GameService {
     public SaveManager getSaveManager() { return saveManager; }
     public void setSaveManager(SaveManager sm) { saveManager = sm; }
 
+    public BoardService getBoardService() { return boardService; }
+    public void setBoardService(BoardService boardService) { this.boardService = boardService; }
+
     public void startNewGame() {
         setCurrentTurn(Tint.LIGHT);
         service.getMovesManager().setMoves(new ArrayList<>());

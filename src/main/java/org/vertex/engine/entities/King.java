@@ -3,16 +3,20 @@ package org.vertex.engine.entities;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.enums.TypeID;
 import org.vertex.engine.service.BooleanService;
+import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.PieceService;
 
 import java.util.List;
 
 public class King extends Piece {
 	private transient PieceService pieceService;
+	private transient GameService gameService;
 
-	public King(PieceService pieceService, Tint color, int col, int row) {
+	public King(PieceService pieceService, GameService gameService,
+				Tint color, int col, int row) {
 		super(color, col, row);
 		this.pieceService = pieceService;
+		this.gameService = gameService;
 		this.typeID = TypeID.KING;
 	}
 
@@ -21,10 +25,25 @@ public class King extends Piece {
 		this.typeID = TypeID.KING;
 	}
 
+	public PieceService getPieceService() {
+		return pieceService;
+	}
+
+	public void setPieceService(PieceService pieceService) {
+		this.pieceService = pieceService;
+	}
+
+	public GameService getGameService() {
+		return gameService;
+	}
+
+	public void setGameService(GameService gameService) {
+		this.gameService = gameService;
+	}
 
 	@Override
 	public boolean canMove(int targetCol, int targetRow, List<Piece> board) {
-		switch(pieceService.getBoardService().getService().getGameService().getGame()) {
+		switch(gameService.getGame()) {
 			case CHESS -> {
 				if(!isWithinBoard(targetCol, targetRow)) { return false; }
 				int colDiff = Math.abs(targetCol - getCol());
@@ -80,12 +99,9 @@ public class King extends Piece {
 
 	@Override
 	public Piece copy() {
-		King p = new King(pieceService, getColor(), getCol(), getRow());
+		King p = new King(pieceService, gameService,
+				getColor(), getCol(), getRow());
 		p.setHasMoved(hasMoved());
 		return p;
-	}
-
-	public void setPieceService(PieceService pieceService) {
-		this.pieceService = pieceService;
 	}
 }

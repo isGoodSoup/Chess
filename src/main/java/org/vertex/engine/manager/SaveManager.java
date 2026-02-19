@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SaveManager {
-
     private static final String AUTOSAVE_FILE = "autosave.json";
     private static final String ACHIEVEMENTS_FILE = "achievements.json";
     private final Gson gson;
@@ -27,7 +26,7 @@ public class SaveManager {
     private static final Logger log = LoggerFactory.getLogger(SaveManager.class);
 
     public SaveManager() {
-        Path saveFolder = Path.of(System.getProperty("user.home"), ".vertex", "chess");
+        Path saveFolder = Path.of(System.getProperty("user.home"), ".vertex");
         this.achievementsPath = saveFolder.resolve(ACHIEVEMENTS_FILE);
         RuntimeTypeAdapterFactory<Piece> pieceAdapter =
                 RuntimeTypeAdapterFactory

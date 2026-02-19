@@ -48,14 +48,17 @@ public class ServiceFactory {
         this.movesManager = new MovesManager();
         this.piece.setMoveManager(movesManager);
         this.render.setMovesManager(movesManager);
+        this.saveManager = new SaveManager();
+        this.gs = new GameService(render, null, saveManager);
         this.board = new BoardService(piece, promotion,
                 model, movesManager);
+        this.piece.setGameService(gs);
+        this.board.setGameService(gs);
+        this.promotion.setGameService(gs);
+        this.gs.setBoardService(board);
         this.piece.setBoardService(board);
         this.board.setService(this);
         this.model.setBoardService(board);
-        this.saveManager = new SaveManager();
-        this.gs = new GameService(render, board, saveManager);
-        this.piece.setGameService(gs);
         this.gs.setServiceFactory(this);
         this.gs.setSaveManager(saveManager);
         this.timer = new TimerService();
