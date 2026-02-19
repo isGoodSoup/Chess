@@ -125,6 +125,8 @@ public class GameService {
         setGame(newGame);
         log.info("Game rotated to {}. Overwriting autosave.", newGame);
 
+        boardService.prepBoard();
+        boardService.startBoard();
         setCurrentTurn(Tint.LIGHT);
         Save newSave = new Save(
                 getGames(),
