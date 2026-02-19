@@ -109,7 +109,7 @@ public class GameService {
     public void autoSave() {
         Save save = new Save(
                 getGames(),
-                LocalDate.now().toString(),
+                "autosave",
                 getCurrentTurn(),
                 service.getPieceService().getPieces(),
                 service.getAchievementService().getUnlockedAchievements()
@@ -124,7 +124,19 @@ public class GameService {
         Games newGame = games[nextIndex];
         setGame(newGame);
         log.info("Game rotated to {}. Overwriting autosave.", newGame);
-        startNewGame();
+
+        setCurrentTurn(Tint.LIGHT);
+        Save newSave = new Save(
+                getGames(),
+                LocalDate.now().toString(),
+                getCurrentTurn(),
+                service.getPieceService().getPieces(),
+                service.getAchievementService().getUnlockedAchievements()
+        );
+        saveManager.saveGame(newSave);
+        Ruleset rule = service.getModelService().createRuleSet(newGame);
+        service.getModelService().setRule(rule);
+
         service.getAnimationService()
                 .add(new ToastAnimation(newGame.getLabel()));
     }
