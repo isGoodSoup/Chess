@@ -79,7 +79,7 @@ public class BoardService {
     }
 
     public void prepBoard() {
-        Games game = service.getGameService().getGame();
+        Games game = GameService.getGames();
         if (game == null) {
             throw new IllegalStateException("Game must be selected before starting the board");
         }
@@ -113,7 +113,7 @@ public class BoardService {
             p.setPreRow(p.getPreRow());
             p.setX(col * Board.getSquare());
             p.setY(row * Board.getSquare());
-            p.getSprite();
+            pieceService.getSprite(p);
             boardArray[row][col] = p;
         }
         board.setPieces(boardArray);
@@ -176,10 +176,10 @@ public class BoardService {
     }
 
     public void setPieces() {
-        Games game = service.getGameService().getGame();
+        Games game = GameService.getGames();
 
-        if(game != service.getGameService().getGame()) {
-            log.debug("Current game: {}", service.getGameService().getGame());
+        if(game != GameService.getGames()) {
+            log.debug("Current game: {}", GameService.getGames());
             lastLoggedGame = game;
         }
 
@@ -223,8 +223,8 @@ public class BoardService {
                 pieces.add(wQ);
                 pieces.add(bQ);
 
-                King wK = new King(pieceService, gameService, Tint.LIGHT, 4, 7);
-                King bK = new King(pieceService, gameService, Tint.DARK, 4, 0);
+                King wK = new King(pieceService, Tint.LIGHT, 4, 7);
+                King bK = new King(pieceService, Tint.DARK, 4, 0);
                 pieces.add(wK);
                 pieces.add(bK);
 
@@ -279,7 +279,7 @@ public class BoardService {
             return;
         }
 
-        switch(service.getGameService().getGame()) {
+        switch(GameService.getGames()) {
             case CHESS -> {
                 List<Piece> pieces = pieceService.getPieces();
                 columns.clear();
@@ -308,8 +308,8 @@ public class BoardService {
                         pieces.add(pieceService.getRandomPiece(Tint.DARK, col, 0));
                     }
                 }
-                pieces.add(new King(pieceService, gameService, Tint.LIGHT, 4, 7));
-                pieces.add(new King(pieceService, gameService, Tint.DARK, 4, 0));
+                pieces.add(new King(pieceService, Tint.LIGHT, 4, 7));
+                pieces.add(new King(pieceService, Tint.DARK, 4, 0));
             }
             case CHECKERS -> {}
         }

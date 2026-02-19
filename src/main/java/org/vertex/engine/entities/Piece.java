@@ -2,14 +2,10 @@ package org.vertex.engine.entities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vertex.engine.enums.Theme;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.enums.TypeID;
-import org.vertex.engine.gui.Colors;
-import org.vertex.engine.render.Colorblindness;
 import org.vertex.engine.service.PieceService;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 public abstract class Piece {
@@ -38,28 +34,6 @@ public abstract class Piece {
 		this.preCol = col;
 		this.preRow = row;
 		this.id = NEXT_ID++;
-		getSprite();
-		getKingSprites();
-	}
-
-	public BufferedImage getSprite() {
-		String pieceName = getClass().getSimpleName().toLowerCase();
-		Theme theme = Colors.getTheme();
-		String color = theme.getColor(this.color);
-		String suffix = "";
-		String path ="/pieces/" + pieceName + "/" + pieceName + "_" + color;
-		return PieceService.getImage(path);
-	}
-
-	public BufferedImage getKingSprites() {
-		Theme theme = Colors.getTheme();
-		String color = theme.getColor(this.color);
-		String path = "/pieces/checker/checker_king_" + color;
-		return PieceService.getImage(path);
-	}
-
-	public BufferedImage getFilteredSprite(BufferedImage image) {
-		return Colorblindness.filter(image);
 	}
 
 	public long getID() {

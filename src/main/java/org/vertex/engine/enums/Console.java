@@ -45,7 +45,7 @@ public enum Console {
                 case "KNIGHT" -> new Knight(tone, col, row);
                 case "ROOK" -> new Rook(tone, col, row);
                 case "QUEEN" -> new Queen(tone, col, row);
-                case "KING" -> new King(tone, col, row);
+                case "KING" -> new King(service.getPieceService(), tone, col, row);
                 default -> null;
             };
 

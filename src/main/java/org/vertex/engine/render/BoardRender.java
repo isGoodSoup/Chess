@@ -76,7 +76,7 @@ public class BoardRender {
     }
 
     public void drawBoard(Graphics2D g2) {
-        Piece currentPiece = pieceService.getHeldPiece();
+        Piece currentPiece = PieceService.getHeldPiece();
         Piece hoveredPiece = pieceService.getHoveredPieceKeyboard();
         int hoverX = pieceService.getHoveredSquareX();
         int hoverY = pieceService.getHoveredSquareY();
@@ -100,7 +100,7 @@ public class BoardRender {
 
         synchronized (pieceService.getPieces()) {
             for (Piece p : pieceService.getPieces()) {
-                drawPiece(g2, p, Colorblindness.filter(p.getSprite()));
+                drawPiece(g2, p, Colorblindness.filter(pieceService.getSprite(p)));
             }
         }
 
@@ -180,12 +180,12 @@ public class BoardRender {
         int size = (int) (square * piece.getScale());
         int offset = (square - size)/2;
 
-        if(piece instanceof King && boardService.getService().getGameService().getGame() == Games.CHECKERS) {
-            override = piece.getKingSprites();
+        if(piece instanceof King && GameService.getGames() == Games.CHECKERS) {
+            override = pieceService.getKingSprites(piece);
         }
 
         g2.drawImage(
-                override != null ? override : piece.getSprite(),
+                override != null ? override : pieceService.getSprite(piece),
                 getBoardOriginX() + piece.getX() + offset,
                 getBoardOriginY() + piece.getY() + offset,
                 size,

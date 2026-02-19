@@ -181,7 +181,7 @@ public class GUIService {
 
     public void drawTick(Graphics2D g2, boolean isLegal) {
         if(!BooleanService.canShowTick) { return; }
-        if(pieceService.getHeldPiece() == null) return;
+        if(PieceService.getHeldPiece() == null) return;
 
         BufferedImage image = isLegal ? YES : NO;
         image = Colorblindness.filter(image);

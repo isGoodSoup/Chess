@@ -74,7 +74,7 @@ public class PromotionService {
                     piece.getCol());
         }
         else {
-            promotedPiece = new King(pieceService, gameService, piece.getColor(),
+            promotedPiece = new King(pieceService, piece.getColor(),
                     piece.getRow(), piece.getCol());
         }
 

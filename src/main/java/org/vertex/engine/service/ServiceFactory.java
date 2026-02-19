@@ -86,6 +86,7 @@ public class ServiceFactory {
         this.movesManager.init(this, eventBus);
         this.render.getMenuRender().init();
         this.mouseInput.init();
+        this.piece.loadSprites();
         this.achievement.init();
     }
 

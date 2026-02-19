@@ -4,9 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.*;
 import org.vertex.engine.enums.Games;
+import org.vertex.engine.enums.Theme;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.enums.TypeID;
 import org.vertex.engine.events.CheckEvent;
+import org.vertex.engine.gui.Colors;
 import org.vertex.engine.manager.EventBus;
 import org.vertex.engine.manager.MovesManager;
 
@@ -18,7 +20,6 @@ import java.util.*;
 
 public class PieceService {
     private static Map<String, BufferedImage> cache;
-    private static Piece currentPiece;
     private final List<Piece> pieces;
     private Piece checkingPiece;
     private Piece hoveredPieceKeyboard;
@@ -65,7 +66,7 @@ public class PieceService {
     }
 
 
-    public Piece getHeldPiece() {
+    public static Piece getHeldPiece() {
         return movesManager.getSelectedPiece();
     }
 
@@ -116,6 +117,58 @@ public class PieceService {
         });
     }
 
+    public void loadSprites() {
+        for (String pieceName : List.of("pawn", "rook",
+                "bishop", "knight", "queen", "king", "checker",
+                "silver", "gold", "lance", "tokin")) {
+            for (Tint color : Tint.values()) {
+                String path = "/pieces/" + pieceName + "/" +
+                        pieceName + "_" + Colors.getTheme().getColor(color);
+                try {
+                    getImage(path);
+                } catch (IllegalStateException ignored) {}
+
+                if (pieceName.equals("king") || pieceName.equals("checker")) {
+                    String kingPath = "/pieces/checker/checker_king_" + Colors.getTheme().getColor(color);
+                    try { getImage(kingPath); } catch (IllegalStateException ignored) {}
+                }
+
+                assert gameService != null;
+                if(GameService.getGames() == Games.SHOGI) {
+                    String shogiPath = "/pieces/shogi/" + pieceName;
+                    try { getImage(shogiPath); } catch (IllegalStateException ignored) {}
+                }
+            }
+        }
+    }
+
+    public BufferedImage getSprite(Piece piece) {
+        String pieceName = piece.getClass().getSimpleName().toLowerCase();
+        Theme theme = Colors.getTheme();
+        String color = theme.getColor(piece.getColor());
+        String suffix = "";
+        String path ="/pieces/" + pieceName + "/" + pieceName + "_" + color;
+        return getImage(path);
+    }
+
+    public BufferedImage getShogiSprites(Piece piece) {
+        String pieceName = piece.getClass().getSimpleName().toLowerCase();
+        String path = "/pieces/shogi/" + pieceName;
+        try {
+            return getImage(path);
+        } catch (IllegalStateException e) {
+            log.warn("Missing Shogi sprite for piece: {}, skipping", pieceName);
+            return null;
+        }
+    }
+
+    public BufferedImage getKingSprites(Piece piece) {
+        Theme theme = Colors.getTheme();
+        String color = theme.getColor(piece.getColor());
+        String path = "/pieces/checker/checker_king_" + color;
+        return getImage(path);
+    }
+
     public static void clearCache() {
         cache.clear();
     }
@@ -124,9 +177,12 @@ public class PieceService {
         return switch(p.getTypeID()) {
             case PAWN -> 10;
             case CHECKER -> 20;
-            case KNIGHT, BISHOP -> 30;
+            case TOKIN -> 30;
+            case KNIGHT, BISHOP, LANCE -> 30;
             case ROOK -> 50;
             case QUEEN -> 90;
+            case SILVER -> 100;
+            case GOLD -> 100;
             case KING -> 900;
         };
     }
@@ -159,13 +215,13 @@ public class PieceService {
             case 3 -> new Bishop(color, col, row);
             case 4 -> new Knight(color, col, row);
             case 5 -> new Queen(color, col, row);
-            case 6 -> new King(this, null, color, col, row);
+            case 6 -> new King(this, color, col, row);
             default -> new Pawn(color, col, row);
         };
     }
 
     public Piece getKing(Tint color) {
-        if(gameService.getGame() != Games.CHESS) { return null; }
+        if(GameService.getGames() != Games.CHESS) { return null; }
         if(BooleanService.isSandboxEnabled) { return null; }
         for(Piece p : pieces) {
             if(p instanceof King && p.getColor() == color) {
@@ -281,7 +337,7 @@ public class PieceService {
 
         while (c != targetCol && r != targetRow) {
             for (Piece p : board) {
-                if (p == currentPiece) { continue; }
+                if (p == getHeldPiece()) { continue; }
                 if (p.getCol() == c && p.getRow() == r) {
                     return false;
                 }
@@ -304,7 +360,7 @@ public class PieceService {
     }
 
     public boolean isKingInCheck(Tint kingColor) {
-        if(gameService.getGame() != Games.CHESS) { return false; }
+        if(GameService.getGames() != Games.CHESS) { return false; }
         if(BooleanService.isSandboxEnabled) { return false; }
         Piece king = getKing(kingColor);
 
@@ -345,7 +401,7 @@ public class PieceService {
         simPiece.setCol(targetCol);
         simPiece.setRow(targetRow);
 
-        if(gameService.getGame() == Games.CHESS) {
+        if(GameService.getGames() == Games.CHESS) {
             if(!BooleanService.isSandboxEnabled && !BooleanService.canType) {
                 Piece king = simPieces.stream()
                         .filter(p -> p instanceof King

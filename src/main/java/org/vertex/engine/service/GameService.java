@@ -16,7 +16,7 @@ public class GameService {
     private GameMenu gameMenu;
     private GameState state;
     private PlayState mode;
-    private Games game;
+    private static Games games;
     private Tint currentTurn;
     private RenderContext render;
     private BoardService boardService;
@@ -29,27 +29,27 @@ public class GameService {
         this.render = render;
         this.boardService = boardService;
         this.saveManager = saveManager;
-        game = Games.CHESS;
+        games = Games.CHESS;
     }
 
     public GameMenu getGameMenu() { return gameMenu; }
     public void setGameMenu(GameMenu menu) { gameMenu = menu; }
 
-    public void setGame(Games g) { game = g; }
-    public Games getGame() { return game; }
+    public void setGame(Games games) { GameService.games = games; }
+    public static Games getGames() { return games; }
 
     public GameState getState() { return state; }
-    public void setState(GameState s) { state = s; }
+    public void setState(GameState state) { this.state = state; }
 
     public PlayState getMode() { return mode; }
     public Tint getCurrentTurn() { return currentTurn; }
     public void setCurrentTurn(Tint tint) { currentTurn = tint; }
 
     public ServiceFactory getServiceFactory() { return service; }
-    public void setServiceFactory(ServiceFactory svc) { service = svc; }
+    public void setServiceFactory(ServiceFactory service) { this.service = service; }
 
     public SaveManager getSaveManager() { return saveManager; }
-    public void setSaveManager(SaveManager sm) { saveManager = sm; }
+    public void setSaveManager(SaveManager saveManager) { this.saveManager = saveManager; }
 
     public BoardService getBoardService() { return boardService; }
     public void setBoardService(BoardService boardService) { this.boardService = boardService; }
@@ -62,7 +62,7 @@ public class GameService {
         boardService.prepBoard();
         boardService.startBoard();
         Save newSave = new Save(
-                getGame(),
+                getGames(),
                 LocalDate.now().toString(),
                 getCurrentTurn(),
                 service.getPieceService().getPieces(),
@@ -70,7 +70,7 @@ public class GameService {
         );
         saveManager.saveGame(newSave);
         log.info("New game started and autosave created.");
-        Ruleset rule = service.getModelService().createRuleSet(game);
+        Ruleset rule = service.getModelService().createRuleSet(games);
         service.getModelService().setRule(rule);
         setState(GameState.BOARD);
     }
@@ -87,7 +87,7 @@ public class GameService {
             startNewGame();
             return;
         }
-        if(loaded.game() != getGame()) {
+        if(loaded.game() != getGames()) {
             log.info("Switching game mode to match save: {}", loaded.game());
         }
         setGame(loaded.game());
@@ -98,7 +98,7 @@ public class GameService {
         service.getAchievementService().setUnlockedAchievements(loaded.achievements());
         setCurrentTurn(loaded.player());
 
-        Ruleset rule = service.getModelService().createRuleSet(getGame());
+        Ruleset rule = service.getModelService().createRuleSet(getGames());
         service.getModelService().setRule(rule);
 
         service.getTimerService().start();
@@ -108,7 +108,7 @@ public class GameService {
 
     public void autoSave() {
         Save save = new Save(
-                getGame(),
+                getGames(),
                 LocalDate.now().toString(),
                 getCurrentTurn(),
                 service.getPieceService().getPieces(),
@@ -120,7 +120,7 @@ public class GameService {
 
     public void nextGame() {
         Games[] games = Games.values();
-        int nextIndex = (game.ordinal() + 1) % games.length;
+        int nextIndex = (GameService.games.ordinal() + 1) % games.length;
         Games newGame = games[nextIndex];
         setGame(newGame);
         log.info("Game rotated to {}. Overwriting autosave.", newGame);

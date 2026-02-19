@@ -3,6 +3,7 @@ package org.vertex.engine.input;
 import org.vertex.engine.entities.Board;
 import org.vertex.engine.entities.Piece;
 import org.vertex.engine.render.RenderContext;
+import org.vertex.engine.service.PieceService;
 import org.vertex.engine.service.ServiceFactory;
 
 public class MouseInput {
@@ -18,7 +19,7 @@ public class MouseInput {
     }
 
     public void init() {
-        this.piece = service.getPieceService().getHeldPiece();
+        this.piece = PieceService.getHeldPiece();
     }
 
     public Mouse getMouse() {
