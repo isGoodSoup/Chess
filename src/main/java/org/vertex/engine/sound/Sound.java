@@ -114,8 +114,11 @@ public class Sound {
         checkVolume();
     }
 
-    public void playFX(int i) {
+    public synchronized void playFX(int index) {
         if(!BooleanService.canPlayFX) { return; }
-        new Thread(() -> play(i)).start();
+        Clip clip = clips[index];
+        if(clip.isRunning()) clip.stop();
+        clip.setFramePosition(0);
+        clip.start();
     }
 }

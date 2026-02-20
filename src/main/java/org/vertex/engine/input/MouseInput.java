@@ -71,9 +71,13 @@ public class MouseInput {
 
     private void updateMenus(Map<Clickable, Rectangle> buttons) {
         for(Map.Entry<Clickable, Rectangle> entry : buttons.entrySet()) {
-            if(entry.getValue().contains(mouse.getX(), mouse.getY())
-                    && mouse.wasPressed() && !isClickingOption(entry.getKey())) {
-                activate(entry.getKey());
+            if(entry.getValue().contains(mouse.getX(), mouse.getY()) && mouse.wasPressed()) {
+                if (!isClickingOption(entry.getKey())) {
+                    service.getSound().playFX(0);
+                    entry.getKey().onClick(service.getGameService());
+                    isClicking = true;
+                    click = entry.getKey();
+                }
                 break;
             }
         }
@@ -82,13 +86,6 @@ public class MouseInput {
             isClicking = false;
             click = null;
         }
-    }
-
-    public void activate(Clickable c) {
-        service.getSound().playFX(0);
-        c.onClick(service.getGameService());
-        isClicking = true;
-        click = c;
     }
 
     private void checkPiece() {
