@@ -7,6 +7,7 @@ import org.vertex.engine.gui.Colors;
 import org.vertex.engine.gui.GameFrame;
 import org.vertex.engine.manager.MovesManager;
 import org.vertex.engine.render.MenuRender;
+import org.vertex.engine.service.BoardService;
 import org.vertex.engine.service.BooleanService;
 import org.vertex.engine.service.PieceService;
 import org.vertex.engine.service.ServiceFactory;
@@ -30,6 +31,7 @@ public class KeyboardInput {
 
     private ServiceFactory service;
     private GameFrame gameFrame;
+    private BoardService boardService;
 
     public KeyboardInput() {
         this.selectedIndexY = 0;
@@ -96,6 +98,14 @@ public class KeyboardInput {
         return ITEMS_PER_PAGE;
     }
 
+    public BoardService getBoardService() {
+        return boardService;
+    }
+
+    public void setBoardService(BoardService boardService) {
+        this.boardService = boardService;
+    }
+
     public void keyboardMove() {
         Piece selectedPiece = service.getMovesManager().getSelectedPiece();
         if(selectedPiece == null) {
@@ -139,9 +149,9 @@ public class KeyboardInput {
 
         switch(dir) {
             case UP -> moveY = Math.max(0, moveY - 1);
-            case DOWN -> moveY = Math.min(7, moveY + 1);
+            case DOWN -> moveY = Math.min(boardService.getBoard().getRow() - 1, moveY + 1);
             case LEFT -> moveX = Math.max(0, moveX - 1);
-            case RIGHT -> moveX = Math.min(7, moveX + 1);
+            case RIGHT -> moveX = Math.min(boardService.getBoard().getCol() - 1, moveX + 1);
         }
         updateKeyboardHover();
     }
