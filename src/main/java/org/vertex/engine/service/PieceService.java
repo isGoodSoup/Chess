@@ -24,6 +24,7 @@ public class PieceService {
     private Piece checkingPiece;
     private Piece hoveredPieceKeyboard;
     private Piece hoveredPiece;
+    private Piece lastPiece;
     private int dragOffsetX;
     private int dragOffsetY;
     private int hoveredSquareX = -1;
@@ -66,13 +67,20 @@ public class PieceService {
         PieceService.movesManager = movesManager;
     }
 
-
     public static Piece getHeldPiece() {
         return movesManager.getSelectedPiece();
     }
 
     public void setHeldPiece(Piece piece) {
         movesManager.setSelectedPiece(piece);
+    }
+
+    public Piece getLastPiece() {
+        return lastPiece;
+    }
+
+    public void setLastPiece(Piece piece) {
+        this.lastPiece = piece;
     }
 
     public Piece getHoveredPiece() {
@@ -128,16 +136,25 @@ public class PieceService {
 
     public BufferedImage getSprite(Piece piece) {
         Games game = GameService.getGame();
-        if(game == Games.SHOGI) {
-            return getShogiSprite(piece);
-        }
+        try {
+            if(game == Games.SHOGI || game == Games.SANDBOX) {
+                return getShogiSprite(piece);
+            }
 
-        if(game == Games.CHECKERS && piece.getTypeID() == TypeID.KING) {
-            return getKingSprites(piece);
+            if(game == Games.CHECKERS && piece.getTypeID() == TypeID.KING) {
+                return getKingSprites(piece);
+            }
+            return getThemedSprite(piece);
+
+        } catch (RuntimeException e) {
+            log.warn("Error to load sprite,  {} at {},{}: {}",
+                    piece.getClass().getSimpleName(),
+                    piece.getCol(),
+                    piece.getRow(),
+                    e.getMessage());
+            return getPlaceholderSprite();
         }
-        return getThemedSprite(piece);
     }
-
 
     private BufferedImage getThemedSprite(Piece piece) {
         String pieceName = piece.getClass().getSimpleName().toLowerCase();
@@ -151,12 +168,27 @@ public class PieceService {
     private BufferedImage getShogiSprite(Piece piece) {
         String pieceName = piece.getClass().getSimpleName().toLowerCase();
         String suffix = "";
-        if(piece instanceof King && piece.getColor() == Tint.DARK) { suffix = "_jeweled"; }
-        if(piece.isPromoted()) {
-            if(piece instanceof Bishop || piece instanceof Rook) { suffix = "_promoted"; }
+
+        if(GameService.getGame() == Games.SANDBOX) {
+            return getThemedSprite(piece);
         }
+
+        if(piece instanceof King && piece.getColor() == Tint.DARK) {
+            suffix = "_jeweled";
+        }
+        if(piece.isPromoted()) {
+            if(piece instanceof Bishop || piece instanceof Rook) {
+                suffix = "_promoted";
+            }
+        }
+
         String path = "/pieces/shogi/shogi_" + pieceName + suffix;
-        return getImage(path);
+        try {
+            return getImage(path);
+        } catch (IllegalStateException e) {
+            log.warn("Missing Shogi sprite: {}. Using placeholder.", path);
+            return getPlaceholderSprite();
+        }
     }
 
     public BufferedImage getKingSprites(Piece piece) {
@@ -164,6 +196,12 @@ public class PieceService {
         String color = theme.getColor(piece.getColor());
         String path = "/pieces/checker/checker_king_" + color;
         return getImage(path);
+    }
+
+    private BufferedImage getPlaceholderSprite() {
+        BufferedImage placeholder = new BufferedImage(Board.getSquare(),
+                Board.getSquare(), BufferedImage.TYPE_INT_ARGB);
+        return placeholder;
     }
 
     public static void clearCache() {
@@ -221,14 +259,14 @@ public class PieceService {
     }
 
     public Piece getKing(Tint color) {
-        if(BooleanService.isSandboxEnabled) { return null; }
+        if(GameService.getGame() == Games.SANDBOX) { return null; }
         if(GameService.getGame() == Games.CHESS || GameService.getGame() == Games.SHOGI) {
-            for(Piece p : pieces) {
+            for (Piece p : pieces) {
                 if(p instanceof King && p.getColor() == color) {
                     return p;
                 }
             }
-            throw new IllegalStateException("King not found for color: " + color);
+            return null;
         }
         return null;
     }
@@ -236,6 +274,7 @@ public class PieceService {
     public void addPiece(Piece p) {
         pieces.add(p);
         BoardService.getBoardState()[p.getRow()][p.getCol()] = p;
+        lastPiece = p;
     }
 
     public void replacePiece(Piece p, Piece p2) {
@@ -243,6 +282,7 @@ public class PieceService {
         p2.setCol(p.getCol());
         p2.setRow(p.getRow());
         addPiece(p2);
+        lastPiece = p2;
     }
 
     public void removePiece(Piece p) {
@@ -373,9 +413,10 @@ public class PieceService {
     }
 
     public boolean isKingInCheck(Tint kingColor) {
-        if(BooleanService.isSandboxEnabled) { return false; }
+        if(GameService.getGame() == Games.SANDBOX) { return false; }
         if(GameService.getGame() == Games.CHESS || GameService.getGame() == Games.SHOGI) {
             Piece king = getKing(kingColor);
+            if(king == null) { return false; }
 
             for(Piece p : pieces) {
                 if(p.getColor() != kingColor) {
@@ -415,19 +456,21 @@ public class PieceService {
         simPiece.setCol(targetCol);
         simPiece.setRow(targetRow);
 
-        if(GameService.getGame() == Games.CHESS || GameService.getGame() == Games.SHOGI) {
-            if(!BooleanService.isSandboxEnabled && !BooleanService.canType) {
-                Piece king = simPieces.stream()
-                        .filter(p -> p instanceof King
-                                && p.getColor() == piece.getColor())
-                        .findFirst()
-                        .orElseThrow(() -> new IllegalStateException("King must exist after cloning"));
+        if(GameService.getGame() == Games.SANDBOX) {
+            return false;
+        }
 
-                for (Piece enemy : simPieces) {
-                    if(enemy.getColor() != piece.getColor() &&
-                            enemy.canMove(king.getCol(), king.getRow(), simPieces)) {
-                        return true;
-                    }
+        if(GameService.getGame() == Games.CHESS || GameService.getGame() == Games.SHOGI) {
+            Piece king = simPieces.stream()
+                    .filter(p -> p instanceof King
+                            && p.getColor() == piece.getColor())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("King must exist after cloning"));
+
+            for (Piece enemy : simPieces) {
+                if(enemy.getColor() != piece.getColor() &&
+                        enemy.canMove(king.getCol(), king.getRow(), simPieces)) {
+                    return true;
                 }
             }
         }

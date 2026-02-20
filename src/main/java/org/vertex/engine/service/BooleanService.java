@@ -22,7 +22,6 @@ public class BooleanService {
     public static boolean canType;
     public static boolean canPlayFX;
     public static boolean canZoomIn;
-    public static boolean isSandboxEnabled;
 
     public static boolean canDoMoves;
     public static boolean canUndoMoves;
@@ -30,7 +29,6 @@ public class BooleanService {
     public static boolean canPromote;
     public static boolean canSave;
     public static boolean canAIPlay;
-    public static boolean canDoSandbox;
     public static boolean canDoChaos;
     public static boolean canDoHard;
     public static boolean canTime;
@@ -54,8 +52,6 @@ public class BooleanService {
         canSave = false;
         canResetTable = true;
         canStopwatch = true;
-        canDoSandbox = false;
-        isSandboxEnabled = false;
         canDoChaos = false;
         canTheme = false;
         isFullscreen = true;

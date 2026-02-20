@@ -519,7 +519,7 @@ public class MenuRender {
     }
 
     public void drawSandboxMenu(Graphics2D g2) {
-        if(!BooleanService.isSandboxEnabled) { return; }
+        if(GameService.getGame() != Games.SANDBOX) { return; }
         int boardX = render.getBoardRender().getBoardOriginX();
         int boardY = render.getBoardRender().getBoardOriginY();
         int boardWidth = Board.getSquare() * boardService.getBoard().getCol();

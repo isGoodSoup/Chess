@@ -1,6 +1,7 @@
 package org.vertex.engine.enums;
 
 import org.vertex.engine.entities.Board;
+import org.vertex.engine.service.BooleanService;
 import org.vertex.engine.service.GameService;
 
 public enum Games {
@@ -58,6 +59,32 @@ public enum Games {
         public void setup(GameService gameService) {
             gameService.setGame(this);
             gameService.setState(GameState.BOARD);
+            if(!gameService.getSaveManager().autosaveExists()) {
+                gameService.startNewGame();
+            } else {
+                gameService.continueGame();
+            }
+        }
+
+        @Override
+        public int getBoardSize(Board board, GameService gameService) {
+            return board.getGrids().get(GameService.getGame());
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+    },
+    SANDBOX("SANDBOX", "", "Developer tool to test features and piece moves, " +
+            "no AI enabled"){
+        @Override
+        public void setup(GameService gameService) {
+            BooleanService.canAIPlay = false;
+
+            gameService.setGame(this);
+            gameService.setState(GameState.BOARD);
+
             if(!gameService.getSaveManager().autosaveExists()) {
                 gameService.startNewGame();
             } else {

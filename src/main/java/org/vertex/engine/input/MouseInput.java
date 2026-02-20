@@ -4,7 +4,6 @@ import org.vertex.engine.entities.Board;
 import org.vertex.engine.entities.Piece;
 import org.vertex.engine.enums.Games;
 import org.vertex.engine.render.RenderContext;
-import org.vertex.engine.service.BooleanService;
 import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.PieceService;
 import org.vertex.engine.service.ServiceFactory;
@@ -61,8 +60,9 @@ public class MouseInput {
                 int pieceX = p.getCol() * Board.getSquare();
                 int pieceY = p.getRow() * Board.getSquare();
 
-                if (BooleanService.isSandboxEnabled ||
-                        p.getColor() == service.getGameService().getCurrentTurn()
+                boolean isSandbox = GameService.getGame() == Games.SANDBOX;
+                if((isSandbox ||
+                        p.getColor() == service.getGameService().getCurrentTurn())
                         && mouseBoardX >= pieceX
                         && mouseBoardX < pieceX + Board.getSquare()
                         && mouseBoardY >= pieceY

@@ -4,12 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.Piece;
 import org.vertex.engine.enums.GameState;
+import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.PlayState;
 import org.vertex.engine.enums.Theme;
 import org.vertex.engine.render.Colorblindness;
 import org.vertex.engine.render.MenuRender;
 import org.vertex.engine.render.RenderContext;
 import org.vertex.engine.service.BooleanService;
+import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.ServiceFactory;
 
 import javax.swing.*;
@@ -87,7 +89,7 @@ public class BoardPanel extends JPanel implements Runnable {
             case BOARD -> {
                 service.getRender().getBoardRender().drawBoard(g2);
                 service.getRender().getMovesRender().drawMoves(g2);
-                if(!BooleanService.canDoSandbox) {
+                if(!(GameService.getGame() == Games.SANDBOX)) {
                     if(service.getTimerService().isActive()) {
                         service.getGuiService().drawTimer(g2);
                         Piece selected = service.getMovesManager().getSelectedPiece();
@@ -96,7 +98,7 @@ public class BoardPanel extends JPanel implements Runnable {
                         }
                     }
                 }
-                if(BooleanService.canDoSandbox) {
+                if(GameService.getGame() == Games.SANDBOX) {
                     service.getRender().getMenuRender().drawSandboxMenu(g2);
                 }
                 service.getRender().getMenuRender().drawPromotions(g2);
@@ -129,7 +131,7 @@ public class BoardPanel extends JPanel implements Runnable {
     private void update() {
         service.getKeyboardInput().update();
         service.getMouseInput().update();
-        if(!BooleanService.canDoSandbox) {
+        if(!(GameService.getGame() == Games.SANDBOX)) {
             service.getTimerService().update();
         }
         PlayState mode = service.getGameService().getMode();

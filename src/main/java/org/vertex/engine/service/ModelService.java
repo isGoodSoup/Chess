@@ -46,6 +46,7 @@ public class ModelService {
             case CHESS -> new ChessRuleset(pieceService, boardService);
             case CHECKERS -> new CheckersRuleset(pieceService, boardService);
             case SHOGI -> new ShogiRuleset(pieceService, boardService);
+            default -> throw new IllegalStateException("No ruleset?");
         };
     }
 

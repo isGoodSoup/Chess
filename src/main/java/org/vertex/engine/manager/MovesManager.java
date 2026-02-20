@@ -4,10 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.*;
 import org.vertex.engine.enums.GameState;
+import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.Tint;
 import org.vertex.engine.events.*;
 import org.vertex.engine.records.Move;
 import org.vertex.engine.service.BooleanService;
+import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.PieceService;
 import org.vertex.engine.service.ServiceFactory;
 
@@ -172,7 +174,9 @@ public class MovesManager {
             log.info("Promoted piece");
             service.getKeyboardInput().setMoveX(promoted.getCol());
             service.getKeyboardInput().setMoveY(promoted.getRow());
-            selectedPiece = null;
+            if (!(GameService.getGame() == Games.SANDBOX)) {
+                selectedPiece = null;
+            }
             service.getPieceService().setHoveredPieceKeyboard(promoted);
         } else {
             service.getPieceService().switchTurns();
@@ -359,7 +363,10 @@ public class MovesManager {
             selectedPiece.setCol(selectedPiece.getPreCol());
             selectedPiece.setRow(selectedPiece.getPreRow());
             PieceService.updatePos(selectedPiece);
-            PieceService.nullThisPiece();
+
+            selectedPiece = null;
+            service.getPieceService().setHoveredPieceKeyboard(null);
+            BooleanService.isLegal = true;
         }
     }
 

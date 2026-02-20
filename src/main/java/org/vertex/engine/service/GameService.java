@@ -16,6 +16,7 @@ public class GameService {
     private GameState state;
     private PlayState mode;
     private static Games games;
+    private Games previousGame;
     private Tint currentTurn;
     private RenderContext render;
     private BoardService boardService;
@@ -36,6 +37,9 @@ public class GameService {
 
     public void setGame(Games games) { GameService.games = games; }
     public static Games getGame() { return games; }
+
+    public Games getPreviousGame() { return previousGame; }
+    public void setPreviousGame(Games previousGame) { this.previousGame = previousGame; }
 
     public GameState getState() { return state; }
     public void setState(GameState state) { this.state = state; }
@@ -76,8 +80,10 @@ public class GameService {
         );
         saveManager.saveGame(newSave);
         log.info("New game started and autosave created.");
-        Ruleset rule = service.getModelService().createRuleSet(games);
-        service.getModelService().setRule(rule);
+        if(!(GameService.getGame() == Games.SANDBOX)) {
+            Ruleset rule = service.getModelService().createRuleSet(games);
+            service.getModelService().setRule(rule);
+        }
         setState(GameState.BOARD);
     }
 
@@ -97,6 +103,7 @@ public class GameService {
             log.info("Switching game mode to match save: {}", loaded.game());
         }
         setGame(loaded.game());
+        boardService.getBoard().setSize(loaded.game());
         boardService.prepBoard();
         boardService.restoreSprites(loaded, service.getGuiService());
         service.getPieceService().getPieces().clear();
@@ -104,8 +111,10 @@ public class GameService {
         service.getAchievementService().setUnlockedAchievements(loaded.achievements());
         setCurrentTurn(loaded.player());
 
-        Ruleset rule = service.getModelService().createRuleSet(getGame());
-        service.getModelService().setRule(rule);
+        if(!(games == Games.SANDBOX)) {
+            Ruleset rule = service.getModelService().createRuleSet(getGame());
+            service.getModelService().setRule(rule);
+        }
 
         service.getTimerService().start();
         log.info("Autosave loaded successfully.");
@@ -127,6 +136,7 @@ public class GameService {
         Games[] games = Games.values();
         int nextIndex = (GameService.games.ordinal() + 1) % games.length;
         Games newGame = games[nextIndex];
+        setPreviousGame(getGame());
         setGame(newGame);
         log.info("Game rotated to {}. Overwriting autosave.", newGame);
 
@@ -141,7 +151,10 @@ public class GameService {
                 service.getAchievementService().getUnlockedAchievements()
         );
         saveManager.saveGame(newSave);
-        Ruleset rule = service.getModelService().createRuleSet(newGame);
-        service.getModelService().setRule(rule);
+
+        if(!(getGame() == Games.SANDBOX)) {
+            Ruleset rule = service.getModelService().createRuleSet(newGame);
+            service.getModelService().setRule(rule);
+        }
     }
 }

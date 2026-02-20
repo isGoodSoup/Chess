@@ -8,51 +8,23 @@ public enum GameSettings {
         public boolean get() {
             return BooleanService.canAIPlay;
         }
-        public void toggle() {
-            BooleanService.canAIPlay ^= true;
-            BooleanService.canDoSandbox = false;
-        }
+        public void toggle() { BooleanService.canAIPlay ^= true; }
     },
     HELP("Help") {
-        @Override
-        public boolean get() {
-            return BooleanService.canToggleHelp;
-        }
-        @Override
-        public void toggle() {
-            BooleanService.canToggleHelp ^= true;
-        }
+        public boolean get() { return BooleanService.canToggleHelp; }
+        public void toggle() { BooleanService.canToggleHelp ^= true; }
 
     },
     SAVES("Saves") {
-        public boolean get() {
-            return BooleanService.canSave;
-        }
-        public void toggle() {
-            BooleanService.canSave ^= true;
-        }
+        public boolean get() { return BooleanService.canSave; }
+        public void toggle() { BooleanService.canSave ^= true; }
     },
     ACHIEVEMENTS("Achievements") {
-        public boolean get() {
-            return BooleanService.canDoAchievements;
-        }
-        public void toggle() {
-            BooleanService.canDoAchievements ^= true;
-        }
-    },
-    SANDBOX_MODE("Sandbox Mode") {
-        public boolean get() {
-            return BooleanService.canDoSandbox;
-        }
-        public void toggle() {
-            BooleanService.canDoSandbox ^= true;
-            BooleanService.canAIPlay = false;
-        }
+        public boolean get() { return BooleanService.canDoAchievements; }
+        public void toggle() { BooleanService.canDoAchievements ^= true; }
     },
     CHAOS_MODE("Chaos Mode") {
-        public boolean get() {
-            return BooleanService.canDoChaos;
-        }
+        public boolean get() { return BooleanService.canDoChaos; }
         public void toggle() {
             BooleanService.canDoChaos ^= true;
             BooleanService.canUndoMoves = true;

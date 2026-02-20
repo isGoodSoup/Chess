@@ -2,10 +2,11 @@ package org.vertex.engine.render;
 
 import org.vertex.engine.enums.ControlCategory;
 import org.vertex.engine.enums.ControlsHUD;
+import org.vertex.engine.enums.Games;
 import org.vertex.engine.gui.Colors;
-import org.vertex.engine.service.BooleanService;
-import org.vertex.engine.service.UIService;
+import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.ServiceFactory;
+import org.vertex.engine.service.UIService;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -41,10 +42,10 @@ public class ControlsRender {
         };
 
         for(ControlCategory category : categories) {
-            if(category == ControlCategory.SANDBOX && !BooleanService.isSandboxEnabled) continue;
+            if(category == ControlCategory.SANDBOX && !(GameService.getGame() == Games.SANDBOX)) continue;
 
             for(ControlsHUD control : ControlsHUD.values()) {
-                if(control.getCategory() != category) continue;
+                if(control.getCategory() != category) { continue; }
 
                 int x = startX;
                 int spriteHeight = 0;

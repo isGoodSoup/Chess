@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.*;
 import org.vertex.engine.gui.Colors;
 import org.vertex.engine.service.BoardService;
+import org.vertex.engine.service.BooleanService;
+import org.vertex.engine.service.GameService;
 import org.vertex.engine.service.ServiceFactory;
 
 public enum Console {
@@ -34,7 +36,7 @@ public enum Console {
                 case "DARK" -> tone = Tint.DARK;
                 case "LIGHT" -> tone = Tint.LIGHT;
                 default -> {
-                    log.info("Invalid color: {}", colorStr);
+                    log.error("Invalid color: {}", colorStr);
                     return;
                 }
             }
@@ -60,6 +62,15 @@ public enum Console {
 
             service.getPieceService().getPieces().add(createdPiece);
             BoardService.getBoardState()[row][col] = createdPiece;
+
+            if(GameService.getGame() == Games.SANDBOX) {
+                service.getMovesManager().setSelectedPiece(createdPiece);
+                service.getPieceService().setHoveredPieceKeyboard(createdPiece);
+                service.getPieceService().setHoveredSquare(col, row);
+                service.getKeyboardInput().setMoveX(col);
+                service.getKeyboardInput().setMoveY(row);
+                BooleanService.isLegal = true;
+            }
 
             int squareSize = Board.getSquare();
             createdPiece.setX(col * squareSize);
@@ -108,6 +119,12 @@ public enum Console {
             if (!removed) {
                 log.info("No piece found at ({}, {}) to remove.", col, row);
             }
+        }
+    },
+    SPRITE("SPRITE") {
+        @Override
+        public void run(ServiceFactory service, String[] args) {
+
         }
     },
     THEME("THEME") {

@@ -9,10 +9,7 @@ import org.vertex.engine.gui.Colors;
 import org.vertex.engine.gui.GameFrame;
 import org.vertex.engine.manager.MovesManager;
 import org.vertex.engine.render.MenuRender;
-import org.vertex.engine.service.BoardService;
-import org.vertex.engine.service.BooleanService;
-import org.vertex.engine.service.PieceService;
-import org.vertex.engine.service.ServiceFactory;
+import org.vertex.engine.service.*;
 
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
@@ -109,6 +106,35 @@ public class KeyboardInput {
         this.boardService = boardService;
     }
 
+    public void update() {
+        long now = System.currentTimeMillis();
+        Keyboard keyboard = service.getKeyboard();
+        MovesManager move = service.getMovesManager();
+
+        if(keyboard.isEscapeDown()) {
+            service.getGameService().setState(GameState.MENU);
+            service.getGameService().autoSave();
+            selectedIndexY = 0;
+            service.getSound().playFX(2);
+        }
+
+        colorblindKeys(keyboard);
+        sandboxCommands(keyboard);
+
+        switch(service.getGameService().getState()) {
+            case MENU -> menuInput(keyboard, now);
+            case RULES -> rulesInput(keyboard, now);
+            case ACHIEVEMENTS -> achievementsInput(keyboard, now);
+            case BOARD -> boardInput(keyboard, now, move);
+        }
+
+        globalShortcuts(keyboard);
+
+        if(keyboard.wasF11Pressed()) {
+            gameFrame.toggleFullscreen();
+        }
+    }
+
     public void keyboardMove() {
         Piece selectedPiece = service.getMovesManager().getSelectedPiece();
         updateKeyboardHover();
@@ -119,12 +145,21 @@ public class KeyboardInput {
 
             if(piece != null && piece.getColor() == service.getGameService().getCurrentTurn()) {
                 service.getMovesManager().setSelectedPiece(piece);
+                selectedPiece = piece;
             }
         } else {
-            if(BooleanService.isLegal) {
-                service.getAnimationService().startMove(selectedPiece, moveX, moveY);
-                service.getMovesManager().attemptMove(selectedPiece, moveX, moveY);
-                service.getMovesManager().setSelectedPiece(null);
+            boolean isSandbox = GameService.getGame() == Games.SANDBOX;
+            if(selectedPiece != null) {
+                if(BooleanService.isLegal || isSandbox) {
+                    service.getAnimationService().startMove(selectedPiece, moveX, moveY);
+                    service.getMovesManager().attemptMove(selectedPiece, moveX, moveY);
+                    service.getPieceService().setLastPiece(selectedPiece);
+
+                    if(!isSandbox) {
+                        service.getMovesManager().setSelectedPiece(null);
+                        service.getPieceService().setHoveredPieceKeyboard(null);
+                    }
+                }
             }
         }
     }
@@ -133,11 +168,13 @@ public class KeyboardInput {
         Piece selectedPiece = service.getMovesManager().getSelectedPiece();
         service.getPieceService().setHoveredSquare(moveX, moveY);
 
+        boolean isSandbox = GameService.getGame() == Games.SANDBOX;
         if (selectedPiece != null) {
-            BooleanService.isLegal = selectedPiece.canMove(moveX, moveY, service.getPieceService().getPieces())
+            BooleanService.isLegal = isSandbox
+                    || selectedPiece.canMove(moveX, moveY, service.getPieceService().getPieces())
                     && !service.getPieceService().wouldLeaveKingInCheck(selectedPiece, moveX, moveY);
         } else {
-            BooleanService.isLegal = false;
+            BooleanService.isLegal = isSandbox;
             service.getPieceService().setHoveredPieceKeyboard(
                     PieceService.getPieceAt(moveX, moveY, service.getPieceService().getPieces())
             );
@@ -210,36 +247,7 @@ public class KeyboardInput {
         }
     }
 
-    public void update() {
-        long now = System.currentTimeMillis();
-        Keyboard keyboard = service.getKeyboard();
-        MovesManager move = service.getMovesManager();
-
-        if(keyboard.isEscapeDown()) {
-            service.getGameService().setState(GameState.MENU);
-            service.getGameService().autoSave();
-            selectedIndexY = 0;
-            service.getSound().playFX(2);
-        }
-
-        handleColorblindKeys(keyboard);
-        sandboxCommands(keyboard);
-
-        switch(service.getGameService().getState()) {
-            case MENU -> menuInput(keyboard, now);
-            case RULES -> rulesInput(keyboard, now);
-            case ACHIEVEMENTS -> achievementsInput(keyboard, now);
-            case BOARD -> boardInput(keyboard, now, move);
-        }
-
-        globalShortcuts(keyboard);
-
-        if(keyboard.wasF11Pressed()) {
-            gameFrame.toggleFullscreen();
-        }
-    }
-
-    private void handleColorblindKeys(Keyboard keyboard) {
+    private void colorblindKeys(Keyboard keyboard) {
         if(!BooleanService.canBeColorblind) return;
 
         if(keyboard.wasOnePressed()) MenuRender.setCb(ColorblindType.PROTANOPIA);
@@ -248,24 +256,34 @@ public class KeyboardInput {
     }
 
     private void sandboxCommands(Keyboard keyboard) {
-        if(!BooleanService.isSandboxEnabled) { return; }
+        if(GameService.getGame() != Games.SANDBOX) { return; }
 
-        if(keyboard.isComboPressed(KeyEvent.VK_CONTROL, KeyEvent.VK_ENTER)) {
+        if(keyboard.isComboPressed(KeyEvent.VK_CONTROL, KeyEvent.VK_ENTER) && !BooleanService.canType) {
             BooleanService.canType = true;
-            String fullInput = keyboard.consumeText().trim();
-            if(fullInput.isEmpty()) { return; }
-
-            String[] parts = fullInput.split("\\s+");
-            String commandName = parts[0];
-            String[] args = Arrays.copyOfRange(parts, 1, parts.length);
-            Console consoleCommand = Console.fromString(commandName);
-            if(consoleCommand != null) {
-                consoleCommand.run(service, args);
-            } else {
-                log.error("Unknown command: {}", commandName);
-            }
-            BooleanService.canType = false;
+            log.info("Entered sandbox typing mode");
+            return;
         }
+
+        if(BooleanService.canType && keyboard.wasEnterPressed()) {
+            String fullInput = keyboard.consumeText().trim();
+            if(!fullInput.isEmpty()) {
+                String[] parts = fullInput.split("\\s+");
+                String commandName = parts[0];
+                String[] args = Arrays.copyOfRange(parts, 1, parts.length);
+                Console consoleCommand = Console.fromString(commandName);
+                if(consoleCommand != null) {
+                    consoleCommand.run(service, args);
+                } else {
+                    log.error("Unknown command: {}", commandName);
+                }
+            }
+            exitTypingMode();
+        }
+    }
+
+    private void exitTypingMode() {
+        BooleanService.canType = false;
+        BooleanService.isLegal = true;
     }
 
     private void menuInput(Keyboard keyboard, long now) {

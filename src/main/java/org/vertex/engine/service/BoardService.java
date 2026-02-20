@@ -3,6 +3,7 @@ package org.vertex.engine.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertex.engine.entities.*;
+import org.vertex.engine.enums.GameState;
 import org.vertex.engine.enums.Games;
 import org.vertex.engine.enums.Time;
 import org.vertex.engine.enums.Tint;
@@ -109,6 +110,12 @@ public class BoardService {
             if(p == null) continue;
             int col = p.getCol();
             int row = p.getRow();
+
+            if(row >= board.getRow() || col >= board.getCol()) {
+                log.warn("Skipping piece at invalid position: {} {}", row, col);
+                continue;
+            }
+
             p.setPreCol(p.getPreCol());
             p.setPreRow(p.getPreRow());
             p.setX(col * Board.getSquare());
@@ -137,10 +144,11 @@ public class BoardService {
     }
 
     public void startBoard() {
+        if(GameService.getGame() == Games.SANDBOX) { setPiecesSandbox(); }
         if(BooleanService.canDoChaos) { setPiecesChaos(); }
         else { setPieces(); }
 
-        if(!BooleanService.canDoSandbox) {
+        if(!(GameService.getGame() == Games.SANDBOX)) {
             if(BooleanService.canStopwatch) {
                 TimerService.setTime(Time.STOPWATCH);
                 BooleanService.canTime = false;
@@ -356,29 +364,35 @@ public class BoardService {
         }
     }
 
-    public void toggleSandboxMode() {
-        BooleanService.canDoSandbox = !BooleanService.canDoSandbox;
-        BooleanService.isSandboxEnabled = BooleanService.canDoSandbox;
-        BooleanService.canType = false;
+    public void setPiecesSandbox() {
+        clearBoardState();
+        pieceService.getPieces().clear();
+        boardState = new Piece[board.getRow()][board.getCol()];
+    }
 
-        if(!BooleanService.canDoSandbox) {
+    public void toggleSandboxMode() {
+        GameService gameService = this.service.getGameService();
+
+        if(GameService.getGame() != Games.SANDBOX) {
+            gameService.setGame(Games.SANDBOX);
+            gameService.setState(GameState.BOARD);
+            BooleanService.canType = false;
+            setPiecesSandbox();
+        } else {
             finalizeSandbox();
+            gameService.setGame(Games.CHESS);
+            gameService.setState(GameState.BOARD);
         }
     }
 
     public void finalizeSandbox() {
-        BooleanService.isSandboxEnabled = false;
-        BooleanService.canDoSandbox = false;
-
         Piece[][] state = new Piece[board.getRow()][board.getCol()];
         for(Piece p : pieceService.getPieces()) {
             if(p != null) {
                 state[p.getRow()][p.getCol()] = p;
+                p.setPickedUp(false);
             }
         }
         boardState = state;
-        for(Piece p : pieceService.getPieces()) {
-            p.setPickedUp(false);
-        }
     }
 }
