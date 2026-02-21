@@ -3,6 +3,7 @@ package org.lud.engine.render.menu;
 import org.lud.engine.entities.Button;
 import org.lud.engine.enums.GameMenu;
 import org.lud.engine.enums.GameState;
+import org.lud.engine.enums.Games;
 import org.lud.engine.gui.Colors;
 import org.lud.engine.input.KeyboardInput;
 import org.lud.engine.input.Mouse;
@@ -12,6 +13,7 @@ import org.lud.engine.interfaces.UI;
 import org.lud.engine.render.Colorblindness;
 import org.lud.engine.render.MenuRender;
 import org.lud.engine.render.RenderContext;
+import org.lud.engine.service.BooleanService;
 import org.lud.engine.service.GameService;
 import org.lud.engine.service.UIService;
 
@@ -38,6 +40,7 @@ public class MainMenu implements UI {
     private Button achievementsButton;
     private Button settingsButton;
     private Button exitButton;
+    private Button themeButton;
 
     public MainMenu(RenderContext render, GameService gameService,
                     UIService uiService, KeyboardInput keyUI,
@@ -106,7 +109,7 @@ public class MainMenu implements UI {
                 int width = baseImg.getWidth();
                 int height = baseImg.getHeight();
                 x = startX; y = startY;
-                x -= width; y -= height;
+                x -= width; y -= height/2;
 
                 if(playButton == null) {
                     playButton = createButton(x, y, width, height, () ->
@@ -121,11 +124,12 @@ public class MainMenu implements UI {
                         : render.getMenuRender().getColorblindSprite(baseImg);
 
                 FontMetrics fm = g2.getFontMetrics();
-                int textX = x + (width - fm.stringWidth(GameMenu.PLAY.getLabel()))/2;
+                Games game = GameService.getGame();
+                int textX = x + (width - fm.stringWidth(game.getLabel()))/2;
                 int textY = y + (height - fm.getHeight())/2 + fm.getAscent();
                 g2.drawImage(img, x, y, null);
                 g2.setColor(textColor);
-                g2.drawString(GameMenu.PLAY.getLabel(), textX, textY);
+                g2.drawString(game.getLabel(), textX, textY);
             }
 
             if(option == GameMenu.SETTINGS) {
@@ -166,35 +170,6 @@ public class MainMenu implements UI {
                 g2.drawImage(img, x, y, null);
             }
 
-            if(option == GameMenu.GAMES) {
-                BufferedImage baseImg = render.getMenuRender().getBUTTON();
-                BufferedImage altImg = render.getMenuRender().getBUTTON_HIGHLIGHTED();
-                int width = baseImg.getWidth();
-                int height = baseImg.getHeight();
-                x = startX; y = startY;
-                x -= width;
-
-                if(gameButton == null) {
-                    gameButton = createButton(x, y, width, height, () ->
-                            option.run(gameService));
-                }
-
-                Color textColor = render.isHovered(gameButton)
-                        ? Color.WHITE : Colors.BUTTON;
-
-                BufferedImage img = render.isHovered(gameButton)
-                        ? render.getMenuRender().getColorblindSprite(altImg)
-                        : render.getMenuRender().getColorblindSprite(baseImg);
-
-                String game = GameService.getGame().getLabel();
-                FontMetrics fm = g2.getFontMetrics();
-                int textX = x + (width - fm.stringWidth(game))/2;
-                int textY = y + (height - fm.getHeight())/2 + fm.getAscent();
-                g2.drawImage(img, x, y, null);
-                g2.setColor(textColor);
-                g2.drawString(game, textX, textY);
-            }
-
             if(option == GameMenu.EXIT) {
                 BufferedImage baseImg = render.getMenuRender().getEXIT();
                 BufferedImage altImg = render.getMenuRender().getEXIT_HIGHLIGHTED();
@@ -213,6 +188,27 @@ public class MainMenu implements UI {
                         ? render.getMenuRender().getColorblindSprite(altImg)
                         : render.getMenuRender().getColorblindSprite(baseImg);
                 g2.drawImage(img, x, y, null);
+            }
+
+            if(option == GameMenu.THEME) {
+                if(BooleanService.canTheme) {
+                    BufferedImage baseImg = render.getMenuRender().getRESET();
+                    BufferedImage altImg = render.getMenuRender().getRESET_HIGHLIGHTED();
+                    int width = baseImg.getWidth();
+                    int height = baseImg.getHeight();
+
+                    x = render.scale((int) (RenderContext.BASE_WIDTH - width * 1.75f) - width);
+                    y = render.scale(RenderContext.BASE_HEIGHT - 115);
+
+                    if(themeButton == null) {
+                        themeButton = createButton(x, y, width, height, Colors::nextTheme);
+                    }
+
+                    BufferedImage img = render.isHovered(themeButton)
+                            ? render.getMenuRender().getColorblindSprite(altImg)
+                            : render.getMenuRender().getColorblindSprite(baseImg);
+                    g2.drawImage(img, x, y, null);
+                }
             }
         }
     }

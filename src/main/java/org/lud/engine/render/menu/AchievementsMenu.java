@@ -107,7 +107,7 @@ public class AchievementsMenu implements UI {
             boolean isSelected = relativeIndex == keyUI.getSelectedIndexY();
 
             int textX = x + render.scale(110);
-            int titleY = startY + render.scale(60);
+            int titleY = startY + render.scale(70);
             int descY = titleY;
 
             g2.setColor(Colorblindness.filter(Colors.getTheme() == Theme.DEFAULT
@@ -126,7 +126,7 @@ public class AchievementsMenu implements UI {
                 UIService.drawBox(g2, STROKE, x, startY,
                         width, height, ARC, hasBackground,
                         false, 255);
-                g2.drawString(a.getId().getTitle(), textX, titleY);
+                g2.drawString(a.getId().getTitle().toUpperCase(), textX, titleY);
             }
 
             img = AchievementSprites.getSprite(a);

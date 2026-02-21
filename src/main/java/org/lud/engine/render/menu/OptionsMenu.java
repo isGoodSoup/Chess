@@ -124,7 +124,7 @@ public class OptionsMenu implements UI {
 
         int startY = headerY + render.scale(100);
         int lineHeight = g2.getFontMetrics().getHeight()
-                + render.scale(10);
+                + render.scale(48);
 
         int itemsPerPage = 8;
         int startIndex = keyUI.getCurrentPage() * itemsPerPage;
@@ -155,7 +155,7 @@ public class OptionsMenu implements UI {
             int blockX = getCenterX(totalWidth, maxRowWidth);
             int textX = blockX;
             int toggleX = blockX + maxRowWidth - toggleWidth;
-            int toggleY = startY - toggleHeight;
+            int toggleY = startY - toggleHeight + 15;
 
             g2.drawString(label.toUpperCase(), textX,
                     render.getOffsetY() + startY);

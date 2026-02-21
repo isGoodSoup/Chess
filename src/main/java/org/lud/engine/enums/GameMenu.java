@@ -1,5 +1,6 @@
 package org.lud.engine.enums;
 
+import org.lud.engine.gui.Colors;
 import org.lud.engine.interfaces.Clickable;
 import org.lud.engine.service.GameService;
 
@@ -26,6 +27,12 @@ public enum GameMenu implements Clickable {
         @Override
         public void run(GameService gameService) {
             gameService.setState(GameState.ACHIEVEMENTS);
+        }
+    },
+    THEME("THEMES", "Change the look and feel", ""){
+        @Override
+        public void run(GameService gameService) {
+            Colors.nextTheme();
         }
     },
     EXIT("EXIT", "Leave?", "") {
