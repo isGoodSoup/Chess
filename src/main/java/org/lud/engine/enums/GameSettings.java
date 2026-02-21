@@ -5,7 +5,6 @@ import org.lud.engine.service.BooleanService;
 import org.lud.engine.service.GameService;
 
 public enum GameSettings implements Clickable {
-
     AI_OPPONENT("AI Opponent") {
         public boolean get() { return BooleanService.canAIPlay; }
         public void toggle() { BooleanService.canAIPlay ^= true; }

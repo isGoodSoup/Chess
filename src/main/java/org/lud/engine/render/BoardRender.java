@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage;
 
 public class BoardRender {
     private Button backButton;
+    private Button undoButton;
+    private Button resetButton;
     private RenderContext render;
     private UIService uiService;
     private PieceService pieceService;
@@ -115,9 +117,34 @@ public class BoardRender {
 
         int buttonX = 32;
         int buttonY = RenderContext.BASE_HEIGHT - 100;
+        int offset = render.scale(80);
 
         drawBaseBoard(g2);
-        g2.drawImage(initButton(buttonX, buttonY), buttonX, buttonY, null);
+        g2.drawImage(
+                initButton(backButton, buttonX, buttonY,
+                        render.getMenuRender().getPREVIOUS_PAGE(),
+                        render.getMenuRender().getPREVIOUS_PAGE_ON(),
+                        () -> gameService.setState(GameState.MENU)),
+                buttonX, buttonY, null
+        );
+        buttonX += offset;
+
+        g2.drawImage(
+                initButton(undoButton, buttonX, buttonY,
+                        render.getMenuRender().getUNDO(),
+                        render.getMenuRender().getUNDO_HIGHLIGHTED(),
+                        () -> render.getMovesManager().undoLastMove()),
+                buttonX, buttonY, null
+        );
+        buttonX += offset;
+
+        g2.drawImage(
+                initButton(resetButton, buttonX, buttonY,
+                        render.getMenuRender().getRESET(),
+                        render.getMenuRender().getRESET_HIGHLIGHTED(),
+                        () -> boardService.resetBoard()),
+                buttonX, buttonY, null
+        );
 
         g2.setRenderingHint(
                 RenderingHints.KEY_INTERPOLATION,
@@ -238,19 +265,11 @@ public class BoardRender {
         return b;
     }
 
-    private BufferedImage initButton(int buttonX, int buttonY) {
-        int x = buttonX;
-        int y = buttonY;
-
-        BufferedImage baseImg = render.getMenuRender().getPREVIOUS_PAGE();
-        BufferedImage altImg = render.getMenuRender().getPREVIOUS_PAGE_ON();
-        if(backButton == null) {
-            backButton = createButton(x, y, baseImg.getWidth(), baseImg.getHeight(), () ->
-                    gameService.setState(GameState.MENU));
-            render.getMenuRender().getButtons().put(backButton, new Rectangle(x, y,
-                    baseImg.getWidth(), baseImg.getHeight()));
+    private BufferedImage initButton(Button button, int buttonX, int buttonY,
+                                     BufferedImage baseImg, BufferedImage altImg, Runnable action) {
+        if(button == null) {
+            button = createButton(buttonX, buttonY, baseImg.getWidth(), baseImg.getHeight(), action);
         }
-        BufferedImage img = render.isHovered(backButton) ? altImg : baseImg;
-        return img;
+        return render.isHovered(button) ? altImg : baseImg;
     }
 }

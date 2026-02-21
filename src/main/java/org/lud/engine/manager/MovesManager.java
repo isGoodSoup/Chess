@@ -136,7 +136,8 @@ public class MovesManager {
                                         piece.getCol() - dc,
                                         newCol, newRow,
                                         piece.getColor(),
-                                        nextCaptured));
+                                        nextCaptured,
+                                        piece.isPromoted()));
 
                                 areMoreJumpsAvailable = true;
                             }
@@ -160,7 +161,8 @@ public class MovesManager {
                     piece.getCol(),
                     targetCol, targetRow,
                     piece.getColor(),
-                    captured));
+                    captured,
+                    piece.isPromoted()));
         }
 
         PieceService.movePiece(piece, targetCol, targetRow);
@@ -335,7 +337,8 @@ public class MovesManager {
                 lastMove.targetCol(),
                 lastMove.targetRow(),
                 lastMove.color(),
-                lastMove.captured()
+                lastMove.captured(),
+                lastMove.wasPromoted()
         );
         return newMove;
     }
@@ -370,17 +373,20 @@ public class MovesManager {
         }
     }
 
-    public void undoLastMove(Piece piece) {
-        if(!BooleanService.canUndoMoves) { return; }
+    public void undoLastMove() {
+        if(!BooleanService.canUndoMoves || moves.isEmpty()) { return; }
+
         Move lastMove = moves.removeLast();
         Piece movedPiece = lastMove.piece();
-        movedPiece.setCol(lastMove.fromCol());
         movedPiece.setRow(lastMove.fromRow());
-        PieceService.updatePos(movedPiece);
+        movedPiece.setCol(lastMove.fromCol());
         movedPiece.setHasMoved(false);
-
+        if (lastMove.wasPromoted()) {
+            movedPiece.setPromoted(false);
+        }
+        PieceService.updatePos(movedPiece);
         Piece captured = lastMove.captured();
-        if (captured != null) {
+        if (captured != null && !service.getPieceService().getPieces().contains(captured)) {
             service.getPieceService().getPieces().add(captured);
             PieceService.updatePos(captured);
         }

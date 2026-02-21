@@ -54,12 +54,6 @@ public class OptionsMenu implements UI {
                        KeyboardInput keyUI, Mouse mouse, MouseInput mouseInput,
                        BufferedImage... images) {
 
-        if (images.length < 10) {
-            throw new IllegalArgumentException("OptionsMenu requires 11 images in order: " +
-                    "toggleOn, toggleOff, toggleOnHighlighted, toggleOffHighlighted, " +
-                    "hardModeOn, hardModeOnHighlighted, nextPage, nextPageOn, previousPage, previousPageOn");
-        }
-
         this.render = render;
         this.uiService = uiService;
         this.keyUI = keyUI;
@@ -88,7 +82,7 @@ public class OptionsMenu implements UI {
     }
 
     private int getCenterX(int containerWidth, int elementWidth) {
-        return render.getOffsetX() + (containerWidth - elementWidth) / 2;
+        return render.getOffsetX() + (containerWidth - elementWidth)/2;
     }
 
     @Override
@@ -143,7 +137,7 @@ public class OptionsMenu implements UI {
         for(int i = startIndex; i < endIndex; i++) {
             String label = ENABLE + options[i].getLabel();
             int textWidth = g2.getFontMetrics().stringWidth(label);
-            int toggleWidth = render.scale(toggleOn.getWidth() / 2);
+            int toggleWidth = render.scale(toggleOn.getWidth()/2);
             int rowWidth = textWidth + gap + toggleWidth;
             if(rowWidth > maxRowWidth)
                 maxRowWidth = rowWidth;
@@ -156,8 +150,8 @@ public class OptionsMenu implements UI {
                     relativeIndex == keyUI.getSelectedIndexY();
             String label = ENABLE + option.getLabel();
             int textWidth = g2.getFontMetrics().stringWidth(label);
-            int toggleWidth = render.scale(toggleOn.getWidth() / 2);
-            int toggleHeight = render.scale(toggleOn.getHeight() / 2);
+            int toggleWidth = render.scale(toggleOn.getWidth()/2);
+            int toggleHeight = render.scale(toggleOn.getHeight()/2);
             int blockX = getCenterX(totalWidth, maxRowWidth);
             int textX = blockX;
             int toggleX = blockX + maxRowWidth - toggleWidth;
@@ -177,11 +171,11 @@ public class OptionsMenu implements UI {
             buttons.put(option, toggleHitbox);
 
             boolean isEnabled = option.get();
-            boolean hovered = toggleHitbox.contains(
+            boolean isHovered = toggleHitbox.contains(
                     mouse.getX(), mouse.getY());
 
-            BufferedImage toggleImage = resolveToggleImage(
-                    option, isEnabled, isSelected, hovered);
+            BufferedImage toggleImage = drawToggle(
+                    option, isEnabled, isSelected, isHovered);
 
             uiService.drawToggle(g2,
                     toggleImage,
@@ -197,40 +191,41 @@ public class OptionsMenu implements UI {
         drawPagination(g2);
     }
 
-    private BufferedImage resolveToggleImage(GameSettings option,
-                                             boolean enabled,
-                                             boolean selected,
-                                             boolean hovered) {
+    private BufferedImage drawToggle(GameSettings option, boolean isEnabled,
+                                     boolean isSelected, boolean isHovered) {
         if(option == GameSettings.HARD_MODE) {
-            if(enabled)
-                return selected
+            if(isEnabled) {
+                return (isSelected || isHovered)
                         ? Colorblindness.filter(hardModeOnHighlighted)
                         : Colorblindness.filter(hardModeOn);
-            return hovered
+            } else {
+                return (isSelected || isHovered)
+                        ? Colorblindness.filter(toggleOffHighlighted)
+                        : Colorblindness.filter(toggleOff);
+            }
+        }
+
+        if(isEnabled) {
+            return (isSelected || isHovered)
+                    ? Colorblindness.filter(toggleOnHighlighted)
+                    : Colorblindness.filter(toggleOn);
+        } else {
+            return (isSelected || isHovered)
                     ? Colorblindness.filter(toggleOffHighlighted)
                     : Colorblindness.filter(toggleOff);
         }
-
-        if(enabled)
-            return (selected || hovered)
-                    ? Colorblindness.filter(toggleOnHighlighted)
-                    : Colorblindness.filter(toggleOn);
-
-        return (selected || hovered)
-                ? Colorblindness.filter(toggleOffHighlighted)
-                : Colorblindness.filter(toggleOff);
     }
 
-    private void initButtons(GameSettings[] options,
-                             int totalWidth) {
+    private void initButtons(GameSettings[] options, int totalWidth) {
+        int baseY = render.scale(600);
         if(nextButton == null) {
-            int x = totalWidth / 2;
-            int y = render.scale(500)
-                    + (UIService.getFont(
+            int x = totalWidth/2;
+            int y = baseY + (UIService.getFont(
                     UIService.getMENU_FONT()).getSize() + 10)
                     * KeyboardInput.getITEMS_PER_PAGE();
 
-            nextButton = new Button(x, y, nextPage.getWidth(), nextPage.getHeight(), () -> {
+            nextButton = new Button(x, y, nextPage.getWidth(),
+                    nextPage.getHeight(), () -> {
                         int totalPages =
                                 (options.length
                                         + KeyboardInput.getITEMS_PER_PAGE() - 1)
@@ -245,13 +240,13 @@ public class OptionsMenu implements UI {
         }
 
         if(prevButton == null) {
-            int x = totalWidth / 2 - render.scale(100);
-            int y = render.scale(500)
-                    + (UIService.getFont(
+            int x = totalWidth/2 - render.scale(80);
+            int y = baseY + (UIService.getFont(
                     UIService.getMENU_FONT()).getSize() + 10)
                     * KeyboardInput.getITEMS_PER_PAGE();
 
-            prevButton = new Button(x, y, previousPage.getWidth(), previousPage.getHeight(), () -> {
+            prevButton = new Button(x, y, previousPage.getWidth(),
+                    previousPage.getHeight(), () -> {
                         int page = keyUI.getCurrentPage() - 1;
                         if(page < 0)
                             page = 0;
@@ -268,19 +263,11 @@ public class OptionsMenu implements UI {
     }
 
     private void drawPagination(Graphics2D g2) {
-        boolean nextHovered = buttons.get(nextButton)
-                        .contains(mouse.getX(), mouse.getY())
-                        && !mouseInput.isClickingOption(nextButton);
-
-        boolean prevHovered = buttons.get(prevButton)
-                        .contains(mouse.getX(), mouse.getY())
-                        && !mouseInput.isClickingOption(prevButton);
-
-        BufferedImage nextImg = nextHovered
+        BufferedImage nextImg = render.isHovered(nextButton)
                         ? Colorblindness.filter(nextPageOn)
                         : Colorblindness.filter(nextPage);
 
-        BufferedImage prevImg = prevHovered
+        BufferedImage prevImg = render.isHovered(prevButton)
                         ? Colorblindness.filter(previousPageOn)
                         : Colorblindness.filter(previousPage);
 

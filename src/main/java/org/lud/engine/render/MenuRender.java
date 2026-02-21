@@ -46,6 +46,10 @@ public class MenuRender {
     private transient BufferedImage NEXT_PAGE_ON;
     private transient BufferedImage PREVIOUS_PAGE;
     private transient BufferedImage PREVIOUS_PAGE_ON;
+    private transient BufferedImage UNDO;
+    private transient BufferedImage UNDO_HIGHLIGHTED;
+    private transient BufferedImage RESET;
+    private transient BufferedImage RESET_HIGHLIGHTED;
 
     private static ColorblindType cb;
     private int lastHoveredIndex = -1;
@@ -101,6 +105,22 @@ public class MenuRender {
         }
     }
 
+    public BufferedImage getUNDO() {
+        return UNDO;
+    }
+
+    public BufferedImage getUNDO_HIGHLIGHTED() {
+        return UNDO_HIGHLIGHTED;
+    }
+
+    public BufferedImage getRESET() {
+        return RESET;
+    }
+
+    public BufferedImage getRESET_HIGHLIGHTED() {
+        return RESET_HIGHLIGHTED;
+    }
+
     public BufferedImage getPREVIOUS_PAGE() {
         return PREVIOUS_PAGE;
     }
@@ -122,27 +142,36 @@ public class MenuRender {
             NEXT_PAGE_ON = UIService.getImage("/ui/next_page_highlighted");
             PREVIOUS_PAGE = UIService.getImage("/ui/previous_page");
             PREVIOUS_PAGE_ON = UIService.getImage("/ui/previous_page_highlighted");
+            UNDO = UIService.getImage("/ui/undo");
+            UNDO_HIGHLIGHTED = UIService.getImage("/ui/undo_highlighted");
+            RESET = UIService.getImage("/ui/reset");
+            RESET_HIGHLIGHTED = UIService.getImage("/ui/reset_highlighted");
 
             OPTION_IMAGES = new BufferedImage[]{
                     TOGGLE_ON, TOGGLE_OFF, TOGGLE_ON_HIGHLIGHTED, TOGGLE_OFF_HIGHLIGHTED,
                     HARD_MODE_ON, HARD_MODE_ON_HIGHLIGHTED, NEXT_PAGE, NEXT_PAGE_ON,
                     PREVIOUS_PAGE, PREVIOUS_PAGE_ON};
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public BufferedImage getColorblindSprite(BufferedImage img) {
-        if(img == TOGGLE_ON) return Colorblindness.filter(TOGGLE_ON);
-        if(img == TOGGLE_OFF) return Colorblindness.filter(TOGGLE_OFF);
-        if(img == TOGGLE_ON_HIGHLIGHTED) return Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED);
-        if(img == TOGGLE_OFF_HIGHLIGHTED) return Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED);
-        if(img == HARD_MODE_ON) return Colorblindness.filter(HARD_MODE_ON);
-        if(img == HARD_MODE_ON_HIGHLIGHTED) return Colorblindness.filter(HARD_MODE_ON_HIGHLIGHTED);
-        if(img == NEXT_PAGE) return Colorblindness.filter(NEXT_PAGE);
-        if(img == NEXT_PAGE_ON) return Colorblindness.filter(NEXT_PAGE_ON);
-        if(img == PREVIOUS_PAGE) return Colorblindness.filter(PREVIOUS_PAGE);
-        if(img == PREVIOUS_PAGE_ON) return Colorblindness.filter(PREVIOUS_PAGE_ON);
+        if (img == TOGGLE_ON) { return Colorblindness.filter(TOGGLE_ON); }
+        if (img == TOGGLE_OFF) { return Colorblindness.filter(TOGGLE_OFF); }
+        if (img == TOGGLE_ON_HIGHLIGHTED) { return Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED); }
+        if (img == TOGGLE_OFF_HIGHLIGHTED) { return Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED); }
+        if (img == HARD_MODE_ON) { return Colorblindness.filter(HARD_MODE_ON); }
+        if (img == HARD_MODE_ON_HIGHLIGHTED) { return Colorblindness.filter(HARD_MODE_ON_HIGHLIGHTED); }
+        if (img == NEXT_PAGE) { return Colorblindness.filter(NEXT_PAGE); }
+        if (img == NEXT_PAGE_ON) { return Colorblindness.filter(NEXT_PAGE_ON); }
+        if (img == PREVIOUS_PAGE) { return Colorblindness.filter(PREVIOUS_PAGE); }
+        if (img == PREVIOUS_PAGE_ON) { return Colorblindness.filter(PREVIOUS_PAGE_ON); }
+        if (img == UNDO) { return Colorblindness.filter(UNDO); }
+        if (img == UNDO_HIGHLIGHTED) { return Colorblindness.filter(UNDO_HIGHLIGHTED); }
+        if (img == RESET) { return Colorblindness.filter(RESET); }
+        if (img == RESET_HIGHLIGHTED) { return Colorblindness.filter(RESET_HIGHLIGHTED); }
         return img;
     }
 }
