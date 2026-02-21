@@ -26,30 +26,24 @@ public class MenuRender {
 
     private final Map<Clickable, Rectangle> buttons;
     private final Map<Button, Boolean> buttonsClicked;
+    private transient Map<BufferedImage, BufferedImage> colorblindCache;
     private final List<UI> menus;
 
-    private transient BufferedImage TOGGLE_ON;
-    private transient BufferedImage TOGGLE_OFF;
-    private transient BufferedImage TOGGLE_ON_HIGHLIGHTED;
-    private transient BufferedImage TOGGLE_OFF_HIGHLIGHTED;
-    private transient BufferedImage HARD_MODE_ON;
-    private transient BufferedImage HARD_MODE_ON_HIGHLIGHTED;
-    private transient BufferedImage NEXT_PAGE;
-    private transient BufferedImage NEXT_PAGE_ON;
-    private transient BufferedImage PREVIOUS_PAGE;
-    private transient BufferedImage PREVIOUS_PAGE_ON;
-    private transient BufferedImage UNDO;
-    private transient BufferedImage UNDO_HIGHLIGHTED;
-    private transient BufferedImage RESET;
-    private transient BufferedImage RESET_HIGHLIGHTED;
-    private transient BufferedImage PLAY;
-    private transient BufferedImage PLAY_HIGHLIGHTED;
-    private transient BufferedImage ACHIEVEMENTS;
-    private transient BufferedImage ACHIEVEMENTS_HIGHLIGHTED;
-    private transient BufferedImage SETTINGS;
-    private transient BufferedImage SETTINGS_HIGHLIGHTED;
-    private transient BufferedImage EXIT;
-    private transient BufferedImage EXIT_HIGHLIGHTED;
+    private transient BufferedImage TOGGLE_ON, TOGGLE_OFF, TOGGLE_ON_HIGHLIGHTED, TOGGLE_OFF_HIGHLIGHTED;
+    private transient BufferedImage HARD_MODE_ON, HARD_MODE_ON_HIGHLIGHTED;
+    private transient BufferedImage NEXT_PAGE, NEXT_PAGE_ON;
+    private transient BufferedImage PREVIOUS_PAGE, PREVIOUS_PAGE_ON;
+    private transient BufferedImage UNDO, UNDO_HIGHLIGHTED;
+    private transient BufferedImage RESET, RESET_HIGHLIGHTED;
+    private transient BufferedImage PLAY, PLAY_HIGHLIGHTED;
+    private transient BufferedImage ACHIEVEMENTS, ACHIEVEMENTS_HIGHLIGHTED;
+    private transient BufferedImage SETTINGS, SETTINGS_HIGHLIGHTED;
+    private transient BufferedImage EXIT, EXIT_HIGHLIGHTED;
+
+    private transient BufferedImage CHESS, CHESS_HIGHLIGHTED;
+    private transient BufferedImage CHECKERS, CHECKERS_HIGHLIGHTED;
+    private transient BufferedImage SHOGI, SHOGI_HIGHLIGHTED;
+    private transient BufferedImage SANDBOX, SANDBOX_HIGHLIGHTED;
 
     private static ColorblindType cb;
     private int lastHoveredIndex = -1;
@@ -101,14 +95,6 @@ public class MenuRender {
         this.gameService = gameService;
     }
 
-    public void draw(Graphics2D g2) {
-        for (UI menu : menus) {
-            if(menu.canDraw(gameService.getState())) {
-                menu.drawMenu(g2);
-            }
-        }
-    }
-
     public BufferedImage getUNDO() {
         return UNDO;
     }
@@ -141,6 +127,24 @@ public class MenuRender {
         return PLAY_HIGHLIGHTED;
     }
 
+    public BufferedImage getGAME() {
+        return switch(GameService.getGame()) {
+            case CHESS -> CHESS;
+            case CHECKERS -> CHECKERS;
+            case SHOGI -> SHOGI;
+            case SANDBOX -> SANDBOX;
+        };
+    }
+
+    public BufferedImage getGAME_HIGHLIGHTED() {
+        return switch(GameService.getGame()) {
+            case CHESS -> CHESS_HIGHLIGHTED;
+            case CHECKERS -> CHECKERS_HIGHLIGHTED;
+            case SHOGI -> SHOGI_HIGHLIGHTED;
+            case SANDBOX -> SANDBOX_HIGHLIGHTED;
+        };
+    }
+
     public BufferedImage getACHIEVEMENTS() {
         return ACHIEVEMENTS;
     }
@@ -165,65 +169,93 @@ public class MenuRender {
         return EXIT_HIGHLIGHTED;
     }
 
+    public void draw(Graphics2D g2) {
+        for (UI menu : menus) {
+            if(menu.canDraw(gameService.getState())) {
+                menu.drawMenu(g2);
+            }
+        }
+    }
+
     public void init() {
         this.sprites = new AchievementSprites();
+
         try {
             TOGGLE_ON = UIService.getImage("/ui/toggle_on");
             TOGGLE_OFF = UIService.getImage("/ui/toggle_off");
             TOGGLE_ON_HIGHLIGHTED = UIService.getImage("/ui/toggle_onh");
             TOGGLE_OFF_HIGHLIGHTED = UIService.getImage("/ui/toggle_offh");
+
             HARD_MODE_ON = UIService.getImage("/ui/hardmode_on");
             HARD_MODE_ON_HIGHLIGHTED = UIService.getImage("/ui/hardmode_onh");
+
             NEXT_PAGE = UIService.getImage("/ui/next_page");
             NEXT_PAGE_ON = UIService.getImage("/ui/next_page_highlighted");
             PREVIOUS_PAGE = UIService.getImage("/ui/previous_page");
             PREVIOUS_PAGE_ON = UIService.getImage("/ui/previous_page_highlighted");
+
             UNDO = UIService.getImage("/ui/undo");
             UNDO_HIGHLIGHTED = UIService.getImage("/ui/undo_highlighted");
             RESET = UIService.getImage("/ui/reset");
             RESET_HIGHLIGHTED = UIService.getImage("/ui/reset_highlighted");
+
             PLAY = UIService.getImage("/ui/button_play");
             PLAY_HIGHLIGHTED = UIService.getImage("/ui/button_play_highlighted");
+
             ACHIEVEMENTS = UIService.getImage("/ui/achievements");
             ACHIEVEMENTS_HIGHLIGHTED = UIService.getImage("/ui/achievements_highlighted");
+
             SETTINGS = UIService.getImage("/ui/settings");
             SETTINGS_HIGHLIGHTED = UIService.getImage("/ui/settings_highlighted");
+
             EXIT = UIService.getImage("/ui/exit");
             EXIT_HIGHLIGHTED = UIService.getImage("/ui/exit_highlighted");
 
+            CHESS = UIService.getImage("/ui/button_chess");
+            CHESS_HIGHLIGHTED = UIService.getImage("/ui/button_chess_highlighted");
+            CHECKERS = UIService.getImage("/ui/button_checkers");
+            CHECKERS_HIGHLIGHTED = UIService.getImage("/ui/button_checkers_highlighted");
+            SHOGI = UIService.getImage("/ui/button_shogi");
+            SHOGI_HIGHLIGHTED = UIService.getImage("/ui/button_shogi_highlighted");
+            SANDBOX = UIService.getImage("/ui/button_sandbox");
+            SANDBOX_HIGHLIGHTED = UIService.getImage("/ui/button_sandbox_highlighted");
+
+            initCache();
             OPTION_IMAGES = new BufferedImage[]{
                     TOGGLE_ON, TOGGLE_OFF, TOGGLE_ON_HIGHLIGHTED, TOGGLE_OFF_HIGHLIGHTED,
                     HARD_MODE_ON, HARD_MODE_ON_HIGHLIGHTED, NEXT_PAGE, NEXT_PAGE_ON,
-                    PREVIOUS_PAGE, PREVIOUS_PAGE_ON};
-
+                    PREVIOUS_PAGE, PREVIOUS_PAGE_ON,
+            };
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to load menu sprites", e);
+        }
+    }
+
+    public void initCache() {
+        colorblindCache = new HashMap<>();
+        BufferedImage[] allSprites = new BufferedImage[] {
+                TOGGLE_ON, TOGGLE_OFF, TOGGLE_ON_HIGHLIGHTED, TOGGLE_OFF_HIGHLIGHTED,
+                HARD_MODE_ON, HARD_MODE_ON_HIGHLIGHTED,
+                NEXT_PAGE, NEXT_PAGE_ON,
+                PREVIOUS_PAGE, PREVIOUS_PAGE_ON,
+                UNDO, UNDO_HIGHLIGHTED,
+                RESET, RESET_HIGHLIGHTED,
+                PLAY, PLAY_HIGHLIGHTED,
+                CHESS, CHESS_HIGHLIGHTED,
+                CHECKERS, CHECKERS_HIGHLIGHTED,
+                SHOGI, SHOGI_HIGHLIGHTED,
+                SANDBOX, SANDBOX_HIGHLIGHTED,
+                ACHIEVEMENTS, ACHIEVEMENTS_HIGHLIGHTED,
+                SETTINGS, SETTINGS_HIGHLIGHTED,
+                EXIT, EXIT_HIGHLIGHTED
+        };
+
+        for (BufferedImage sprite : allSprites) {
+            colorblindCache.put(sprite, Colorblindness.filter(sprite));
         }
     }
 
     public BufferedImage getColorblindSprite(BufferedImage img) {
-        if(img == TOGGLE_ON) { return Colorblindness.filter(TOGGLE_ON); }
-        if(img == TOGGLE_OFF) { return Colorblindness.filter(TOGGLE_OFF); }
-        if(img == TOGGLE_ON_HIGHLIGHTED) { return Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED); }
-        if(img == TOGGLE_OFF_HIGHLIGHTED) { return Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED); }
-        if(img == HARD_MODE_ON) { return Colorblindness.filter(HARD_MODE_ON); }
-        if(img == HARD_MODE_ON_HIGHLIGHTED) { return Colorblindness.filter(HARD_MODE_ON_HIGHLIGHTED); }
-        if(img == NEXT_PAGE) { return Colorblindness.filter(NEXT_PAGE); }
-        if(img == NEXT_PAGE_ON) { return Colorblindness.filter(NEXT_PAGE_ON); }
-        if(img == PREVIOUS_PAGE) { return Colorblindness.filter(PREVIOUS_PAGE); }
-        if(img == PREVIOUS_PAGE_ON) { return Colorblindness.filter(PREVIOUS_PAGE_ON); }
-        if(img == UNDO) { return Colorblindness.filter(UNDO); }
-        if(img == UNDO_HIGHLIGHTED) { return Colorblindness.filter(UNDO_HIGHLIGHTED); }
-        if(img == RESET) { return Colorblindness.filter(RESET); }
-        if(img == RESET_HIGHLIGHTED) { return Colorblindness.filter(RESET_HIGHLIGHTED); }
-        if(img == PLAY) { return Colorblindness.filter(PLAY); }
-        if(img == PLAY_HIGHLIGHTED) { return Colorblindness.filter(PLAY_HIGHLIGHTED); }
-        if(img == ACHIEVEMENTS) { return Colorblindness.filter(ACHIEVEMENTS); }
-        if(img == ACHIEVEMENTS_HIGHLIGHTED) { return Colorblindness.filter(ACHIEVEMENTS_HIGHLIGHTED); }
-        if(img == SETTINGS) { return Colorblindness.filter(SETTINGS); }
-        if(img == SETTINGS_HIGHLIGHTED) { return Colorblindness.filter(SETTINGS_HIGHLIGHTED); }
-        if(img == EXIT) { return Colorblindness.filter(EXIT); }
-        if(img == EXIT_HIGHLIGHTED) { return Colorblindness.filter(EXIT_HIGHLIGHTED); }
-        return img;
+        return colorblindCache.getOrDefault(img, img);
     }
 }

@@ -93,10 +93,9 @@ public class MainMenu implements UI {
 
         drawLogo(g2);
 
-        int startX = totalWidth/2 + 75;
-        int startY = render.scale(RenderContext.BASE_HEIGHT - 300);
-        int x = startX;
-        int y = startY;
+        int startX = getStart()[0];
+        int startY = getStart()[1];
+        int x = startX, y = startY;
 
         for(GameMenu option : options) {
             if(option == GameMenu.PLAY) {
@@ -104,8 +103,8 @@ public class MainMenu implements UI {
                 BufferedImage altImg = render.getMenuRender().getPLAY_HIGHLIGHTED();
                 int width = baseImg.getWidth();
                 int height = baseImg.getHeight();
-
-                x -= width;
+                x = startX; y = startY;
+                x -= width; y -= height;
 
                 if(playButton == null) {
                     playButton = createButton(x, y, width, height, () ->
@@ -123,8 +122,8 @@ public class MainMenu implements UI {
                 BufferedImage altImg = render.getMenuRender().getSETTINGS_HIGHLIGHTED();
                 int width = baseImg.getWidth();
                 int height = baseImg.getHeight();
-
-                x = startX;
+                x = startX; y = startY;
+                x -= 2;
 
                 if(settingsButton == null) {
                     settingsButton = createButton(x, y, width, height, () ->
@@ -142,9 +141,8 @@ public class MainMenu implements UI {
                 BufferedImage altImg = render.getMenuRender().getACHIEVEMENTS_HIGHLIGHTED();
                 int width = baseImg.getWidth();
                 int height = baseImg.getHeight();
-
-                x = startX;
-                y += height;
+                x = startX; y = startY;
+                x -= 2; y -= height;
 
                 if(achievementsButton == null) {
                     achievementsButton = createButton(x, y, width, height, () ->
@@ -157,8 +155,52 @@ public class MainMenu implements UI {
                 g2.drawImage(img, x, y, null);
             }
 
+            if(option == GameMenu.GAMES) {
+                BufferedImage baseImg = render.getMenuRender().getGAME();
+                BufferedImage altImg = render.getMenuRender().getGAME_HIGHLIGHTED();
+                int width = baseImg.getWidth();
+                int height = baseImg.getHeight();
+                x = startX; y = startY;
+                x -= width;
 
+                if(gameButton == null) {
+                    gameButton = createButton(x, y, width, height, () ->
+                            option.run(gameService));
+                }
+
+                BufferedImage img = render.isHovered(gameButton)
+                        ? render.getMenuRender().getColorblindSprite(altImg)
+                        : render.getMenuRender().getColorblindSprite(baseImg);
+                g2.drawImage(img, x, y, null);
+            }
+
+            if(option == GameMenu.EXIT) {
+                BufferedImage baseImg = render.getMenuRender().getEXIT();
+                BufferedImage altImg = render.getMenuRender().getEXIT_HIGHLIGHTED();
+                int width = baseImg.getWidth();
+                int height = baseImg.getHeight();
+                x = startX; y = startY;
+
+                x += totalWidth/3 + render.scale(100);
+                y += render.scale(200);
+
+                if(exitButton == null) {
+                    exitButton = createButton(x, y, width, height, () ->
+                            option.run(gameService));
+                }
+
+                BufferedImage img = render.isHovered(exitButton)
+                        ? render.getMenuRender().getColorblindSprite(altImg)
+                        : render.getMenuRender().getColorblindSprite(baseImg);
+                g2.drawImage(img, x, y, null);
+            }
         }
+    }
+
+    private int[] getStart() {
+        int startX = getTotalWidth()/2 + 75;
+        int startY = render.scale(RenderContext.BASE_HEIGHT - 300);
+        return new int[]{startX, startY};
     }
 
     private Button createButton(int x, int y, int w, int h, Runnable action) {
