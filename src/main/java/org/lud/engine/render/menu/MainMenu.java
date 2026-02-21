@@ -1,5 +1,6 @@
 package org.lud.engine.render.menu;
 
+import org.lud.engine.entities.Button;
 import org.lud.engine.enums.GameMenu;
 import org.lud.engine.enums.GameState;
 import org.lud.engine.gui.Colors;
@@ -32,6 +33,11 @@ public class MainMenu implements UI {
     private final Mouse mouse;
 
     private final Map<Clickable, Rectangle> buttons;
+    private Button playButton;
+    private Button gameButton;
+    private Button achievementsButton;
+    private Button settingsButton;
+    private Button exitButton;
 
     public MainMenu(RenderContext render, GameService gameService,
                     UIService uiService, KeyboardInput keyUI,
@@ -56,6 +62,16 @@ public class MainMenu implements UI {
         return render.getOffsetX() + (containerWidth - elementWidth)/2;
     }
 
+    @Override
+    public void drawMenu(Graphics2D g2) {
+        draw(g2, MenuRender.MENU);
+    }
+
+    @Override
+    public boolean canDraw(State state) {
+        return state == GameState.MENU;
+    }
+
     private void drawLogo(Graphics2D g2) {
         BufferedImage logo = UIService.getLogo();
         if(logo == null) { return; }
@@ -68,16 +84,6 @@ public class MainMenu implements UI {
         g2.drawImage(img, x, y, logoWidth, logoHeight, null);
     }
 
-    @Override
-    public void drawMenu(Graphics2D g2) {
-        draw(g2, MenuRender.MENU);
-    }
-
-    @Override
-    public boolean canDraw(State state) {
-        return state == GameState.MENU;
-    }
-
     public void draw(Graphics2D g2, GameMenu[] options) {
         buttons.clear();
         int totalWidth = getTotalWidth();
@@ -87,94 +93,81 @@ public class MainMenu implements UI {
 
         drawLogo(g2);
 
-        Font baseFont = UIService.getFont(UIService.getMENU_FONT());
-        Font selectedFont = UIService.getFontBold(UIService.getMENU_FONT());
-        int spacing = render.scale(UIService.getMENU_SPACING());
-        int centerX = render.getOffsetX() + totalWidth/2;
-        int computedTotalWidth = 0;
-        int[] buttonWidths = new int[options.length];
-        FontMetrics[] metricsArray = new FontMetrics[options.length];
-        for(int i = 0; i < options.length; i++) {
-            GameMenu op = options[i];
-            String label = buildLabel(op);
-            boolean isSelected = i == keyUI.getSelectedIndexY();
-            Font font = isSelected ? selectedFont : baseFont;
-            g2.setFont(font);
-            FontMetrics metrics = g2.getFontMetrics();
-            metricsArray[i] = metrics;
-            int width = metrics.stringWidth(label) + PADDING_X;
-            buttonWidths[i] = width;
-            computedTotalWidth += width;
-            if(i < options.length - 1)
-                computedTotalWidth += spacing;
-        }
+        int startX = totalWidth/2 + 75;
+        int startY = render.scale(RenderContext.BASE_HEIGHT - 300);
+        int x = startX;
+        int y = startY;
 
-        int startX = centerX - computedTotalWidth/2;
-        int currentX = startX;
-        GameMenu hoveredOption = null;
+        for(GameMenu option : options) {
+            if(option == GameMenu.PLAY) {
+                BufferedImage baseImg = render.getMenuRender().getPLAY();
+                BufferedImage altImg = render.getMenuRender().getPLAY_HIGHLIGHTED();
+                int width = baseImg.getWidth();
+                int height = baseImg.getHeight();
 
-        for(int i = 0; i < options.length; i++) {
-            GameMenu op = options[i];
-            String label = buildLabel(op);
-            boolean isSelected = i == keyUI.getSelectedIndexY();
-            Font font = isSelected ? selectedFont : baseFont;
-            g2.setFont(font);
-            FontMetrics metrics = metricsArray[i];
-            int textWidth = metrics.stringWidth(label);
-            int textHeight = metrics.getHeight();
-            int ascent = metrics.getAscent();
-            int buttonWidth = buttonWidths[i];
-            int buttonHeight = textHeight + PADDING_Y;
-            int textX = currentX + (buttonWidth - textWidth)/2;
-            int textY = CENTER_Y
-                    + (buttonHeight - textHeight)/2
-                    + ascent;
-            Rectangle hitbox = new Rectangle(
-                    currentX - 2,
-                    CENTER_Y,
-                    buttonWidth,
-                    buttonHeight
-            );
-            buttons.put(op, hitbox);
-            render.getMenuRender().getButtons().putAll(buttons);
-            boolean isHovered = render.isHovered(op);
+                x -= width;
 
-            uiService.drawButton(
-                    g2,
-                    currentX - 2,
-                    CENTER_Y,
-                    buttonWidth,
-                    buttonHeight,
-                    ARC,
-                    isHovered || isSelected
-            );
+                if(playButton == null) {
+                    playButton = createButton(x, y, width, height, () ->
+                            option.run(gameService));
+                }
 
-            Color textColor = isSelected
-                    ? Colorblindness.filter(Colors.getHighlight())
-                    : Colorblindness.filter(Colors.getBackground());
-            g2.setColor(textColor);
-            g2.drawString(label, textX, textY);
-
-            if(isHovered) {
-                hoveredOption = op;
+                BufferedImage img = render.isHovered(playButton)
+                        ? render.getMenuRender().getColorblindSprite(altImg)
+                        : render.getMenuRender().getColorblindSprite(baseImg);
+                g2.drawImage(img, x, y, null);
             }
-            currentX += buttonWidth + spacing;
-        }
 
-        if(hoveredOption != null) {
-            String tooltip = resolveTooltip(hoveredOption);
-            uiService.drawTooltip(g2, tooltip, 16, ARC/2);
+            if(option == GameMenu.SETTINGS) {
+                BufferedImage baseImg = render.getMenuRender().getSETTINGS();
+                BufferedImage altImg = render.getMenuRender().getSETTINGS_HIGHLIGHTED();
+                int width = baseImg.getWidth();
+                int height = baseImg.getHeight();
+
+                x = startX;
+
+                if(settingsButton == null) {
+                    settingsButton = createButton(x, y, width, height, () ->
+                            option.run(gameService));
+                }
+
+                BufferedImage img = render.isHovered(settingsButton)
+                        ? render.getMenuRender().getColorblindSprite(altImg)
+                        : render.getMenuRender().getColorblindSprite(baseImg);
+                g2.drawImage(img, x, y, null);
+            }
+
+            if(option == GameMenu.ADVANCEMENTS) {
+                BufferedImage baseImg = render.getMenuRender().getACHIEVEMENTS();
+                BufferedImage altImg = render.getMenuRender().getACHIEVEMENTS_HIGHLIGHTED();
+                int width = baseImg.getWidth();
+                int height = baseImg.getHeight();
+
+                x = startX;
+                y += height;
+
+                if(achievementsButton == null) {
+                    achievementsButton = createButton(x, y, width, height, () ->
+                            option.run(gameService));
+                }
+
+                BufferedImage img = render.isHovered(achievementsButton)
+                        ? render.getMenuRender().getColorblindSprite(altImg)
+                        : render.getMenuRender().getColorblindSprite(baseImg);
+                g2.drawImage(img, x, y, null);
+            }
+
+
         }
     }
 
-    private String buildLabel(GameMenu op) {
-        if(op == GameMenu.PLAY) {
-            return op.getLabel() + GameService.getGame().getLabel();
-        }
-        return op.getLabel();
+    private Button createButton(int x, int y, int w, int h, Runnable action) {
+        Button b = new Button(x, y, w, h, action);
+        render.getMenuRender().getButtons().put(b, new Rectangle(x, y, w, h));
+        return b;
     }
 
-    private String resolveTooltip(GameMenu op) {
+    private String showTooltip(GameMenu op) {
         if(op == GameMenu.PLAY) {
             return gameService.getTooltip(GameService.getGame(),
                     gameService.getSaveManager().autosaveExists()

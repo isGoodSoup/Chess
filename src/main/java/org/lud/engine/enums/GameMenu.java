@@ -4,11 +4,15 @@ import org.lud.engine.interfaces.Clickable;
 import org.lud.engine.service.GameService;
 
 public enum GameMenu implements Clickable {
-    PLAY("", "Start a match of ", "Continue match of ") {
+    PLAY("PLAY", "Start a match of ", "Continue match of ") {
         @Override
         public void run(GameService gameService) {
             GameService.getGame().setup(gameService);
         }
+    },
+    GAMES("GAMES", "", "") {
+        @Override
+        public void run(GameService gameService) {}
     },
     SETTINGS("SETTINGS", "Settings, themes, toggles", "") {
         @Override

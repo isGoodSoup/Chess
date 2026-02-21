@@ -21,14 +21,6 @@ public class MenuRender {
     public static final Games[] GAMES = Games.values();
     public static final GameSettings[] SETTINGS_MENU = GameSettings.values();
     public static BufferedImage[] OPTION_IMAGES;
-    public static String ENABLE = "Enable ";
-    private static final String SETTINGS = "SETTINGS";
-    private static final String ACHIEVEMENTS = "ACHIEVEMENTS";
-    private static final String CHECKMATE = "Checkmate!";
-    private static final String STALEMATE = "Stalemate";
-    private static final int OPTION_X = 100;
-    private static final int OPTION_Y = 160;
-    private static final float SCALE = 1.5f;
     private static final int ARC = 32;
     private static final int STROKE = 6;
 
@@ -50,6 +42,14 @@ public class MenuRender {
     private transient BufferedImage UNDO_HIGHLIGHTED;
     private transient BufferedImage RESET;
     private transient BufferedImage RESET_HIGHLIGHTED;
+    private transient BufferedImage PLAY;
+    private transient BufferedImage PLAY_HIGHLIGHTED;
+    private transient BufferedImage ACHIEVEMENTS;
+    private transient BufferedImage ACHIEVEMENTS_HIGHLIGHTED;
+    private transient BufferedImage SETTINGS;
+    private transient BufferedImage SETTINGS_HIGHLIGHTED;
+    private transient BufferedImage EXIT;
+    private transient BufferedImage EXIT_HIGHLIGHTED;
 
     private static ColorblindType cb;
     private int lastHoveredIndex = -1;
@@ -87,6 +87,10 @@ public class MenuRender {
 
     public static int getARC() {
         return ARC;
+    }
+
+    public static int getSTROKE() {
+        return STROKE;
     }
 
     public GameService getGameService() {
@@ -129,6 +133,38 @@ public class MenuRender {
         return PREVIOUS_PAGE_ON;
     }
 
+    public BufferedImage getPLAY() {
+        return PLAY;
+    }
+
+    public BufferedImage getPLAY_HIGHLIGHTED() {
+        return PLAY_HIGHLIGHTED;
+    }
+
+    public BufferedImage getACHIEVEMENTS() {
+        return ACHIEVEMENTS;
+    }
+
+    public BufferedImage getACHIEVEMENTS_HIGHLIGHTED() {
+        return ACHIEVEMENTS_HIGHLIGHTED;
+    }
+
+    public BufferedImage getSETTINGS() {
+        return SETTINGS;
+    }
+
+    public BufferedImage getSETTINGS_HIGHLIGHTED() {
+        return SETTINGS_HIGHLIGHTED;
+    }
+
+    public BufferedImage getEXIT() {
+        return EXIT;
+    }
+
+    public BufferedImage getEXIT_HIGHLIGHTED() {
+        return EXIT_HIGHLIGHTED;
+    }
+
     public void init() {
         this.sprites = new AchievementSprites();
         try {
@@ -146,6 +182,14 @@ public class MenuRender {
             UNDO_HIGHLIGHTED = UIService.getImage("/ui/undo_highlighted");
             RESET = UIService.getImage("/ui/reset");
             RESET_HIGHLIGHTED = UIService.getImage("/ui/reset_highlighted");
+            PLAY = UIService.getImage("/ui/button_play");
+            PLAY_HIGHLIGHTED = UIService.getImage("/ui/button_play_highlighted");
+            ACHIEVEMENTS = UIService.getImage("/ui/achievements");
+            ACHIEVEMENTS_HIGHLIGHTED = UIService.getImage("/ui/achievements_highlighted");
+            SETTINGS = UIService.getImage("/ui/settings");
+            SETTINGS_HIGHLIGHTED = UIService.getImage("/ui/settings_highlighted");
+            EXIT = UIService.getImage("/ui/exit");
+            EXIT_HIGHLIGHTED = UIService.getImage("/ui/exit_highlighted");
 
             OPTION_IMAGES = new BufferedImage[]{
                     TOGGLE_ON, TOGGLE_OFF, TOGGLE_ON_HIGHLIGHTED, TOGGLE_OFF_HIGHLIGHTED,
@@ -158,20 +202,28 @@ public class MenuRender {
     }
 
     public BufferedImage getColorblindSprite(BufferedImage img) {
-        if (img == TOGGLE_ON) { return Colorblindness.filter(TOGGLE_ON); }
-        if (img == TOGGLE_OFF) { return Colorblindness.filter(TOGGLE_OFF); }
-        if (img == TOGGLE_ON_HIGHLIGHTED) { return Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED); }
-        if (img == TOGGLE_OFF_HIGHLIGHTED) { return Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED); }
-        if (img == HARD_MODE_ON) { return Colorblindness.filter(HARD_MODE_ON); }
-        if (img == HARD_MODE_ON_HIGHLIGHTED) { return Colorblindness.filter(HARD_MODE_ON_HIGHLIGHTED); }
-        if (img == NEXT_PAGE) { return Colorblindness.filter(NEXT_PAGE); }
-        if (img == NEXT_PAGE_ON) { return Colorblindness.filter(NEXT_PAGE_ON); }
-        if (img == PREVIOUS_PAGE) { return Colorblindness.filter(PREVIOUS_PAGE); }
-        if (img == PREVIOUS_PAGE_ON) { return Colorblindness.filter(PREVIOUS_PAGE_ON); }
-        if (img == UNDO) { return Colorblindness.filter(UNDO); }
-        if (img == UNDO_HIGHLIGHTED) { return Colorblindness.filter(UNDO_HIGHLIGHTED); }
-        if (img == RESET) { return Colorblindness.filter(RESET); }
-        if (img == RESET_HIGHLIGHTED) { return Colorblindness.filter(RESET_HIGHLIGHTED); }
+        if(img == TOGGLE_ON) { return Colorblindness.filter(TOGGLE_ON); }
+        if(img == TOGGLE_OFF) { return Colorblindness.filter(TOGGLE_OFF); }
+        if(img == TOGGLE_ON_HIGHLIGHTED) { return Colorblindness.filter(TOGGLE_ON_HIGHLIGHTED); }
+        if(img == TOGGLE_OFF_HIGHLIGHTED) { return Colorblindness.filter(TOGGLE_OFF_HIGHLIGHTED); }
+        if(img == HARD_MODE_ON) { return Colorblindness.filter(HARD_MODE_ON); }
+        if(img == HARD_MODE_ON_HIGHLIGHTED) { return Colorblindness.filter(HARD_MODE_ON_HIGHLIGHTED); }
+        if(img == NEXT_PAGE) { return Colorblindness.filter(NEXT_PAGE); }
+        if(img == NEXT_PAGE_ON) { return Colorblindness.filter(NEXT_PAGE_ON); }
+        if(img == PREVIOUS_PAGE) { return Colorblindness.filter(PREVIOUS_PAGE); }
+        if(img == PREVIOUS_PAGE_ON) { return Colorblindness.filter(PREVIOUS_PAGE_ON); }
+        if(img == UNDO) { return Colorblindness.filter(UNDO); }
+        if(img == UNDO_HIGHLIGHTED) { return Colorblindness.filter(UNDO_HIGHLIGHTED); }
+        if(img == RESET) { return Colorblindness.filter(RESET); }
+        if(img == RESET_HIGHLIGHTED) { return Colorblindness.filter(RESET_HIGHLIGHTED); }
+        if(img == PLAY) { return Colorblindness.filter(PLAY); }
+        if(img == PLAY_HIGHLIGHTED) { return Colorblindness.filter(PLAY_HIGHLIGHTED); }
+        if(img == ACHIEVEMENTS) { return Colorblindness.filter(ACHIEVEMENTS); }
+        if(img == ACHIEVEMENTS_HIGHLIGHTED) { return Colorblindness.filter(ACHIEVEMENTS_HIGHLIGHTED); }
+        if(img == SETTINGS) { return Colorblindness.filter(SETTINGS); }
+        if(img == SETTINGS_HIGHLIGHTED) { return Colorblindness.filter(SETTINGS_HIGHLIGHTED); }
+        if(img == EXIT) { return Colorblindness.filter(EXIT); }
+        if(img == EXIT_HIGHLIGHTED) { return Colorblindness.filter(EXIT_HIGHLIGHTED); }
         return img;
     }
 }
