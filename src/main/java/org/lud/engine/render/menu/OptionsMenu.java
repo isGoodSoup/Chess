@@ -136,7 +136,7 @@ public class OptionsMenu implements UI {
 
         for(int i = startIndex; i < endIndex; i++) {
             String label = ENABLE + options[i].getLabel();
-            int textWidth = g2.getFontMetrics().stringWidth(label);
+            int textWidth = g2.getFontMetrics().stringWidth(label.toUpperCase());
             int toggleWidth = render.scale(toggleOn.getWidth()/2);
             int rowWidth = textWidth + gap + toggleWidth;
             if(rowWidth > maxRowWidth)
@@ -149,16 +149,15 @@ public class OptionsMenu implements UI {
             boolean isSelected =
                     relativeIndex == keyUI.getSelectedIndexY();
             String label = ENABLE + option.getLabel();
-            int textWidth = g2.getFontMetrics().stringWidth(label);
-            int toggleWidth = render.scale(toggleOn.getWidth()/2);
-            int toggleHeight = render.scale(toggleOn.getHeight()/2);
+            int textWidth = g2.getFontMetrics().stringWidth(label.toUpperCase());
+            int toggleWidth = render.scale(toggleOn.getWidth());
+            int toggleHeight = render.scale(toggleOn.getHeight());
             int blockX = getCenterX(totalWidth, maxRowWidth);
             int textX = blockX;
             int toggleX = blockX + maxRowWidth - toggleWidth;
             int toggleY = startY - toggleHeight;
 
-            g2.drawString(label,
-                    textX,
+            g2.drawString(label.toUpperCase(), textX,
                     render.getOffsetY() + startY);
 
             Rectangle toggleHitbox = new Rectangle(

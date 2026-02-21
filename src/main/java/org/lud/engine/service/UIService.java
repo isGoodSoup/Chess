@@ -20,13 +20,11 @@ import java.util.Objects;
 
 public class UIService {
     private static Font font;
-    private static Font font_bold;
     private static BufferedImage logo;
     private static final int MENU_SPACING = 40;
     private static final int MENU_START_X = 100;
     private static final int MENU_START_Y = 160;
     private static final int MENU_FONT = 32;
-    private static final int MENU_SUBFONT = 24;
     private static final int MOVES_CAP = 28;
     private static final int PADDING = 90;
 
@@ -70,13 +68,9 @@ public class UIService {
         try {
             font = Font.createFont(Font.TRUETYPE_FONT,
                     Objects.requireNonNull(Board.class.getResourceAsStream(
-                            "/fonts/Monocraft.ttf")));
-            font_bold = Font.createFont(Font.TRUETYPE_FONT,
-                    Objects.requireNonNull(Board.class.getResourceAsStream(
-                            "/fonts/Monocraft-Semibold.ttf")));
+                            "/fonts/PressStart2P-Regular.ttf")));
             GraphicsEnvironment ge =
                     GraphicsEnvironment.getLocalGraphicsEnvironment();
-            ge.registerFont(font_bold);
             ge.registerFont(font);
         } catch(Exception e) {
             log.error(e.getMessage());
@@ -86,10 +80,6 @@ public class UIService {
 
     public static Font getFont(int size) {
         return font.deriveFont(Font.PLAIN, (float) size);
-    }
-
-    public static Font getFontBold(int size) {
-        return font_bold.deriveFont(Font.PLAIN, (float) size);
     }
 
     public static int getMENU_SPACING() {
@@ -106,10 +96,6 @@ public class UIService {
 
     public static int getMENU_FONT() {
         return MENU_FONT;
-    }
-
-    public static int getMENU_SUBFONT() {
-        return MENU_SUBFONT;
     }
 
     public BufferedImage getYES() {

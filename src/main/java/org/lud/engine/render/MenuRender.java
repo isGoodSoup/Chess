@@ -35,15 +35,11 @@ public class MenuRender {
     private transient BufferedImage PREVIOUS_PAGE, PREVIOUS_PAGE_ON;
     private transient BufferedImage UNDO, UNDO_HIGHLIGHTED;
     private transient BufferedImage RESET, RESET_HIGHLIGHTED;
-    private transient BufferedImage PLAY, PLAY_HIGHLIGHTED;
     private transient BufferedImage ACHIEVEMENTS, ACHIEVEMENTS_HIGHLIGHTED;
     private transient BufferedImage SETTINGS, SETTINGS_HIGHLIGHTED;
     private transient BufferedImage EXIT, EXIT_HIGHLIGHTED;
 
-    private transient BufferedImage CHESS, CHESS_HIGHLIGHTED;
-    private transient BufferedImage CHECKERS, CHECKERS_HIGHLIGHTED;
-    private transient BufferedImage SHOGI, SHOGI_HIGHLIGHTED;
-    private transient BufferedImage SANDBOX, SANDBOX_HIGHLIGHTED;
+    private transient BufferedImage BUTTON, BUTTON_HIGHLIGHTED;
 
     private static ColorblindType cb;
     private int lastHoveredIndex = -1;
@@ -119,30 +115,12 @@ public class MenuRender {
         return PREVIOUS_PAGE_ON;
     }
 
-    public BufferedImage getPLAY() {
-        return PLAY;
+    public BufferedImage getBUTTON() {
+        return BUTTON;
     }
 
-    public BufferedImage getPLAY_HIGHLIGHTED() {
-        return PLAY_HIGHLIGHTED;
-    }
-
-    public BufferedImage getGAME() {
-        return switch(GameService.getGame()) {
-            case CHESS -> CHESS;
-            case CHECKERS -> CHECKERS;
-            case SHOGI -> SHOGI;
-            case SANDBOX -> SANDBOX;
-        };
-    }
-
-    public BufferedImage getGAME_HIGHLIGHTED() {
-        return switch(GameService.getGame()) {
-            case CHESS -> CHESS_HIGHLIGHTED;
-            case CHECKERS -> CHECKERS_HIGHLIGHTED;
-            case SHOGI -> SHOGI_HIGHLIGHTED;
-            case SANDBOX -> SANDBOX_HIGHLIGHTED;
-        };
+    public BufferedImage getBUTTON_HIGHLIGHTED() {
+        return BUTTON_HIGHLIGHTED;
     }
 
     public BufferedImage getACHIEVEMENTS() {
@@ -199,8 +177,8 @@ public class MenuRender {
             RESET = UIService.getImage("/ui/reset");
             RESET_HIGHLIGHTED = UIService.getImage("/ui/reset_highlighted");
 
-            PLAY = UIService.getImage("/ui/button_play");
-            PLAY_HIGHLIGHTED = UIService.getImage("/ui/button_play_highlighted");
+            BUTTON = UIService.getImage("/ui/button");
+            BUTTON_HIGHLIGHTED = UIService.getImage("/ui/button_highlighted");
 
             ACHIEVEMENTS = UIService.getImage("/ui/achievements");
             ACHIEVEMENTS_HIGHLIGHTED = UIService.getImage("/ui/achievements_highlighted");
@@ -210,15 +188,6 @@ public class MenuRender {
 
             EXIT = UIService.getImage("/ui/exit");
             EXIT_HIGHLIGHTED = UIService.getImage("/ui/exit_highlighted");
-
-            CHESS = UIService.getImage("/ui/button_chess");
-            CHESS_HIGHLIGHTED = UIService.getImage("/ui/button_chess_highlighted");
-            CHECKERS = UIService.getImage("/ui/button_checkers");
-            CHECKERS_HIGHLIGHTED = UIService.getImage("/ui/button_checkers_highlighted");
-            SHOGI = UIService.getImage("/ui/button_shogi");
-            SHOGI_HIGHLIGHTED = UIService.getImage("/ui/button_shogi_highlighted");
-            SANDBOX = UIService.getImage("/ui/button_sandbox");
-            SANDBOX_HIGHLIGHTED = UIService.getImage("/ui/button_sandbox_highlighted");
 
             initCache();
             OPTION_IMAGES = new BufferedImage[]{
@@ -240,11 +209,7 @@ public class MenuRender {
                 PREVIOUS_PAGE, PREVIOUS_PAGE_ON,
                 UNDO, UNDO_HIGHLIGHTED,
                 RESET, RESET_HIGHLIGHTED,
-                PLAY, PLAY_HIGHLIGHTED,
-                CHESS, CHESS_HIGHLIGHTED,
-                CHECKERS, CHECKERS_HIGHLIGHTED,
-                SHOGI, SHOGI_HIGHLIGHTED,
-                SANDBOX, SANDBOX_HIGHLIGHTED,
+                BUTTON, BUTTON_HIGHLIGHTED,
                 ACHIEVEMENTS, ACHIEVEMENTS_HIGHLIGHTED,
                 SETTINGS, SETTINGS_HIGHLIGHTED,
                 EXIT, EXIT_HIGHLIGHTED

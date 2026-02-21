@@ -59,7 +59,7 @@ public class MovesRender {
         int boardWidth = render.scale(RenderContext.BASE_WIDTH) - Board.getSquare() * 8;
         int totalHeight = render.scale(RenderContext.BASE_HEIGHT);
 
-        g2.setFont(UIService.getFontBold(24));
+        g2.setFont(UIService.getFont(24));
         FontMetrics fm = g2.getFontMetrics();
         int lineHeight = render.scale(fm.getHeight() + 8);
 

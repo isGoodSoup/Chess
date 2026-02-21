@@ -96,11 +96,13 @@ public class MainMenu implements UI {
         int startX = getStart()[0];
         int startY = getStart()[1];
         int x = startX, y = startY;
+        int padding = 100;
 
+        g2.setFont(UIService.getFont(UIService.getMENU_FONT()));
         for(GameMenu option : options) {
             if(option == GameMenu.PLAY) {
-                BufferedImage baseImg = render.getMenuRender().getPLAY();
-                BufferedImage altImg = render.getMenuRender().getPLAY_HIGHLIGHTED();
+                BufferedImage baseImg = render.getMenuRender().getBUTTON();
+                BufferedImage altImg = render.getMenuRender().getBUTTON_HIGHLIGHTED();
                 int width = baseImg.getWidth();
                 int height = baseImg.getHeight();
                 x = startX; y = startY;
@@ -111,10 +113,19 @@ public class MainMenu implements UI {
                             option.run(gameService));
                 }
 
+                Color textColor = render.isHovered(playButton)
+                        ? Color.WHITE : Colors.BUTTON;
+
                 BufferedImage img = render.isHovered(playButton)
                         ? render.getMenuRender().getColorblindSprite(altImg)
                         : render.getMenuRender().getColorblindSprite(baseImg);
+
+                FontMetrics fm = g2.getFontMetrics();
+                int textX = x + (width - fm.stringWidth(GameMenu.PLAY.getLabel()))/2;
+                int textY = y + (height - fm.getHeight())/2 + fm.getAscent();
                 g2.drawImage(img, x, y, null);
+                g2.setColor(textColor);
+                g2.drawString(GameMenu.PLAY.getLabel(), textX, textY);
             }
 
             if(option == GameMenu.SETTINGS) {
@@ -156,8 +167,8 @@ public class MainMenu implements UI {
             }
 
             if(option == GameMenu.GAMES) {
-                BufferedImage baseImg = render.getMenuRender().getGAME();
-                BufferedImage altImg = render.getMenuRender().getGAME_HIGHLIGHTED();
+                BufferedImage baseImg = render.getMenuRender().getBUTTON();
+                BufferedImage altImg = render.getMenuRender().getBUTTON_HIGHLIGHTED();
                 int width = baseImg.getWidth();
                 int height = baseImg.getHeight();
                 x = startX; y = startY;
@@ -168,10 +179,20 @@ public class MainMenu implements UI {
                             option.run(gameService));
                 }
 
+                Color textColor = render.isHovered(gameButton)
+                        ? Color.WHITE : Colors.BUTTON;
+
                 BufferedImage img = render.isHovered(gameButton)
                         ? render.getMenuRender().getColorblindSprite(altImg)
                         : render.getMenuRender().getColorblindSprite(baseImg);
+
+                String game = GameService.getGame().getLabel();
+                FontMetrics fm = g2.getFontMetrics();
+                int textX = x + (width - fm.stringWidth(game))/2;
+                int textY = y + (height - fm.getHeight())/2 + fm.getAscent();
                 g2.drawImage(img, x, y, null);
+                g2.setColor(textColor);
+                g2.drawString(game, textX, textY);
             }
 
             if(option == GameMenu.EXIT) {
