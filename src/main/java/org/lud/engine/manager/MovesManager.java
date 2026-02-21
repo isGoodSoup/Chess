@@ -377,33 +377,30 @@ public class MovesManager {
     }
 
     public void undoLastMove() {
-        if(moves.isEmpty()) { return; }
-
-        Tint turn = moves.getLast().currentTurn();
-        while (!moves.isEmpty() && moves.getLast().currentTurn() == turn) {
-            undo();
-        }
-        service.getPieceService().switchTurns();
-    }
-
-    private void undo() {
         if(!BooleanService.canUndoMoves || moves.isEmpty()) { return; }
 
-        Piece[][] boardState = BoardService.getBoardState();
-        Move lastMove = moves.getLast();
-        Piece p = lastMove.piece();
-        Piece captured = lastMove.captured();
+        Tint turn = moves.getLast().currentTurn();
+        while(!moves.isEmpty() && moves.getLast().currentTurn() == turn) {
+            Piece[][] boardState = BoardService.getBoardState();
+            Move lastMove = moves.getLast();
+            Piece p = lastMove.piece();
+            Piece captured = lastMove.captured();
 
-        p.setCol(p.getPreCol());
-        p.setRow(p.getPreRow());
-        PieceService.updatePos(p, false);
-        boardState[lastMove.fromRow()][lastMove.fromCol()] = p;
-        
-        log.info("Move undone: {} <- from {} [{}{}]",
-                service.getBoardService().getSquareNameAt(lastMove.targetCol(), lastMove.targetRow()),
-                service.getBoardService().getSquareNameAt(lastMove.fromCol(), lastMove.fromRow()),
-                p.getTypeID(), captured != null ? " capturing " + captured.getTypeID() : "");
-        moves.removeLast();
+            p.setCol(p.getPreCol());
+            p.setRow(p.getPreRow());
+            PieceService.updatePos(p, false);
+            boardState[lastMove.fromRow()][lastMove.fromCol()] = p;
+
+            log.info("Move undone: {} <- from {} [{}{}]",
+                    service.getBoardService().getSquareNameAt(lastMove.targetCol(), lastMove.targetRow()),
+                    service.getBoardService().getSquareNameAt(lastMove.fromCol(), lastMove.fromRow()),
+                    p.getTypeID(), captured != null ? " capturing " + captured.getTypeID() : "");
+            if(captured != null) {
+
+            }
+            moves.removeLast();
+        }
+        service.getPieceService().switchTurns();
     }
 
     private boolean isAIturn() {
