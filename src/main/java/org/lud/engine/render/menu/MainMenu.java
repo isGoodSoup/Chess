@@ -148,6 +148,7 @@ public class MainMenu implements UI {
                 BufferedImage img = render.isHovered(settingsButton)
                         ? render.getMenuRender().getColorblindSprite(altImg)
                         : render.getMenuRender().getColorblindSprite(baseImg);
+                g2.drawImage(render.getMenuRender().defineButton(settingsButton), x, y, null);
                 g2.drawImage(img, x, y, null);
             }
 
@@ -167,6 +168,7 @@ public class MainMenu implements UI {
                 BufferedImage img = render.isHovered(achievementsButton)
                         ? render.getMenuRender().getColorblindSprite(altImg)
                         : render.getMenuRender().getColorblindSprite(baseImg);
+                g2.drawImage(render.getMenuRender().defineButton(achievementsButton), x, y, null);
                 g2.drawImage(img, x, y, null);
             }
 
@@ -187,6 +189,7 @@ public class MainMenu implements UI {
                 BufferedImage img = render.isHovered(exitButton)
                         ? render.getMenuRender().getColorblindSprite(altImg)
                         : render.getMenuRender().getColorblindSprite(baseImg);
+                g2.drawImage(render.getMenuRender().defineButton(exitButton), x, y, null);
                 g2.drawImage(img, x, y, null);
             }
 
@@ -207,6 +210,7 @@ public class MainMenu implements UI {
                     BufferedImage img = render.isHovered(themeButton)
                             ? render.getMenuRender().getColorblindSprite(altImg)
                             : render.getMenuRender().getColorblindSprite(baseImg);
+                    g2.drawImage(render.getMenuRender().defineButton(themeButton), x, y, null);
                     g2.drawImage(img, x, y, null);
                 }
             }

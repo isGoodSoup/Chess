@@ -20,7 +20,7 @@ public class MenuRender {
     public static final GameMenu[] MENU = GameMenu.values();
     public static final Games[] GAMES = Games.values();
     public static final GameSettings[] SETTINGS_MENU = GameSettings.values();
-    public static BufferedImage[] OPTION_IMAGES;
+    public static BufferedImage[] OPTION_BUTTONS;
     private static final int ARC = 32;
     private static final int STROKE = 6;
 
@@ -40,6 +40,7 @@ public class MenuRender {
     private transient BufferedImage EXIT, EXIT_HIGHLIGHTED;
 
     private transient BufferedImage BUTTON, BUTTON_HIGHLIGHTED;
+    private transient BufferedImage BUTTON_SMALL, BUTTON_SMALL_HIGHLIGHTED;
 
     private static ColorblindType cb;
     private int lastHoveredIndex = -1;
@@ -123,6 +124,22 @@ public class MenuRender {
         return BUTTON_HIGHLIGHTED;
     }
 
+    public BufferedImage getBUTTON_SMALL() {
+        return BUTTON_SMALL;
+    }
+
+    public void setBUTTON_SMALL(BufferedImage BUTTON_SMALL) {
+        this.BUTTON_SMALL = BUTTON_SMALL;
+    }
+
+    public BufferedImage getBUTTON_SMALL_HIGHLIGHTED() {
+        return BUTTON_SMALL_HIGHLIGHTED;
+    }
+
+    public void setBUTTON_SMALL_HIGHLIGHTED(BufferedImage BUTTON_SMALL_HIGHLIGHTED) {
+        this.BUTTON_SMALL_HIGHLIGHTED = BUTTON_SMALL_HIGHLIGHTED;
+    }
+
     public BufferedImage getACHIEVEMENTS() {
         return ACHIEVEMENTS;
     }
@@ -180,6 +197,9 @@ public class MenuRender {
             BUTTON = UIService.getImage("/ui/button");
             BUTTON_HIGHLIGHTED = UIService.getImage("/ui/button_highlighted");
 
+            BUTTON_SMALL = UIService.getImage("/ui/button_small");
+            BUTTON_SMALL_HIGHLIGHTED = UIService.getImage("/ui/button_small_highlighted");
+
             ACHIEVEMENTS = UIService.getImage("/ui/achievements");
             ACHIEVEMENTS_HIGHLIGHTED = UIService.getImage("/ui/achievements_highlighted");
 
@@ -190,10 +210,10 @@ public class MenuRender {
             EXIT_HIGHLIGHTED = UIService.getImage("/ui/exit_highlighted");
 
             initCache();
-            OPTION_IMAGES = new BufferedImage[]{
+            OPTION_BUTTONS = new BufferedImage[]{
                     TOGGLE_ON, TOGGLE_OFF, TOGGLE_ON_HIGHLIGHTED, TOGGLE_OFF_HIGHLIGHTED,
                     HARD_MODE_ON, HARD_MODE_ON_HIGHLIGHTED, NEXT_PAGE, NEXT_PAGE_ON,
-                    PREVIOUS_PAGE, PREVIOUS_PAGE_ON,
+                    PREVIOUS_PAGE, PREVIOUS_PAGE_ON
             };
         } catch (IOException e) {
             throw new RuntimeException("Failed to load menu sprites", e);
@@ -210,6 +230,7 @@ public class MenuRender {
                 UNDO, UNDO_HIGHLIGHTED,
                 RESET, RESET_HIGHLIGHTED,
                 BUTTON, BUTTON_HIGHLIGHTED,
+                BUTTON_SMALL, BUTTON_SMALL_HIGHLIGHTED,
                 ACHIEVEMENTS, ACHIEVEMENTS_HIGHLIGHTED,
                 SETTINGS, SETTINGS_HIGHLIGHTED,
                 EXIT, EXIT_HIGHLIGHTED
@@ -222,5 +243,11 @@ public class MenuRender {
 
     public BufferedImage getColorblindSprite(BufferedImage img) {
         return colorblindCache.getOrDefault(img, img);
+    }
+
+    public BufferedImage defineButton(Clickable c) {
+        return render.isHovered(c)
+                ? getColorblindSprite(BUTTON_SMALL_HIGHLIGHTED)
+                : getColorblindSprite(BUTTON_SMALL);
     }
 }
