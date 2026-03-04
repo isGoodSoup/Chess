@@ -2,7 +2,7 @@
 eclipse.project.name = appName + '-core'
 
 dependencies {
-  implementation "com.github.isGoodSoup:LudEngine:$lastEngineCommit"
+  implementation 'com.github.isGoodSoup:LudEngine:-SNAPSHOT'
   api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
   api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
