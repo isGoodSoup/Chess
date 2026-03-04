@@ -46,14 +46,6 @@ public class SettingsMenu extends Menu {
         this.data = new ArrayList<>();
         this.runnables = new ArrayList<>();
         loadSprites();
-
-        InputContext menu = new InputContext("SettingsMenu");
-        menu.bindKey(Input.Keys.UP, () -> cursor(Direction.UP));
-        menu.bindKey(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
-        menu.bindKey(Input.Keys.ENTER, this::activate);
-
-        InputManager.get().addContext(menu);
-        InputManager.get().setActiveContext(menu);
     }
 
     public void loadSprites() {
@@ -88,6 +80,14 @@ public class SettingsMenu extends Menu {
     @Override
     public void show() {
         super.show();
+        InputContext menu = new InputContext("SettingsMenu");
+        menu.bindKey(Input.Keys.UP, () -> cursor(Direction.UP));
+        menu.bindKey(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
+        menu.bindKey(Input.Keys.ENTER, this::activate);
+
+        InputManager.get().addContext(menu);
+        InputManager.get().setActiveContext(menu);
+        
         getStage().addActor(group);
         group.addAction(Actions.moveTo(25f, 25f, DURATION, Interpolation.pow5Out));
     }

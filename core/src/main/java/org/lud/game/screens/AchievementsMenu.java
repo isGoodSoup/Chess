@@ -49,14 +49,6 @@ public class AchievementsMenu extends Menu {
         this.achievements = achievementService.listOfAchievements();
         addMenu(this);
         loadSprites();
-
-        InputContext menu = new InputContext("AchievementsMenu");
-        menu.bindKey(Input.Keys.UP, () -> cursor(Direction.UP));
-        menu.bindKey(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
-        menu.bindKey(Input.Keys.ENTER, this::activate);
-
-        InputManager.get().addContext(menu);
-        InputManager.get().setActiveContext(menu);
     }
 
     public void loadSprites() {
@@ -91,6 +83,14 @@ public class AchievementsMenu extends Menu {
     @Override
     public void show() {
         super.show();
+        InputContext menu = new InputContext("AchievementsMenu");
+        menu.bindKey(Input.Keys.UP, () -> cursor(Direction.UP));
+        menu.bindKey(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
+        menu.bindKey(Input.Keys.ENTER, this::activate);
+
+        InputManager.get().addContext(menu);
+        InputManager.get().setActiveContext(menu);
+
         getStage().addActor(group);
         group.addAction(Actions.moveTo(25f, 25f, DURATION, Interpolation.pow5Out));
     }

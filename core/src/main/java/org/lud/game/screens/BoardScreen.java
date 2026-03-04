@@ -84,17 +84,6 @@ public class BoardScreen extends Menu {
 
         addMenu(this);
         loadSprites();
-
-        InputContext menu = new InputContext("BoardScreen");
-        menu.bindKey(Input.Keys.TAB, () -> setCursorActive(!isCursorActive()));
-        menu.bindKey(Input.Keys.UP, () -> { if(isCursorActive()) cursor(Direction.UP, true); });
-        menu.bindKey(Input.Keys.DOWN, () -> { if(isCursorActive()) cursor(Direction.DOWN, true); });
-        menu.bindKey(Input.Keys.LEFT, () -> { if(isCursorActive()) cursor(Direction.LEFT, true); });
-        menu.bindKey(Input.Keys.RIGHT, () -> { if(isCursorActive()) cursor(Direction.RIGHT, true); });
-        menu.bindKey(Input.Keys.ENTER, () -> { if(isCursorActive()) activate(); });
-        InputManager manager = InputManager.get();
-        manager.addContext(menu);
-        manager.setActiveContext(menu);
     }
 
     public BoardInput getBoardInput() {
@@ -183,6 +172,17 @@ public class BoardScreen extends Menu {
             p.setSize(TILE_SIZE, TILE_SIZE);
             boardGroup.addActor(p);
         }
+
+        InputContext menu = new InputContext("BoardScreen");
+        menu.bindKey(Input.Keys.TAB, () -> setCursorActive(!isCursorActive()));
+        menu.bindKey(Input.Keys.UP, () -> { if(isCursorActive()) cursor(Direction.UP, true); });
+        menu.bindKey(Input.Keys.DOWN, () -> { if(isCursorActive()) cursor(Direction.DOWN, true); });
+        menu.bindKey(Input.Keys.LEFT, () -> { if(isCursorActive()) cursor(Direction.LEFT, true); });
+        menu.bindKey(Input.Keys.RIGHT, () -> { if(isCursorActive()) cursor(Direction.RIGHT, true); });
+        menu.bindKey(Input.Keys.ENTER, () -> { if(isCursorActive()) activate(); });
+        InputManager manager = InputManager.get();
+        manager.addContext(menu);
+        manager.setActiveContext(menu);
 
         coordinator = new Coordinator();
         multiplexer = new InputMultiplexer(getStage(), coordinator);

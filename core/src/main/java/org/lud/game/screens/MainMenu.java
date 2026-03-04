@@ -57,14 +57,6 @@ public class MainMenu extends Menu {
         this.gameService = gameService;
         this.data = new ArrayList<>();
         loadSprites();
-
-        InputContext menu = new InputContext("MainMenu");
-        menu.bindKey(Input.Keys.UP, () -> cursor(Direction.UP));
-        menu.bindKey(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
-        menu.bindKey(Input.Keys.ENTER, this::activate);
-
-        InputManager.get().addContext(menu);
-        InputManager.get().setActiveContext(menu);
     }
 
     public void loadSprites() {
@@ -125,6 +117,15 @@ public class MainMenu extends Menu {
     @Override
     public void show() {
         super.show();
+
+        InputContext menu = new InputContext("MainMenu");
+        menu.bindKey(Input.Keys.UP, () -> cursor(Direction.UP));
+        menu.bindKey(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
+        menu.bindKey(Input.Keys.ENTER, this::activate);
+
+        InputManager.get().addContext(menu);
+        InputManager.get().setActiveContext(menu);
+
         menuGroup.setPosition(0, Gdx.graphics.getHeight());
         getStage().addActor(menuGroup);
         menuGroup.addAction(Actions.moveTo(0, 0, DURATION, Interpolation.pow5Out));
