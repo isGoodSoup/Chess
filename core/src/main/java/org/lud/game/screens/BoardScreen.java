@@ -16,6 +16,8 @@ import org.lud.engine.gui.Button;
 import org.lud.engine.gui.Colors;
 import org.lud.engine.gui.Menu;
 import org.lud.engine.gui.Toast;
+import org.lud.engine.input.InputContext;
+import org.lud.engine.input.InputManager;
 import org.lud.game.input.BoardInput;
 import org.lud.engine.input.Coordinator;
 import org.lud.engine.interfaces.Moves;
@@ -82,6 +84,17 @@ public class BoardScreen extends Menu {
 
         addMenu(this);
         loadSprites();
+
+        InputContext menu = new InputContext("BoardScreen");
+        menu.bindKey(Input.Keys.TAB, () -> setCursorActive(!isCursorActive()));
+        menu.bindKey(Input.Keys.UP, () -> { if(isCursorActive()) cursor(Direction.UP, true); });
+        menu.bindKey(Input.Keys.DOWN, () -> { if(isCursorActive()) cursor(Direction.DOWN, true); });
+        menu.bindKey(Input.Keys.LEFT, () -> { if(isCursorActive()) cursor(Direction.LEFT, true); });
+        menu.bindKey(Input.Keys.RIGHT, () -> { if(isCursorActive()) cursor(Direction.RIGHT, true); });
+        menu.bindKey(Input.Keys.ENTER, () -> { if(isCursorActive()) activate(); });
+        InputManager manager = InputManager.get();
+        manager.addContext(menu);
+        manager.setActiveContext(menu);
     }
 
     public BoardInput getBoardInput() {
@@ -203,10 +216,6 @@ public class BoardScreen extends Menu {
         drawTooltip(delta);
 
         boardInput.update(boardGroup);
-
-        if(Coordinator.getLastInput() == LastInput.KEYBOARD) {
-            globalInput();
-        }
     }
 
     public void animateMove(MovePiece move) {
@@ -252,19 +261,6 @@ public class BoardScreen extends Menu {
 
         getTooltip().update(delta, hoveredPiece != null, mouseX, mouseY);
         getTooltip().render(getBatch());
-    }
-
-    @Override
-    public void checkInput() {}
-
-    @Override
-    public void loadKeys() {
-        getActions().put(Input.Keys.TAB, () -> setCursorActive(!isCursorActive()));
-        getActions().put(Input.Keys.UP, () -> { if(isCursorActive()) cursor(Direction.UP, true); });
-        getActions().put(Input.Keys.DOWN, () -> { if(isCursorActive()) cursor(Direction.DOWN, true); });
-        getActions().put(Input.Keys.LEFT, () -> { if(isCursorActive()) cursor(Direction.LEFT, true); });
-        getActions().put(Input.Keys.RIGHT, () -> { if(isCursorActive()) cursor(Direction.RIGHT, true); });
-        getActions().put(Input.Keys.ENTER, () -> { if(isCursorActive()) activate(); });
     }
 
     @Override

@@ -15,6 +15,8 @@ import org.lud.engine.gui.Button;
 import org.lud.engine.gui.Colors;
 import org.lud.engine.gui.Localization;
 import org.lud.engine.gui.Menu;
+import org.lud.engine.input.InputContext;
+import org.lud.engine.input.InputManager;
 import org.lud.game.enums.Achievements;
 import org.lud.game.service.*;
 
@@ -47,6 +49,14 @@ public class AchievementsMenu extends Menu {
         this.achievements = achievementService.listOfAchievements();
         addMenu(this);
         loadSprites();
+
+        InputContext menu = new InputContext("AchievementsMenu");
+        menu.bindKey(Input.Keys.UP, () -> cursor(Direction.UP));
+        menu.bindKey(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
+        menu.bindKey(Input.Keys.ENTER, this::activate);
+
+        InputManager.get().addContext(menu);
+        InputManager.get().setActiveContext(menu);
     }
 
     public void loadSprites() {
@@ -100,16 +110,6 @@ public class AchievementsMenu extends Menu {
         getLargeFont().setColor(Colors.getForeground());
         getLargeFont().draw(getBatch(), header, headerX, startY);
         getBatch().end();
-    }
-
-    @Override
-    public void checkInput() {}
-
-    @Override
-    public void loadKeys() {
-        getActions().put(Input.Keys.UP, () -> cursor(Direction.UP));
-        getActions().put(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
-        getActions().put(Input.Keys.ENTER, this::activate);
     }
 
     @Override

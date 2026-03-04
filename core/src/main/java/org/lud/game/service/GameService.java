@@ -1,10 +1,15 @@
 package org.lud.game.service;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import org.lud.engine.core.GameFrame;
 import org.lud.engine.enums.GameState;
+import org.lud.engine.enums.Lang;
 import org.lud.engine.enums.Turn;
+import org.lud.engine.gui.Colors;
 import org.lud.engine.gui.Menu;
+import org.lud.engine.input.InputContext;
+import org.lud.engine.input.InputManager;
 import org.lud.engine.interfaces.Moves;
 import org.lud.engine.interfaces.Service;
 import org.lud.engine.service.ServiceFactory;
@@ -12,7 +17,10 @@ import org.lud.game.actors.Piece;
 import org.lud.game.entities.Board;
 import org.lud.game.enums.TypeID;
 import org.lud.game.moves.MovePiece;
-import org.lud.game.screens.*;
+import org.lud.game.screens.AchievementsMenu;
+import org.lud.game.screens.BoardScreen;
+import org.lud.game.screens.MainMenu;
+import org.lud.game.screens.SettingsMenu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +34,6 @@ public class GameService implements Service {
     private final ServiceFactory service;
 
     private Menu activeMenu;
-    private final GlobalScreen globalScreen;
     private final Menu mainMenu;
     private final Menu settingsMenu;
     private final Menu achievementsMenu;
@@ -49,13 +56,21 @@ public class GameService implements Service {
         BoardService board = service.get(BoardService.class);
         AchievementService achievement = service.get(AchievementService.class);
 
-        this.globalScreen = new GlobalScreen(service);
         this.mainMenu = new MainMenu(this, audio, board, piece);
         this.settingsMenu = new SettingsMenu(this, audio, board, piece);
         this.achievementsMenu = new AchievementsMenu(this, audio, board, piece, achievement);
         this.boardScreen = new BoardScreen(board, this, piece, audio);
 
-        mainMenu.setGlobalInput(globalScreen);
+        InputContext global = new InputContext("Global");
+        global.bindKey(Input.Keys.ESCAPE, () -> service.get(GameService.class).showMainMenu());
+        global.bindKey(Input.Keys.M, audio::toggleMusic);
+        global.bindKey(Input.Keys.NUMPAD_ADD, () -> audio.setMusicVolume(0.1f));
+        global.bindKey(Input.Keys.NUMPAD_SUBTRACT, () -> audio.setMusicVolume(-0.1f));
+        global.bindCombo(Input.Keys.T, Colors::nextTheme);
+        global.bindCombo(Input.Keys.L, Lang::nextLang);
+        global.bindCombo(Input.Keys.Q, Gdx.app::exit);
+        InputManager.get().setGlobalContext(global);
+
         activeMenu = mainMenu;
     }
 

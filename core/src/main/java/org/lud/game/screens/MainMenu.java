@@ -6,14 +6,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import org.lud.engine.data.ButtonData;
 import org.lud.engine.enums.Direction;
 import org.lud.engine.enums.Lang;
+import org.lud.engine.enums.UIButton;
 import org.lud.engine.gui.Button;
 import org.lud.engine.gui.Localization;
 import org.lud.engine.gui.Menu;
+import org.lud.engine.input.InputContext;
+import org.lud.engine.input.InputManager;
 import org.lud.game.actors.Logo;
-import org.lud.engine.data.ButtonData;
-import org.lud.engine.enums.UIButton;
 import org.lud.game.service.AudioService;
 import org.lud.game.service.BoardService;
 import org.lud.game.service.GameService;
@@ -55,6 +57,14 @@ public class MainMenu extends Menu {
         this.gameService = gameService;
         this.data = new ArrayList<>();
         loadSprites();
+
+        InputContext menu = new InputContext("MainMenu");
+        menu.bindKey(Input.Keys.UP, () -> cursor(Direction.UP));
+        menu.bindKey(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
+        menu.bindKey(Input.Keys.ENTER, this::activate);
+
+        InputManager.get().addContext(menu);
+        InputManager.get().setActiveContext(menu);
     }
 
     public void loadSprites() {
@@ -139,16 +149,6 @@ public class MainMenu extends Menu {
 
         getTooltip().update(delta, hovering, mouseX, mouseY);
         getTooltip().render(getBatch());
-    }
-
-    @Override
-    public void checkInput() {}
-
-    @Override
-    public void loadKeys() {
-        getActions().put(Input.Keys.UP, () -> cursor(Direction.UP));
-        getActions().put(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
-        getActions().put(Input.Keys.ENTER, this::activate);
     }
 
     @Override
