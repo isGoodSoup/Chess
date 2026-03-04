@@ -204,8 +204,6 @@ public class BoardScreen extends Menu {
 
         boardInput.update(boardGroup);
 
-        checkInput();
-
         if(Coordinator.getLastInput() == LastInput.KEYBOARD) {
             globalInput();
         }
@@ -257,20 +255,16 @@ public class BoardScreen extends Menu {
     }
 
     @Override
-    public void checkInput() {
-        if(Gdx.input.isKeyJustPressed(Input.Keys.TAB)) { setCursorActive(!isCursorActive()); }
-        if(isCursorActive()) {
-            if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) { activate(); }
-            if(Gdx.input.isKeyJustPressed(Input.Keys.UP)) { cursor(Direction.UP, true); }
-            if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) { cursor(Direction.LEFT, true); }
-            if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) { cursor(Direction.DOWN, true); }
-            if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) { cursor(Direction.RIGHT, true); }
-        }
-    }
+    public void checkInput() {}
 
     @Override
     public void loadKeys() {
-
+        getActions().put(Input.Keys.TAB, () -> setCursorActive(!isCursorActive()));
+        getActions().put(Input.Keys.UP, () -> { if(isCursorActive()) cursor(Direction.UP, true); });
+        getActions().put(Input.Keys.DOWN, () -> { if(isCursorActive()) cursor(Direction.DOWN, true); });
+        getActions().put(Input.Keys.LEFT, () -> { if(isCursorActive()) cursor(Direction.LEFT, true); });
+        getActions().put(Input.Keys.RIGHT, () -> { if(isCursorActive()) cursor(Direction.RIGHT, true); });
+        getActions().put(Input.Keys.ENTER, () -> { if(isCursorActive()) activate(); });
     }
 
     @Override

@@ -56,10 +56,6 @@ public class GameService implements Service {
         this.boardScreen = new BoardScreen(board, this, piece, audio);
 
         mainMenu.setGlobalInput(globalScreen);
-        settingsMenu.setGlobalInput(globalScreen);
-        achievementsMenu.setGlobalInput(globalScreen);
-        boardScreen.setGlobalInput(globalScreen);
-
         activeMenu = mainMenu;
     }
 

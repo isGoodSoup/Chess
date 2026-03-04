@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import org.lud.engine.enums.Direction;
 import org.lud.engine.enums.Lang;
 import org.lud.engine.gui.Button;
 import org.lud.engine.gui.Localization;
@@ -123,8 +124,6 @@ public class MainMenu extends Menu {
     public void render(float delta) {
         super.render(delta);
 
-        checkInput();
-
         float mouseX = Gdx.input.getX();
         float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
         boolean hovering = false;
@@ -143,14 +142,14 @@ public class MainMenu extends Menu {
     }
 
     @Override
-    public void checkInput() {
-        if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            activate();
-        }
-    }
+    public void checkInput() {}
 
     @Override
-    public void loadKeys() {}
+    public void loadKeys() {
+        getActions().put(Input.Keys.UP, () -> cursor(Direction.UP));
+        getActions().put(Input.Keys.DOWN, () -> cursor(Direction.DOWN));
+        getActions().put(Input.Keys.ENTER, this::activate);
+    }
 
     @Override
     public void playFX(int i) {
