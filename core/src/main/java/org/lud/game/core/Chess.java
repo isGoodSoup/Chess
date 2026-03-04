@@ -46,7 +46,7 @@ public class Chess extends GameFrame {
         service.get(AudioService.class).setMusicVolume(-0.4f);
 
         Localization.lang.setLocale(Locale.forLanguageTag("en"));
-        Colors.setTheme(Theme.LEGACY);
+        Colors.setTheme(Theme.BLACK);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
 
         setScreen(new IntroScreen(this, () -> new MainMenu(

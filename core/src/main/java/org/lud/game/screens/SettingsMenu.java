@@ -87,7 +87,7 @@ public class SettingsMenu extends Menu {
 
         InputManager.get().addContext(menu);
         InputManager.get().setActiveContext(menu);
-        
+
         getStage().addActor(group);
         group.addAction(Actions.moveTo(25f, 25f, DURATION, Interpolation.pow5Out));
     }
