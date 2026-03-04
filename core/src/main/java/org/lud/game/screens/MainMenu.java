@@ -123,7 +123,6 @@ public class MainMenu extends Menu {
     public void render(float delta) {
         super.render(delta);
 
-        globalInput();
         checkInput();
 
         float mouseX = Gdx.input.getX();

@@ -97,7 +97,6 @@ public class SettingsMenu extends Menu {
         getLargeFont().draw(getBatch(), header, headerX, startY);
         getBatch().end();
 
-        globalInput();
         checkInput();
     }
 
