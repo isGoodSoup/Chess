@@ -1,0 +1,18 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+dependencies {
+  api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
+  api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+  api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.github.tommyettinger:libgdx-utils-box2d:$utilsBox2dVersion"
+  api "com.github.tommyettinger:libgdx-utils:$utilsVersion"
+  api "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$controllerMappingVersion"
+  api "org.slf4j:slf4j-api:2.0.17"
+  api "com.fasterxml.jackson.core:jackson-databind:2.15.2"
+  implementation('ch.qos.logback:logback-classic:1.5.13')
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
+}

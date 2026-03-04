@@ -1,0 +1,136 @@
+package org.lud.game.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import org.lud.engine.core.AudioService;
+import org.lud.engine.data.Achievement;
+import org.lud.engine.data.ButtonData;
+import org.lud.engine.enums.UIButton;
+import org.lud.engine.gui.Button;
+import org.lud.engine.gui.Colors;
+import org.lud.engine.gui.Localization;
+import org.lud.engine.gui.Menu;
+import org.lud.game.service.AchievementService;
+import org.lud.game.service.BoardService;
+import org.lud.game.service.GameService;
+import org.lud.game.service.PieceService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class AchievementsMenu extends Menu {
+    private static final float DURATION = 1f;
+    private final GameService gameService;
+    private final AudioService audioService;
+    private final BoardService boardService;
+    private final PieceService pieceService;
+    private final AchievementService achievementService;
+    private final List<ButtonData> data;
+    private final List<Achievement> achievements;
+    private Group group;
+    private Texture baseButton;
+    private Texture frame;
+
+    public AchievementsMenu(GameService gameService, AudioService audioService,
+                            BoardService boardService, PieceService pieceService,
+                            AchievementService achievementService) {
+        super();
+        this.gameService = gameService;
+        this.audioService = audioService;
+        this.boardService = boardService;
+        this.pieceService = pieceService;
+        this.achievementService = achievementService;
+        this.data = new ArrayList<>();
+        this.achievements = achievementService.listOfAchievements();
+        addMenu(this);
+        loadSprites();
+    }
+
+    public void loadSprites() {
+        String defaultPath = "buttons/";
+        this.baseButton = new Texture(defaultPath + "button_small.png");
+        this.frame = new Texture(defaultPath + "button_small_highlighted.png");
+        data.add(new ButtonData(UIButton.PREVIOUS_PAGE, this::slideOut,
+            () -> playFX(0)));
+    }
+
+    @Override
+    public void setup() {
+        float spacing = 1f;
+        float startX = 25f;
+        float y = 25f;
+
+        group = new Group();
+
+        for(ButtonData data : data) {
+            Texture icon = getButton(data, false);
+            Texture highlighted = getButton(data, true);
+
+            Button b = new Button(startX, y, baseButton.getWidth(), baseButton.getHeight(),
+                baseButton, icon, frame, highlighted, data.soundPath(), data.action());
+
+            group.addActor(b);
+            addButton(b);
+            startX += baseButton.getWidth() + spacing;
+        }
+    }
+
+    @Override
+    public void show() {
+        super.show();
+        getStage().addActor(group);
+        group.addAction(Actions.moveTo(25f, 25f, DURATION, Interpolation.pow5Out));
+    }
+
+    @Override
+    public void render(float delta) {
+        super.render(delta);
+
+        String header = Localization.lang.t("header.achievements").toUpperCase();
+        GlyphLayout layout = new GlyphLayout();
+        layout.setText(getLargeFont(), header);
+
+        float startY = Gdx.graphics.getHeight() - 100f;
+        float headerX = (Gdx.graphics.getWidth() - layout.width)/2f;
+
+        getBatch().begin();
+        getLargeFont().setColor(Colors.getForeground());
+        getLargeFont().draw(getBatch(), header, headerX, startY);
+        getBatch().end();
+
+        globalInput();
+        checkInput();
+    }
+
+    @Override
+    public void checkInput() {
+        if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            activate();
+        }
+    }
+
+    @Override
+    public void loadKeys() {}
+
+    @Override
+    public void playFX(int i) {
+        audioService.playFX(i);
+    }
+
+    public void slideOut() {
+        group.addAction(Actions.sequence(
+            Actions.moveTo(0, -Gdx.graphics.getHeight(), DURATION, Interpolation.pow5Out),
+            Actions.run(gameService::showMainMenu)
+        ));
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+    }
+}
