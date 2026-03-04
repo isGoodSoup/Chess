@@ -2,7 +2,6 @@ package org.lud.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import org.lud.engine.core.AudioService;
 import org.lud.engine.enums.Difficulty;
 import org.lud.engine.enums.Direction;
 import org.lud.engine.enums.GameState;
@@ -10,6 +9,7 @@ import org.lud.engine.enums.Lang;
 import org.lud.engine.gui.Colors;
 import org.lud.engine.gui.Menu;
 import org.lud.engine.service.ServiceFactory;
+import org.lud.game.service.AudioService;
 import org.lud.game.service.BoardService;
 import org.lud.game.service.GameService;
 

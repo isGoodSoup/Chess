@@ -1,4 +1,4 @@
-package org.lud.engine.service;
+package org.lud.game.service;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
