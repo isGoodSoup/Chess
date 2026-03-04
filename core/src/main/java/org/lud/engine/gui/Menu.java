@@ -90,6 +90,7 @@ public abstract class Menu implements Screen {
         this.shaper = new ShapeRenderer();
 
         addMenu(this);
+        setGlobalInput(this);
     }
 
     public Cursor getCursor() { return cursor; }
