@@ -49,7 +49,7 @@ public class Chess extends GameFrame {
         Colors.setTheme(Theme.LEGACY);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
 
-        setScreen(new IntroScreen(() -> new MainMenu(
+        setScreen(new IntroScreen(this, () -> new MainMenu(
             service.get(GameService.class), service.get(AudioService.class),
             service.get(BoardService.class), service.get(PieceService.class))));
     }

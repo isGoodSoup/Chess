@@ -4,16 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import org.lud.engine.core.GameFrame;
 import org.lud.engine.core.Intro;
 import org.lud.engine.interfaces.ScreenTransition;
 
 public class IntroScreen implements Screen {
-
+    private final GameFrame gameFrame;
     private final ScreenTransition transition;
     private final Intro intro;
     private SpriteBatch batch;
 
-    public IntroScreen(ScreenTransition transition) {
+    public IntroScreen(GameFrame gameFrame, ScreenTransition transition) {
+        this.gameFrame = gameFrame;
         this.transition = transition;
         this.intro = new Intro();
     }
@@ -23,7 +25,7 @@ public class IntroScreen implements Screen {
         batch = new SpriteBatch();
     }
 
-    @Override @SuppressWarnings("StatementWithEmptyBody")
+    @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -34,7 +36,9 @@ public class IntroScreen implements Screen {
 
         if(intro.isFinished() && transition != null) {
             Screen next = transition.nextScreen();
-            if(next != null) {}
+            if(next != null) {
+                gameFrame.setScreen(next);
+            }
         }
     }
 
