@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import org.lud.engine.core.AudioService;
 import org.lud.engine.core.GameFrame;
 import org.lud.engine.service.AchievementPersistence;
+import org.lud.game.screens.MainMenu;
 import org.lud.game.service.AchievementService;
 import org.lud.engine.service.EventBus;
 import org.lud.engine.enums.Theme;
@@ -52,13 +53,9 @@ public class Chess extends GameFrame {
         Colors.setTheme(Theme.LEGACY);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
 
-        setScreen(new IntroScreen(
-            this,
-            service.get(GameService.class),
-            service.get(AudioService.class),
-            service.get(BoardService.class),
-            service.get(PieceService.class)
-        ));
+        setScreen(new IntroScreen(() -> new MainMenu(
+            service.get(GameService.class), service.get(AudioService.class),
+            service.get(BoardService.class), service.get(PieceService.class))));
     }
 
     @Override
