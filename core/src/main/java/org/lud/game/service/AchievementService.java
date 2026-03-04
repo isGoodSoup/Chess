@@ -13,7 +13,7 @@ public class AchievementService implements Service {
     private final EventBus eventBus;
     private final ServiceFactory service;
     private final AchievementPersistence persistence;
-    private final Map<Achievements, Achievement> achievements;
+    private final Map<Achievements, Achievement<Achievements>> achievements;
 
     public AchievementService(EventBus eventBus, ServiceFactory service,
                               AchievementPersistence persistence) {
@@ -23,7 +23,7 @@ public class AchievementService implements Service {
         this.achievements = new LinkedHashMap<>();
 
         for(Achievements id : Achievements.values()) {
-            achievements.put(id, new Achievement(id));
+            achievements.put(id, new Achievement<>(id));
         }
     }
 
@@ -32,27 +32,27 @@ public class AchievementService implements Service {
         persistence.save(achievements.values());
     }
 
-    public Collection<Achievement> getAllAchievements() {
+    public Collection<Achievement<Achievements>> getAllAchievements() {
         return achievements.values();
     }
 
-    public List<Achievement> listOfAchievements() {
+    public List<Achievement<Achievements>> listOfAchievements() {
         return new ArrayList<>(achievements.values());
     }
 
-    public List<Achievement> getSortedAchievements(Collection<Achievement> list) {
+    public List<Achievement<Achievements>> getSortedAchievements(Collection<Achievement<Achievements>> list) {
         return list.stream()
             .sorted(Comparator.comparingInt(a -> a.id().ordinal()))
             .toList();
     }
 
-    public List<Achievement> getUnlockedAchievements() {
+    public List<Achievement<Achievements>> getUnlockedAchievements() {
         return achievements.values().stream()
             .filter(Achievement::unlocked)
             .toList();
     }
 
-    public List<Achievement> getLockedAchievements() {
+    public List<Achievement<Achievements>> getLockedAchievements() {
         return achievements.values().stream()
             .filter(a -> !a.unlocked())
             .toList();
