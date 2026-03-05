@@ -2,8 +2,10 @@ package org.lud.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -11,10 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import org.lud.engine.data.ButtonData;
 import org.lud.engine.enums.Direction;
 import org.lud.engine.enums.UIButton;
-import org.lud.engine.gui.Button;
-import org.lud.engine.gui.Colors;
-import org.lud.engine.gui.Localization;
-import org.lud.engine.gui.Menu;
+import org.lud.engine.gui.*;
 import org.lud.engine.input.InputContext;
 import org.lud.engine.input.InputManager;
 import org.lud.engine.service.EventBus;
@@ -36,8 +35,13 @@ public class SettingsMenu extends Menu {
     private final List<ButtonData> data;
     private final List<Runnable> runnables;
     private Group group;
+    private WindowActor windowActor;
     private Texture baseButton;
     private Texture frame;
+
+    private float boxWidth, boxHeight;
+    private float boxX, boxY;
+    private float stageWidth, stageHeight;
 
     public SettingsMenu(GameService gameService, AudioService audioService,
                         BoardService boardService, PieceService pieceService, EventBus eventBus) {
@@ -58,13 +62,25 @@ public class SettingsMenu extends Menu {
         this.frame = new Texture(defaultPath + "button_small_highlighted.png");
         data.add(new ButtonData(UIButton.PREVIOUS_PAGE, this::slideOut,
             () -> playFX(0)));
+
+        stageWidth = getStage().getViewport().getWorldWidth();
+        stageHeight = getStage().getViewport().getWorldHeight();
+
+        this.boxWidth = stageWidth - 200f;
+        this.boxHeight = 850f;
+        this.boxX = stageWidth/2f - boxWidth/2f;
+        this.boxY = stageHeight/2f - boxHeight/2f;
+
+        Texture background = new Texture("tooltip.png");
+        NinePatch patch = new NinePatch(background, 16, 16, 16, 16);
+        windowActor = new WindowActor(patch, boxX, boxY, boxWidth, boxHeight);
     }
 
     @Override
     public void setup() {
         float spacing = 1f;
-        float startX = 50f;
-        float y = 50f;
+        float startX = 25f;
+        float y = 25f;
 
         group = new Group();
 
@@ -92,17 +108,24 @@ public class SettingsMenu extends Menu {
         InputManager.get().addContext(menu);
         InputManager.get().setActiveContext(menu);
 
+        windowActor.setBounds(boxX, boxY, boxWidth, boxHeight);
+        getStage().addActor(windowActor);
+
+        windowActor.setPosition(stageWidth/2f - boxWidth/2f, -boxHeight);
+        windowActor.addAction(Actions.moveTo(stageWidth/2f - boxWidth/2f,
+            stageHeight/2f - boxHeight/2f, 1f, Interpolation.pow5Out));
+
         getStage().addActor(group);
-        group.addAction(Actions.moveTo(50f, 50f, DURATION, Interpolation.pow5Out));
+        group.addAction(Actions.moveTo(25f, 25f, DURATION, Interpolation.pow5Out));
 
         String headerText = Localization.lang.t("header.settings").toUpperCase();
         GlyphLayout layout = new GlyphLayout(getLargeFont(), headerText);
 
-        Label.LabelStyle style = new Label.LabelStyle(getLargeFont(), Colors.getForeground());
+        Label.LabelStyle style = new Label.LabelStyle(getLargeFont(), Color.WHITE);
         Label headerLabel = new Label(headerText, style);
 
         headerLabel.setPosition((Gdx.graphics.getWidth() - layout.width)/2f,
-            Gdx.graphics.getHeight() - 200f);
+            Gdx.graphics.getHeight() - 300f);
         getStage().addActor(headerLabel);
     }
 
@@ -121,6 +144,8 @@ public class SettingsMenu extends Menu {
             Actions.moveTo(0, -Gdx.graphics.getHeight(), DURATION, Interpolation.pow5Out),
             Actions.run(gameService::showMainMenu)
         ));
+
+        windowActor.addAction(Actions.moveTo(stageWidth/2f - boxWidth/2f, -boxHeight));
     }
 
     @Override

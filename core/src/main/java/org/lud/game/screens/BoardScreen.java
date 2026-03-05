@@ -106,8 +106,8 @@ public class BoardScreen extends Menu {
     @Override
     public void setup() {
         float spacing = 1f;
-        float buttonX = 50f;
-        float buttonY = 50f;
+        float buttonX = 25f;
+        float buttonY = 25f;
 
         boardGroup = new Group();
         uiGroup = new Group();
@@ -140,7 +140,7 @@ public class BoardScreen extends Menu {
         pieceService.clearBoard();
 
         boardGroup.setPosition(startX, startY + Gdx.graphics.getHeight());
-        uiGroup.setPosition(50f, startY + Gdx.graphics.getHeight());
+        uiGroup.setPosition(25f, startY + Gdx.graphics.getHeight());
         getToastGroup().setPosition(0, 0);
 
         getStage().addActor(boardGroup);
@@ -149,10 +149,10 @@ public class BoardScreen extends Menu {
 
         if(gameService.isFirstBoardEntry()) {
             boardGroup.addAction(Actions.moveTo(startX, startY, DURATION, Interpolation.pow5Out));
-            uiGroup.addAction(Actions.moveTo(50f, 50f, DURATION, Interpolation.pow5Out));
+            uiGroup.addAction(Actions.moveTo(25f, 25f, DURATION, Interpolation.pow5Out));
         } else {
             boardGroup.setPosition(startX, startY);
-            uiGroup.setPosition(50f, 50f);
+            uiGroup.setPosition(25f, 25f);
         }
 
         BackgroundTile bg = new BackgroundTile(Colors.getEdge(), -PADDING, -PADDING,
@@ -330,7 +330,7 @@ public class BoardScreen extends Menu {
                 Actions.moveTo(startX, -Gdx.graphics.getHeight(), DURATION, Interpolation.pow5Out),
                 Actions.run(gameService::showMainMenu)
         ));
-        uiGroup.addAction(Actions.moveTo(50f, -Gdx.graphics.getHeight(),
+        uiGroup.addAction(Actions.moveTo(25f, -Gdx.graphics.getHeight(),
             DURATION, Interpolation.pow5Out));
     }
 

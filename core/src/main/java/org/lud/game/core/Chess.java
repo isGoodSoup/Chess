@@ -41,6 +41,7 @@ public class Chess extends GameFrame {
         service.register(AchievementService.class,
             new AchievementService(eventBus, service, new AchievementPersistence()));
         service.register(GameService.class, new GameService(this, service));
+        service.register(SettingsService.class, new SettingsService(service));
 
         service.get(AudioService.class).playMusic();
         service.get(AudioService.class).setMusicVolume(-0.4f);
