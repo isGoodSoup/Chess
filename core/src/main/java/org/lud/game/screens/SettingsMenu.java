@@ -12,15 +12,13 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import org.lud.engine.data.ButtonData;
 import org.lud.engine.enums.Direction;
+import org.lud.engine.enums.GameSettings;
 import org.lud.engine.enums.UIButton;
 import org.lud.engine.gui.*;
 import org.lud.engine.input.InputContext;
 import org.lud.engine.input.InputManager;
 import org.lud.engine.service.EventBus;
-import org.lud.game.service.AudioService;
-import org.lud.game.service.BoardService;
-import org.lud.game.service.GameService;
-import org.lud.game.service.PieceService;
+import org.lud.game.service.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +32,7 @@ public class SettingsMenu extends Menu {
     private final EventBus eventBus;
     private final List<ButtonData> data;
     private final List<Runnable> runnables;
+    private final List<GameSettings> settings;
     private Group group;
     private WindowActor windowActor;
     private Texture baseButton;
@@ -53,6 +52,7 @@ public class SettingsMenu extends Menu {
         this.eventBus = eventBus;
         this.data = new ArrayList<>();
         this.runnables = new ArrayList<>();
+        this.settings = List.of(GameSettings.values());
         loadSprites();
     }
 
@@ -94,6 +94,39 @@ public class SettingsMenu extends Menu {
             group.addActor(b);
             addButton(b);
             startX += baseButton.getWidth() + spacing;
+        }
+
+        float startY = boxY + boxHeight - 180f;
+        float rowSpacing = 70f;
+
+        float labelX = boxX + 80f;
+        float toggleX = boxX + boxWidth - 140f;
+
+        Label.LabelStyle style = new Label.LabelStyle(getMediumFont(), Color.WHITE);
+        for(GameSettings s : settings) {
+            String text = Localization.lang.t(s.getLabelKey());
+            Label label = new Label(text, style);
+
+            label.setPosition(labelX, startY);
+
+            Texture unchecked = new Texture("buttons/tickbox_off.png");
+            Texture checked   = new Texture("buttons/tickbox_on.png");
+
+            Texture iconNormal = SettingsService.get(s) ? checked : unchecked;
+            Texture iconHighlighted = iconNormal;
+
+            Button toggle = new Button( toggleX, startY - 10f, 48, 48, unchecked,
+                            iconNormal, frame, iconHighlighted, () -> playFX(1), () -> {
+                    SettingsService.toggle(s);
+                    Texture newIcon = SettingsService.get(s) ? checked : unchecked;
+                }
+            );
+
+            toggle.setSelected(SettingsService.get(s));
+            group.addActor(label);
+            group.addActor(toggle);
+
+            startY -= rowSpacing;
         }
     }
 
