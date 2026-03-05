@@ -29,13 +29,12 @@ if (JavaVersion.current().isJava9Compatible()) {
 }
 
 dependencies {
-  implementation(project(":lwjgl3"))
+  implementation(project(":core"))
   implementation "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxControllersVersion"
   implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
   implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation "com.github.Hangman:TuningFork:$tuningForkVersion"
-  implementation project(':core')
   implementation("com.badlogicgames.gdx:gdx-tools:$gdxVersion"){exclude group: 'com.badlogicgames.gdx', module: 'gdx-backend-lwjgl'}
 
   if(enableGraalNative == 'true') {
