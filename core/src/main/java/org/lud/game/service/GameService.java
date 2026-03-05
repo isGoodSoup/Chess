@@ -12,6 +12,7 @@ import org.lud.engine.input.InputContext;
 import org.lud.engine.input.InputManager;
 import org.lud.engine.interfaces.Moves;
 import org.lud.engine.interfaces.Service;
+import org.lud.engine.service.EventBus;
 import org.lud.engine.service.ServiceFactory;
 import org.lud.game.actors.Piece;
 import org.lud.game.entities.Board;
@@ -55,11 +56,12 @@ public class GameService implements Service {
         PieceService piece = service.get(PieceService.class);
         BoardService board = service.get(BoardService.class);
         AchievementService achievement = service.get(AchievementService.class);
+        EventBus eventBus = service.get(EventBus.class);
 
-        this.mainMenu = new MainMenu(this, audio, board, piece);
-        this.settingsMenu = new SettingsMenu(this, audio, board, piece);
-        this.achievementsMenu = new AchievementsMenu(this, audio, board, piece, achievement);
-        this.boardScreen = new BoardScreen(board, this, piece, audio);
+        this.mainMenu = new MainMenu(this, audio, board, piece, eventBus);
+        this.settingsMenu = new SettingsMenu(this, audio, board, piece, eventBus);
+        this.achievementsMenu = new AchievementsMenu(this, audio, board, piece, achievement, eventBus);
+        this.boardScreen = new BoardScreen(board, this, piece, audio, eventBus);
 
         InputContext global = new InputContext("Global");
         global.bindKey(Input.Keys.ESCAPE, () -> service.get(GameService.class).showMainMenu());

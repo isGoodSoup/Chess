@@ -18,6 +18,7 @@ import org.lud.engine.gui.Menu;
 import org.lud.engine.gui.Toast;
 import org.lud.engine.input.InputContext;
 import org.lud.engine.input.InputManager;
+import org.lud.engine.service.EventBus;
 import org.lud.game.input.BoardInput;
 import org.lud.engine.input.Coordinator;
 import org.lud.engine.interfaces.Moves;
@@ -52,6 +53,7 @@ public class BoardScreen extends Menu {
     private final GameService gameService;
     private final PieceService pieceService;
     private final AudioService audioService;
+    private final EventBus eventBus;
 
     private final List<ButtonData> data;
 
@@ -69,11 +71,13 @@ public class BoardScreen extends Menu {
     private int lastAnimatedLight = -1;
 
     public BoardScreen(BoardService boardService, GameService gameService, PieceService pieceService,
-                       AudioService audioService) {
+                       AudioService audioService, EventBus eventBus) {
+        super(eventBus);
         this.boardService = boardService;
         this.gameService = gameService;
         this.pieceService = pieceService;
         this.audioService = audioService;
+        this.eventBus = eventBus;
         this.data = new ArrayList<>();
 
         this.startX = (Gdx.graphics.getWidth() - BOARD_SIZE)/2f;

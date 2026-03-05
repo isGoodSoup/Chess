@@ -36,7 +36,7 @@ public class Chess extends GameFrame {
 
         service.register(EventBus.class, eventBus);
         service.register(AudioService.class, new AudioService());
-        service.register(BoardService.class, new BoardService(service, camera));
+        service.register(BoardService.class, new BoardService(service, eventBus, camera));
         service.register(PieceService.class, new PieceService(service));
         service.register(AchievementService.class,
             new AchievementService(eventBus, service, new AchievementPersistence()));
@@ -46,12 +46,12 @@ public class Chess extends GameFrame {
         service.get(AudioService.class).setMusicVolume(-0.4f);
 
         Localization.lang.setLocale(Locale.forLanguageTag("en"));
-        Colors.setTheme(Theme.BLACK);
+        Colors.setTheme(Theme.LEGACY);
         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.None);
 
         setScreen(new IntroScreen(this, () -> new MainMenu(
             service.get(GameService.class), service.get(AudioService.class),
-            service.get(BoardService.class), service.get(PieceService.class))));
+            service.get(BoardService.class), service.get(PieceService.class), eventBus)));
     }
 
     @Override

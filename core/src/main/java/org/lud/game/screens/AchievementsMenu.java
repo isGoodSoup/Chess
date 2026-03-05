@@ -18,6 +18,7 @@ import org.lud.engine.gui.Localization;
 import org.lud.engine.gui.Menu;
 import org.lud.engine.input.InputContext;
 import org.lud.engine.input.InputManager;
+import org.lud.engine.service.EventBus;
 import org.lud.game.enums.Achievements;
 import org.lud.game.service.*;
 
@@ -31,6 +32,7 @@ public class AchievementsMenu extends Menu {
     private final BoardService boardService;
     private final PieceService pieceService;
     private final AchievementService achievementService;
+    private final EventBus eventBus;
     private final List<ButtonData> data;
     private final List<Achievement<Achievements>> achievements;
     private Group group;
@@ -39,13 +41,14 @@ public class AchievementsMenu extends Menu {
 
     public AchievementsMenu(GameService gameService, AudioService audioService,
                             BoardService boardService, PieceService pieceService,
-                            AchievementService achievementService) {
-        super();
+                            AchievementService achievementService, EventBus eventBus) {
+        super(eventBus);
         this.gameService = gameService;
         this.audioService = audioService;
         this.boardService = boardService;
         this.pieceService = pieceService;
         this.achievementService = achievementService;
+        this.eventBus = eventBus;
         this.data = new ArrayList<>();
         this.achievements = achievementService.listOfAchievements();
         addMenu(this);

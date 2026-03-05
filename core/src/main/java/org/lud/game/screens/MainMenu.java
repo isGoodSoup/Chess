@@ -15,6 +15,7 @@ import org.lud.engine.gui.Localization;
 import org.lud.engine.gui.Menu;
 import org.lud.engine.input.InputContext;
 import org.lud.engine.input.InputManager;
+import org.lud.engine.service.EventBus;
 import org.lud.game.actors.Logo;
 import org.lud.game.service.AudioService;
 import org.lud.game.service.BoardService;
@@ -35,6 +36,7 @@ public class MainMenu extends Menu {
     private final AudioService audioService;
     private final BoardService boardService;
     private final PieceService pieceService;
+    private final EventBus eventBus;
     private List<ButtonData> data;
     private Texture logo;
 
@@ -48,11 +50,12 @@ public class MainMenu extends Menu {
     private boolean isPlayButton;
 
     public MainMenu(GameService gameService, AudioService audioService,
-                    BoardService boardService, PieceService pieceService) {
-        super();
+                    BoardService boardService, PieceService pieceService, EventBus eventBus) {
+        super(eventBus);
         this.audioService = audioService;
         this.boardService = boardService;
         this.pieceService = pieceService;
+        this.eventBus = eventBus;
         this.tooltips = new LinkedHashMap<>();
         this.gameService = gameService;
         this.data = new ArrayList<>();

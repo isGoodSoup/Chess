@@ -17,6 +17,7 @@ import org.lud.engine.gui.Localization;
 import org.lud.engine.gui.Menu;
 import org.lud.engine.input.InputContext;
 import org.lud.engine.input.InputManager;
+import org.lud.engine.service.EventBus;
 import org.lud.game.service.AudioService;
 import org.lud.game.service.BoardService;
 import org.lud.game.service.GameService;
@@ -31,6 +32,7 @@ public class SettingsMenu extends Menu {
     private final AudioService audioService;
     private final BoardService boardService;
     private final PieceService pieceService;
+    private final EventBus eventBus;
     private final List<ButtonData> data;
     private final List<Runnable> runnables;
     private Group group;
@@ -38,12 +40,13 @@ public class SettingsMenu extends Menu {
     private Texture frame;
 
     public SettingsMenu(GameService gameService, AudioService audioService,
-                        BoardService boardService, PieceService pieceService) {
-        super();
+                        BoardService boardService, PieceService pieceService, EventBus eventBus) {
+        super(eventBus);
         this.gameService = gameService;
         this.audioService = audioService;
         this.boardService = boardService;
         this.pieceService = pieceService;
+        this.eventBus = eventBus;
         this.data = new ArrayList<>();
         this.runnables = new ArrayList<>();
         loadSprites();
