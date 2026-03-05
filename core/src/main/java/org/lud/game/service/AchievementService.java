@@ -1,6 +1,7 @@
 package org.lud.game.service;
 
 import org.lud.engine.data.Achievement;
+import org.lud.engine.events.AchievementUnlockedEvent;
 import org.lud.engine.interfaces.Service;
 import org.lud.engine.service.AchievementPersistence;
 import org.lud.engine.service.EventBus;
