@@ -7,10 +7,12 @@ import org.lud.engine.enums.Turn;
 import org.lud.engine.interfaces.AI;
 import org.lud.engine.interfaces.Moves;
 import org.lud.engine.interfaces.Service;
+import org.lud.engine.service.EventBus;
 import org.lud.engine.service.ServiceFactory;
 import org.lud.game.actors.Piece;
 import org.lud.game.entities.Board;
 import org.lud.game.enums.TypeID;
+import org.lud.game.events.CastlingEvent;
 import org.lud.game.moves.MovePiece;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ public class BoardService implements Service {
     private static final Logger log = LoggerFactory.getLogger(BoardService.class);
     private static Board board;
     private final ServiceFactory service;
+    private final EventBus eventBus;
     private final OrthographicCamera camera;
 
     private final List<Moves> movePieces;
@@ -32,7 +35,8 @@ public class BoardService implements Service {
     private AI currentAI;
     private boolean canUndo;
 
-    public BoardService(ServiceFactory service, OrthographicCamera camera) {
+    public BoardService(ServiceFactory service, EventBus eventBus, OrthographicCamera camera) {
+        this.eventBus = eventBus;
         this.camera = camera;
         this.service = service;
         board = new Board();
@@ -97,8 +101,16 @@ public class BoardService implements Service {
         int targetCol = move.targetCol();
         int targetRow = move.targetRow();
 
+        if(piece.getTypeID() == TypeID.KING) {
+            executeCastling(piece, move.targetCol());
+        }
+
         Piece captured = getPieceAt(targetCol, targetRow,
             service.get(PieceService.class).getPieces());
+
+        if(piece.getTypeID() == TypeID.PAWN) {
+            executeEnPassant(piece, captured, targetCol, targetRow);
+        }
 
         if(captured != null && captured != piece) {
             service.get(PieceService.class).removePiece(captured);
@@ -234,9 +246,68 @@ public class BoardService implements Service {
         return false;
     }
 
-    private void executeCastling(Piece king, int targetCol) {}
+    private void executeCastling(Piece currentPiece, int targetCol) {
+        if(currentPiece.getTypeID() != TypeID.KING) { return; }
+        int colDiff = targetCol - currentPiece.getCol();
 
-    private void executeEnPassant(Piece pa, int targetCol, int targetRow) {}
+        if(Math.abs(colDiff) == 2 && !currentPiece.hasMoved()) {
+            int step = (colDiff > 0) ? 1 : -1;
+            int rookStartCol = (colDiff > 0) ? 7 : 0;
+            int rookTargetCol = (colDiff > 0) ? 5 : 3;
+
+            boolean isPathClear = true;
+            for(int c = currentPiece.getCol() + step; c != rookStartCol; c += step) {
+                if(getPieceAt(c, currentPiece.getRow(),
+                    service.get(PieceService.class).getPieces()) != null) {
+                    isPathClear = false;
+                    break;
+                }
+            }
+
+            if(isPathClear) {
+                for(Piece p : service.get(PieceService.class).getPieces()) {
+                    if(p.getTypeID() == TypeID.ROOK &&
+                        p.getCol() == rookStartCol &&
+                        p.getRow() == currentPiece.getRow() &&
+                        !p.hasMoved()) {
+
+                        p.setCol(rookTargetCol);
+                        p.setHasMoved(true);
+                        eventBus.fire(new CastlingEvent(currentPiece, p));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void executeEnPassant(Piece currentPiece, Piece captured,
+                                  int targetCol, int targetRow) {
+        int oldRow = currentPiece.getPreRow();
+        int movedSquares = Math.abs(targetRow - oldRow);
+
+        if(captured == null && Math.abs(targetCol - currentPiece.getPreCol()) == 1) {
+            int dir = (currentPiece.getTurn() == Turn.LIGHT) ? -1 : 1;
+            if(targetRow - oldRow == dir) {
+                for(Piece p : service.get(PieceService.class).getPieces()) {
+                    if(p.getTypeID() == TypeID.PAWN &&
+                        p != null &&
+                        p.getColor() != currentPiece.getColor() &&
+                        p.getCol() == targetCol &&
+                        p.getRow() == oldRow &&
+                        p.isTwoStepsAhead()) {
+                        captured = p;
+                        service.get(PieceService.class).removePiece(p);
+                        movePieces.add(new MovePiece(p, p.getCol(), p.getRow(),
+                            targetCol, targetRow, Turn.getTurn(), captured));
+                        break;
+                    }
+                }
+            }
+        }
+
+        currentPiece.setTwoStepsAhead(movedSquares == 2);
+    }
 
     public float getBoardStartX() {
         return (Gdx.graphics.getWidth() - Board.getSIZE())/2f;

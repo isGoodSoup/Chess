@@ -346,6 +346,24 @@ public class GameService implements Service {
                 if((colDiff + rowDiff == 1) || (colDiff * rowDiff == 1)) {
                     return BoardService.isValidSquare(p, targetCol, targetRow, list);
                 }
+
+                if(rowDiff == 0 && colDiff == 2 && !p.hasMoved()) {
+                    int rookCol = (targetCol > p.getCol()) ? 7 : 0;
+
+                    Piece rook = BoardService.getPieceAt(rookCol, p.getRow(),
+                        service.get(PieceService.class).getPieces());
+
+                    if(rook != null && rook.getTypeID() == TypeID.ROOK && !rook.hasMoved()) {
+                        int step = (targetCol > p.getCol()) ? 1 : -1;
+                        for (int c = p.getCol() + step; c != rookCol; c += step) {
+                            if (BoardService.getPieceAt(c, p.getRow(),
+                                service.get(PieceService.class).getPieces()) != null) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
             }
         }
         return false;
