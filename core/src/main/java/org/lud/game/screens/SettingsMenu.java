@@ -63,8 +63,8 @@ public class SettingsMenu extends Menu {
     @Override
     public void setup() {
         float spacing = 1f;
-        float startX = 25f;
-        float y = 25f;
+        float startX = 50f;
+        float y = 50f;
 
         group = new Group();
 
@@ -93,7 +93,7 @@ public class SettingsMenu extends Menu {
         InputManager.get().setActiveContext(menu);
 
         getStage().addActor(group);
-        group.addAction(Actions.moveTo(25f, 25f, DURATION, Interpolation.pow5Out));
+        group.addAction(Actions.moveTo(50f, 50f, DURATION, Interpolation.pow5Out));
 
         String headerText = Localization.lang.t("header.settings").toUpperCase();
         GlyphLayout layout = new GlyphLayout(getLargeFont(), headerText);
