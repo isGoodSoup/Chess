@@ -175,11 +175,31 @@ public class BoardScreen extends Menu {
 
         InputContext menu = new InputContext("BoardScreen");
         menu.bindKey(Input.Keys.TAB, () -> setCursorActive(!isCursorActive()));
-        menu.bindKey(Input.Keys.UP, () -> { if(isCursorActive()) cursor(Direction.UP, true); });
-        menu.bindKey(Input.Keys.DOWN, () -> { if(isCursorActive()) cursor(Direction.DOWN, true); });
-        menu.bindKey(Input.Keys.LEFT, () -> { if(isCursorActive()) cursor(Direction.LEFT, true); });
-        menu.bindKey(Input.Keys.RIGHT, () -> { if(isCursorActive()) cursor(Direction.RIGHT, true); });
-        menu.bindKey(Input.Keys.ENTER, () -> { if(isCursorActive()) activate(); });
+        menu.bindKey(Input.Keys.UP, () -> {
+            if(isCursorActive()) { cursor(Direction.UP, true); }
+            else { cursor(Direction.UP); }
+        });
+
+        menu.bindKey(Input.Keys.DOWN, () -> {
+            if(isCursorActive()) { cursor(Direction.DOWN, true); }
+            else { cursor(Direction.DOWN); }
+        });
+
+        menu.bindKey(Input.Keys.LEFT, () -> {
+            if(isCursorActive()) { cursor(Direction.LEFT, true); }
+            else { cursor(Direction.LEFT); }
+        });
+
+        menu.bindKey(Input.Keys.RIGHT, () -> {
+            if(isCursorActive()) { cursor(Direction.RIGHT, true); }
+            else { cursor(Direction.RIGHT); }
+        });
+
+        menu.bindKey(Input.Keys.ENTER, () -> {
+            if(isCursorActive()) { activate(); }
+            else { super.activate(); }
+        });
+
         InputManager manager = InputManager.get();
         manager.addContext(menu);
         manager.setActiveContext(menu);
