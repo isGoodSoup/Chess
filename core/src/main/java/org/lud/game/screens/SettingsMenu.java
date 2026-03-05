@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import org.lud.engine.data.ButtonData;
 import org.lud.engine.enums.Direction;
 import org.lud.engine.enums.UIButton;
@@ -90,23 +91,21 @@ public class SettingsMenu extends Menu {
 
         getStage().addActor(group);
         group.addAction(Actions.moveTo(25f, 25f, DURATION, Interpolation.pow5Out));
+
+        String headerText = Localization.lang.t("header.settings").toUpperCase();
+        GlyphLayout layout = new GlyphLayout(getLargeFont(), headerText);
+
+        Label.LabelStyle style = new Label.LabelStyle(getLargeFont(), Colors.getForeground());
+        Label headerLabel = new Label(headerText, style);
+
+        headerLabel.setPosition((Gdx.graphics.getWidth() - layout.width)/2f,
+            Gdx.graphics.getHeight() - 200f);
+        getStage().addActor(headerLabel);
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
-
-        String header = Localization.lang.t("header.settings").toUpperCase();
-        GlyphLayout layout = new GlyphLayout();
-        layout.setText(getLargeFont(), header);
-
-        float startY = Gdx.graphics.getHeight() - 100f;
-        float headerX = (Gdx.graphics.getWidth() - layout.width)/2f;
-
-        getBatch().begin();
-        getLargeFont().setColor(Colors.getForeground());
-        getLargeFont().draw(getBatch(), header, headerX, startY);
-        getBatch().end();
     }
 
     @Override
